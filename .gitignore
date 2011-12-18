@@ -1,1 +1,8 @@
 *~
+*.bin
+*.elf
+*.map
+*.lst
+*.o
+test_enc28j60
+.depend
