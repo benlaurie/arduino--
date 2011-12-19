@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include "avr-ports.h"
 
 typedef uint8_t byte;
 
@@ -25,16 +26,13 @@ public:
 class Pin
     {
 public:
-    // Note: you can get DDRC and PORTC in a usable way by setting
-    // _SFR_ASM_COMPAT
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB2> B2;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB3> B3;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB4> B4;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB5> B5;
 
-    typedef _Pin<0x04, 0x05, 0x03, PB2> B2;
-    typedef _Pin<0x04, 0x05, 0x03, PB3> B3;
-    typedef _Pin<0x04, 0x05, 0x03, PB4> B4;
-    typedef _Pin<0x04, 0x05, 0x03, PB5> B5;
-    //typedef Pin<DDRC, PORTC, PC4> C4;
-    typedef _Pin<0x07, 0x08, 0x06, PC4> C4;
-    typedef _Pin<0x07, 0x08, 0x06, PC3> C3;
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC4> C4;
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC3> C3;
 
     typedef B3 SPI_MOSI;
     typedef B4 SPI_MISO;

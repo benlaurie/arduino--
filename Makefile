@@ -4,14 +4,14 @@ DEFS = -I /usr/local/avr/avr/include -DF_CPU=16000000
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
 CXX = avr-g++
-OBJCOPY        = avr-objcopy
-OBJDUMP        = avr-objdump
+OBJCOPY = avr-objcopy
+OBJDUMP = avr-objdump
 
 CFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 
-all: test_enc28j60.bin test_enc28j60.lst .depend
+all: .depend test_enc28j60.bin test_enc28j60.lst
 
 .depend: *.cc *.h
 	$(CC) -MM *.cc > .depend
@@ -33,7 +33,10 @@ all: test_enc28j60.bin test_enc28j60.lst .depend
 .o.elf:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
+avr-ports.h: get-ports.lst extract-ports.pl
+	./extract-ports.pl < get-ports.lst > avr-ports.h
+
 clean:
-	rm -f *.o *.map *.lst *.elf *.bin
+	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h
 
 
