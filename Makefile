@@ -1,9 +1,10 @@
-MCU_TARGET = atmega168
+MCU_TARGET = atmega328p
 OPTIMIZE = -O3 -Os
 DEFS = -I /usr/local/avr/avr/include -DF_CPU=16000000
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
 CXX = avr-g++
+AR = avr-ar
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 
@@ -11,10 +12,19 @@ CFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 
-all: avr-ports.h .depend test_enc28j60.bin test_enc28j60.lst
+SRC=
+CXXSRC=arduino++.cpp
+
+# Define all object files.
+OBJ = $(SRC:.c=.o) $(CXXSRC:.cpp=.o) $(ASRC:.S=.o) 
+
+all: avr-ports.h .depend test_enc28j60.bin test_enc28j60.lst libarduino++.a
 
 .depend: *.cc *.h
 	$(CC) -MM *.cc > .depend
+
+libarduino++.a: $(OBJ)
+	@for i in $(OBJ); do echo $(AR) $@ rcs $$i; $(AR) rcs $@ $$i; done
 
 .SUFFIXES: .lst .elf .bin
 
@@ -37,6 +47,6 @@ avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl < get-ports.lst > avr-ports.h
 
 clean:
-	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend
+	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend libarduino.a
 
 
