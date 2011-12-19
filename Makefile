@@ -11,7 +11,7 @@ CFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 
-all: .depend test_enc28j60.bin test_enc28j60.lst
+all: avr-ports.h .depend test_enc28j60.bin test_enc28j60.lst
 
 .depend: *.cc *.h
 	$(CC) -MM *.cc > .depend
@@ -37,6 +37,6 @@ avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl < get-ports.lst > avr-ports.h
 
 clean:
-	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h
+	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend
 
 
