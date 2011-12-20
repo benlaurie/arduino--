@@ -40,7 +40,7 @@ public:
     static void Set() { _SFR_IO8(port) |= _BV(bit); }
     static void Clear() { _SFR_IO8(port) &= ~_BV(bit); }
     static byte Read() { return !!(_SFR_IO8(in) & _BV(bit)); }
-    static byte Toggle() { return (_SFR_IO8(port) ^ _BV(bit)); }
+    static byte Toggle() { return (_SFR_IO8(port) ^= _BV(bit)); }
 };
 
 class Pin
