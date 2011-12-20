@@ -15,5 +15,9 @@ int main(int argc, char **argv)
     D(DDRC);
     D(PINC);
 
+    D(PORTD);
+    D(DDRD);
+    D(PIND);
+
     return 0;
     }

@@ -15,8 +15,8 @@ LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 # Define all object files.
 OBJ = arduino++.o
 
-all: avr-ports.h .depend test_enc28j60.bin test_enc28j60.lst libarduino++.a \
-     blink.lst
+all: avr-ports.h blink.bin .depend test_enc28j60.bin test_enc28j60.lst \
+	libarduino++.a blink.lst
 
 .depend: *.cc *.h
 	$(CC) -MM *.cc > .depend
@@ -47,4 +47,5 @@ avr-ports.h: get-ports.lst extract-ports.pl
 clean:
 	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend libarduino.a
 
-
+upload: blink.bin
+	avrdude -F -V -p atmega328p -P /dev/tty.usbserial-FTDOMH20 -c arduino  -b 115200 -U flash:w:blink.bin

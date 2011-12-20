@@ -5,15 +5,16 @@
 */
 
 #include "arduino++.h"
+#include <util/delay.h>
 
 int main(void)
     {
-    Arduino::init();
-    Pin::B5::Out();
+	Arduino::init();
+	Arduino::D13::out();
 
     while(true)
 	{
-	Pin::B5::Toggle();
+	Arduino::D13::toggle();
 	Arduino::delay(1000);
 	}
 

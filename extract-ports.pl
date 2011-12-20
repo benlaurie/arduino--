@@ -17,7 +17,7 @@ while (my $line = <>) {
 	$line = <>;
 	chomp $line;
 
-	if ($line =~ /ldi\tr\d+, (0x[0-9a-f]+)\t;/) {
+	if ($line =~ /ldi\tr\d+, (0x[0-9a-fA-F]+)\t;/) {
 	    $val = $1;
 	} elsif ($line =~ /st\tZ,/) {
 	    print "#define N$port $val\n";
