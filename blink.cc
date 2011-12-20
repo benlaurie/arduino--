@@ -16,8 +16,8 @@ int main(void)
 		{
 		// toggle the pin
 		Arduino::D13::toggle();
-		
-		_delay_ms(200);
+		// wait
+		Arduino::constantDelay(2000);
 		}
 	
 	return 0;

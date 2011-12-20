@@ -67,7 +67,7 @@ public:
 	
 	static void constantDelay(float ms) 
 		{
-		_delay_us(ms);
+		_delay_ms(ms);
 		}
 	
 	static void delayMicroseconds(unsigned int us);
