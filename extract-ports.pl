@@ -12,10 +12,17 @@ while (my $line = <>) {
     next if $line !~ /^    D\((.*?)\);$/;
     my $port = $1;
 
-    $line = <>;
-    chomp $line;
+    my $val;
+    do {
+	$line = <>;
+	chomp $line;
 
-#    croak if $line !~ /^\s+[0-9a-f]+:\s+[0-9a-f][0-9a-f] [0-9a-f][0-9a-f]\tldi\tr\d+, (0x[0-9a-f]+)\t;/;
-    croak if $line !~ /ldi\tr\d+, (0x[0-9a-f]+)\t;/;
-    print "#define N$port $1\n";
+	if ($line =~ /ldi\tr\d+, (0x[0-9a-f]+)\t;/) {
+	    $val = $1;
+	} elsif ($line =~ /st\tZ,/) {
+	    print "#define N$port $val\n";
+	} else {
+	  croak $line;
+      }
+    } while ($line !~ /st\tZ,/);
 }
