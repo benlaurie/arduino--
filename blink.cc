@@ -1,21 +1,24 @@
 /* 
    The hello world of arduino--, a C++ take on the Arduino libraries.
 
-   Blinks an LED.
+   Blinks an LED connected to digital pin 13 (which is connected to an LED
+   on all Arduino variants that we know of).
 */
 
 #include "arduino++.h"
 
 int main(void)
 	{
-	Arduino::init();
+	// Arduino Pin D13 is an output
 	Arduino::D13::out();
 
-    while(true)
+	while(true)
 		{
+		// toggle the pin
 		Arduino::D13::toggle();
-		Arduino::delay(2000);
+		
+		_delay_ms(200);
 		}
 	
-    return 0;
+	return 0;
 	}
