@@ -12,13 +12,11 @@ CFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 
-SRC=
-CXXSRC=arduino++.cpp
-
 # Define all object files.
-OBJ = $(SRC:.c=.o) $(CXXSRC:.cpp=.o) $(ASRC:.S=.o) 
+OBJ = arduino++.o
 
-all: avr-ports.h .depend test_enc28j60.bin test_enc28j60.lst libarduino++.a
+all: avr-ports.h .depend test_enc28j60.bin test_enc28j60.lst libarduino++.a \
+     blink.lst
 
 .depend: *.cc *.h
 	$(CC) -MM *.cc > .depend
@@ -41,7 +39,7 @@ libarduino++.a: $(OBJ)
 	$(OBJDUMP) -h -S $< > $@
 
 .o.elf:
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< libarduino++.a
 
 avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl < get-ports.lst > avr-ports.h
