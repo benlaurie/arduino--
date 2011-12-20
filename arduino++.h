@@ -3,6 +3,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include "avr-ports.h"
 
 typedef uint8_t byte;
@@ -70,6 +71,11 @@ public:
 	    ;
 	}
 	
+	static void constantDelay(float ms) 
+	{
+		_delay_us(ms);
+	}
+
     static void delayMicroseconds(unsigned int us);
 
 	static void interrupts() { sei(); }

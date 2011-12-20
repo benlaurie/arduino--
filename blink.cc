@@ -5,7 +5,6 @@
 */
 
 #include "arduino++.h"
-#include <util/delay.h>
 
 int main(void)
     {
@@ -15,7 +14,7 @@ int main(void)
     while(true)
 	{
 	Arduino::D13::toggle();
-	Arduino::delay(1000);
+	Arduino::constantDelay(1000);
 	}
 
     return 0;
