@@ -47,5 +47,5 @@ avr-ports.h: get-ports.lst extract-ports.pl
 clean:
 	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend libarduino.a
 
-upload: blink.bin
+upload: all
 	avrdude -F -V -p atmega328p -P /dev/tty.usbserial-FTDOMH20 -c arduino  -b 115200 -U flash:w:blink.bin

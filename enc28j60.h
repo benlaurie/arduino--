@@ -19,8 +19,8 @@
 
 template <class CSPin> class ENC28J60
     {
-    static void Select() { CSPin::Clear(); }
-    static void Deselect() { CSPin::Set(); }
+    static void Select() { CSPin::clear(); }
+    static void Deselect() { CSPin::set(); }
 public:
     static byte ReadOp(byte op, byte address)
 	{
@@ -29,17 +29,17 @@ public:
 	// issue read command
 	SPDR = op | (address & ADDR_MASK);
 	//waitspi();
-	Arduino::WaitSPI();
+	SPI::wait();
 	// read data
 	SPDR = 0x00;
 	//waitspi();
-	Arduino::WaitSPI();
+	SPI::wait();
 	// do dummy read if needed (for mac and mii, see datasheet page 29)
 	if(address & 0x80)
 	    {
 	    SPDR = 0x00;
 	    //waitspi();
-	    Arduino::WaitSPI();
+	    SPI::wait();
 	    }
 	// release CS
 	//CSPASSIVE;
@@ -53,11 +53,11 @@ public:
 	// issue write command
 	SPDR = op | (address & ADDR_MASK);
 	//waitspi();
-	Arduino::WaitSPI();
+	SPI::wait();
 	// write data
 	SPDR = data;
 	//waitspi();
-	Arduino::WaitSPI();
+	SPI::wait();
 	//CSPASSIVE;
 	Deselect();
 	}
@@ -68,14 +68,14 @@ public:
 	// issue read command
 	SPDR = ENC28J60_READ_BUF_MEM;
 	//waitspi();
-	Arduino::WaitSPI();
+	SPI::wait();
 	while(len)
 	    {
 	    len--;
 	    // read data
 	    SPDR = 0x00;
 	    //waitspi();
-	    Arduino::WaitSPI();
+	    SPI::wait();
 	    *data = SPDR;
 	    data++;
 	    }
@@ -91,7 +91,7 @@ public:
 	// issue write command
 	SPDR = ENC28J60_WRITE_BUF_MEM;
 	//waitspi();
-	Arduino::WaitSPI();
+	SPI::wait();
 	while(len)
 	    {
 	    len--;
@@ -99,7 +99,7 @@ public:
 	    SPDR = *data;
 	    data++;
 	    //waitspi();
-	    Arduino::WaitSPI();
+	    SPI::wait();
 	    }
 	//CSPASSIVE;
 	Deselect();
@@ -153,22 +153,22 @@ public:
 	// initialize I/O
 	// ss as output:
 	//pinMode(ENC28J60_CONTROL_CS, OUTPUT);
-	CSPin::Out();
+	CSPin::out();
 	//CSPASSIVE; // ss=0
 	Deselect();
 
 	//pinMode(SPI_MOSI, OUTPUT);
-	Pin::SPI_MOSI::Out();
+	Pin::SPI_MOSI::out();
 	//pinMode(SPI_SCK, OUTPUT);
-	Pin::SPI_SCK::Out();
+	Pin::SPI_SCK::out();
 	//pinMode(SPI_MISO, INPUT);
-	Pin::SPI_MISO::In();
+	Pin::SPI_MISO::in();
 	
 	//digitalWrite(SPI_MOSI, LOW);
-	Pin::SPI_MOSI::Clear();
+	Pin::SPI_MOSI::clear();
 	
 	//digitalWrite(SPI_SCK, LOW);
-	Pin::SPI_SCK::Clear();
+	Pin::SPI_SCK::clear();
 	
 	/*DDRB  |= 1<<PB3 | 1<<PB5; // mosi, sck output
 	  cbi(DDRB,PINB4); // MISO is input
