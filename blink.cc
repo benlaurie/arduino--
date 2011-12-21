@@ -10,12 +10,12 @@
 int main(void)
 	{
 	// Arduino Pin D13 is an output
-	Arduino::D13::modeOutput();
+	Arduino::d13::modeOutput();
 
 	while(true)
 		{
 		// toggle the pin
-		Arduino::D13::toggle();
+		Arduino::d13::toggle();
 		// wait
 		Arduino::constantDelay(2000);
 		}

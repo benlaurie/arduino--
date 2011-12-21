@@ -81,27 +81,27 @@ public:
 	static void noInterrupts() { cli(); }
 	
 	// The analog pins in Arduino numbering
-	typedef Pin::C0 A0;
-	typedef Pin::C1 A1;
-	typedef Pin::C2 A2;
-	typedef Pin::C3 A3;
-	typedef Pin::C4 A4;
+	typedef Pin::C0 a0;
+	typedef Pin::C1 a1;
+	typedef Pin::C2 a2;
+	typedef Pin::C3 a3;
+	typedef Pin::C4 a4;
 	
 	// The digital pins in Arduino numbering
-	typedef Pin::D0 D0;
-	typedef Pin::D1 D1;
-	typedef Pin::D2 D2;
-	typedef Pin::D3 D3;
-	typedef Pin::D4 D4;
-	typedef Pin::D5 D5;
-	typedef Pin::D6 D6;
-	typedef Pin::D7 D7;
-	typedef Pin::B0 D8;
-	typedef Pin::B1 D9;
-	typedef Pin::B2 D10;
-	typedef Pin::B3 D11;
-	typedef Pin::B4 D12;
-	typedef Pin::B5 D13;
+	typedef Pin::D0 d0;
+	typedef Pin::D1 d1;
+	typedef Pin::D2 d2;
+	typedef Pin::D3 d3;
+	typedef Pin::D4 d4;
+	typedef Pin::D5 d5;
+	typedef Pin::D6 d6;
+	typedef Pin::D7 d7;
+	typedef Pin::B0 d8;
+	typedef Pin::B1 d9;
+	typedef Pin::B2 d10;
+	typedef Pin::B3 d11;
+	typedef Pin::B4 d12;
+	typedef Pin::B5 d13;
 	
 	volatile static unsigned long timer0_overflow_count;
 	volatile static unsigned long timer0_clock_cycles;
