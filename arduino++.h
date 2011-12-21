@@ -71,18 +71,23 @@ public:
 		}
 	
 	static void delayMicroseconds(unsigned int us);
+
+	static void constantDelayMicroseconds(float ms) 
+		{
+		_delay_us(ms);
+		}
 	
 	static void interrupts() { sei(); }
 	static void noInterrupts() { cli(); }
 	
-	// The analog pins in Ardiono numbering
+	// The analog pins in Arduino numbering
 	typedef Pin::C0 A0;
 	typedef Pin::C1 A1;
 	typedef Pin::C2 A2;
 	typedef Pin::C3 A3;
 	typedef Pin::C4 A4;
 	
-	// The digital pins in Ardiono numbering
+	// The digital pins in Arduino numbering
 	typedef Pin::D0 D0;
 	typedef Pin::D1 D1;
 	typedef Pin::D2 D2;
