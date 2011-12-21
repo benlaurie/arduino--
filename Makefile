@@ -15,8 +15,8 @@ LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 # Define all object files.
 OBJ = arduino++.o
 
-all: avr-ports.h blink.bin .depend test_enc28j60.bin test_enc28j60.lst \
-	libarduino++.a blink.lst
+all: avr-ports.h .depend blink.bin blink.lst test_enc28j60.bin \
+	test_enc28j60.lst libarduino++.a 
 
 .depend: *.cc *.h
 	$(CC) -MM *.cc > .depend
