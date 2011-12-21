@@ -81,11 +81,11 @@ public:
     static void noInterrupts() { cli(); }
     
     // The analog pins in Arduino numbering
-    typedef Pin::C0 a0;
-    typedef Pin::C1 a1;
-    typedef Pin::C2 a2;
-    typedef Pin::C3 a3;
-    typedef Pin::C4 a4;
+    typedef Pin::C0 A0;
+    typedef Pin::C1 A1;
+    typedef Pin::C2 A2;
+    typedef Pin::C3 A3;
+    typedef Pin::C4 A4;
     
     // The digital pins in Arduino numbering
     typedef Pin::D0 D0;
@@ -108,7 +108,7 @@ public:
     volatile static unsigned long timer0_millis;
     };
 
-template <class Sck,class Miso,class Mosi,class Ss> class _SPI
+template <class Sck, class Miso, class Mosi, class Ss> class _SPI
     {
 public:
 
@@ -166,6 +166,6 @@ public:
     };
 
 
-typedef _SPI<Pin::SPI_SCK,Pin::SPI_MISO,Pin::SPI_MOSI,NullPin> SPI;
+typedef _SPI<Pin::SPI_SCK, Pin::SPI_MISO, Pin::SPI_MOSI, NullPin> SPI;
 
 #endif // ARDUINO_MINUS_MINUS
