@@ -102,7 +102,7 @@ void Arduino::delayMicroseconds(unsigned int us)
     // for a one-microsecond delay, simply return.  the overhead
     // of the function call yields a delay of approximately 1 1/8 us.
     if (--us == 0)
-	return;
+    return;
 
     // the following loop takes a quarter of a microsecond (4 cycles)
     // per iteration, so execute it four times for each microsecond of
@@ -118,9 +118,9 @@ void Arduino::delayMicroseconds(unsigned int us)
     // the function calls takes more than two microseconds.  can't just
     // subtract two, since us is unsigned; we'd overflow.
     if (--us == 0)
-	return;
+    return;
     if (--us == 0)
-	return;
+    return;
 
     // the following loop takes half of a microsecond (4 cycles)
     // per iteration, so execute it twice for each microsecond of
@@ -139,9 +139,9 @@ void Arduino::delayMicroseconds(unsigned int us)
 
     // busy wait
     __asm__ __volatile__ (
-			  "1: sbiw %0,1" "\n\t" // 2 cycles
-			  "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
-			  );
+              "1: sbiw %0,1" "\n\t" // 2 cycles
+              "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+              );
 
     // reenable interrupts.
     SREG = oldSREG;
@@ -152,7 +152,7 @@ void Arduino::init()
     // this needs to be called before setup() or some functions won't
     // work there
     sei();
-	
+    
     // on the ATmega168, timer 0 is also used for fast hardware pwm
     // (using phase-correct PWM would mean that timer 0 overflowed half as often
     // resulting in different millis() behavior on the ATmega8 and ATmega168)
@@ -201,9 +201,9 @@ void Arduino::init()
 
 #if defined(__AVR_ATmega1280__)
     // set timer 3, 4, 5 prescale factor to 64
-    sbi(TCCR3B, CS31);	sbi(TCCR3B, CS30);
-    sbi(TCCR4B, CS41);	sbi(TCCR4B, CS40);
-    sbi(TCCR5B, CS51);	sbi(TCCR5B, CS50);
+    sbi(TCCR3B, CS31);  sbi(TCCR3B, CS30);
+    sbi(TCCR4B, CS41);  sbi(TCCR4B, CS40);
+    sbi(TCCR5B, CS51);  sbi(TCCR5B, CS50);
     // put timer 3, 4, 5 in 8-bit phase correct pwm mode
     sbi(TCCR3A, WGM30);
     sbi(TCCR4A, WGM40);
