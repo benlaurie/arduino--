@@ -88,27 +88,27 @@ public:
 	typedef Pin::C4 a4;
 	
 	// The digital pins in Arduino numbering
-	typedef Pin::D0 d0;
-	typedef Pin::D1 d1;
-	typedef Pin::D2 d2;
-	typedef Pin::D3 d3;
-	typedef Pin::D4 d4;
-	typedef Pin::D5 d5;
-	typedef Pin::D6 d6;
-	typedef Pin::D7 d7;
-	typedef Pin::B0 d8;
-	typedef Pin::B1 d9;
-	typedef Pin::B2 d10;
-	typedef Pin::B3 d11;
-	typedef Pin::B4 d12;
-	typedef Pin::B5 d13;
+	typedef Pin::D0 D0;
+	typedef Pin::D1 D1;
+	typedef Pin::D2 D2;
+	typedef Pin::D3 D3;
+	typedef Pin::D4 D4;
+	typedef Pin::D5 D5;
+	typedef Pin::D6 D6;
+	typedef Pin::D7 D7;
+	typedef Pin::B0 D8;
+	typedef Pin::B1 D9;
+	typedef Pin::B2 D10;
+	typedef Pin::B3 D11;
+	typedef Pin::B4 D12;
+	typedef Pin::B5 D13;
 	
 	volatile static unsigned long timer0_overflow_count;
 	volatile static unsigned long timer0_clock_cycles;
 	volatile static unsigned long timer0_millis;
 	};
 
-template <class sck,class miso,class mosi,class ss> class _SPI
+template <class Sck,class Miso,class Mosi,class Ss> class _SPI
 	{
 public:
 
@@ -122,11 +122,11 @@ public:
 	static void init(byte config = 0)
 		{
 		// initialize the SPI pins
-		sck::modeOutput();
-		mosi::modeOutput();
-		miso::in();
-		ss::modeOutput();
-		ss::set();
+		Sck::modeOutput();
+		Mosi::modeOutput();
+		Miso::in();
+		Ss::modeOutput();
+		Ss::set();
 		
 		mode(config);
 		}
@@ -137,24 +137,23 @@ public:
 		
 		// enable SPI master with configuration byte specified
 		SPCR = 0;
-		SPCR = (config & 0x7F) | (1<<SPE) | (1<<MSTR);
+		SPCR = (config & 0x7F) | (1 << SPE) | (1 << MSTR);
 		tmp = SPSR;
 		tmp = SPDR;
 		}
 	
 	static byte transfer(byte value, byte delay = 0)
 		{
-		ss::clear();
+		Ss::clear();
 		SPDR = value;
 		wait();
-		ss::set();
+		Ss::set();
 		if (delay > 0) 
 			Arduino::delayMicroseconds(delay);
 		return SPDR;
 		}
 	};
 
-// 
 class NullPin
 	{
 public:

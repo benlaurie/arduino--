@@ -8,14 +8,14 @@
 #include "arduino++.h"
 
 int main(void)
-	{
-	// Arduino Pin D13 is an output
-	Arduino::d13::modeOutput();
+    {
+    // Arduino Pin D13 is an output
+    Arduino::D13::modeOutput();
 
-	while(true)
-		{
-		// toggle the pin
-		Arduino::d13::toggle();
+    while(true)
+        {
+        // toggle the pin
+        Arduino::D13::toggle();
 		// wait
 		Arduino::constantDelay(2000);
 		}
