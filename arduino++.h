@@ -15,7 +15,7 @@ public:
     static void modeInput() { _SFR_IO8(ddr) &= ~_BV(bit); }
     static void set() { _SFR_IO8(port) |= _BV(bit); }
     static void clear() { _SFR_IO8(port) &= ~_BV(bit); }
-    static byte read() { return !!(_SFR_IO8(_in) & _BV(bit)); }
+    static byte read() { return !!(_SFR_IO8(in) & _BV(bit)); }
     static byte toggle() { return (_SFR_IO8(port) ^= _BV(bit)); }
     };
 
@@ -161,8 +161,7 @@ public:
     static void modeInput() { }
     static void set() { }
     static void clear() { }
-    static byte read() { return 0; }
-    static byte toggle() { return 0; }
+    // Using read() or toggle() will trigger a compilation error.
     };
 
 
