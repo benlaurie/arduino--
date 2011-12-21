@@ -8,7 +8,7 @@
 
 typedef uint8_t byte;
 
-template <byte ddr, byte port, byte _in, byte bit> class _Pin
+template <byte ddr, byte port, byte in, byte bit> class _Pin
     {
 public:
     static void modeOutput() { _SFR_IO8(ddr) |= _BV(bit); }
@@ -124,7 +124,7 @@ public:
         // initialize the SPI pins
         Sck::modeOutput();
         Mosi::modeOutput();
-        Miso::in();
+        Miso::modeInput();
         Ss::modeOutput();
         Ss::set();
         
