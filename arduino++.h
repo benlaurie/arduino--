@@ -11,11 +11,11 @@ typedef uint8_t byte;
 template <byte ddr, byte port, byte _in, byte bit> class _Pin
 	{
 public:
-	static void out() { _SFR_IO8(ddr) |= _BV(bit); }
-	static void in() { _SFR_IO8(ddr) &= ~_BV(bit); }
+	static void modeOutput() { _SFR_IO8(ddr) |= _BV(bit); }
+	static void modeInput() { _SFR_IO8(ddr) &= ~_BV(bit); }
 	static void set() { _SFR_IO8(port) |= _BV(bit); }
 	static void clear() { _SFR_IO8(port) &= ~_BV(bit); }
-	static byte read() { return !!(_SFR_IO8(in) & _BV(bit)); }
+	static byte read() { return !!(_SFR_IO8(_in) & _BV(bit)); }
 	static byte toggle() { return (_SFR_IO8(port) ^= _BV(bit)); }
 	};
 
@@ -117,10 +117,10 @@ public:
 	static void init(byte config = 0)
 		{
 		// initialize the SPI pins
-		sck::out();
-		mosi::out();
+		sck::modeOutput();
+		mosi::modeOutput();
 		miso::in();
-		ss::out(); 
+		ss::modeOutput();
 		ss::set();
 		
 		mode(config);
@@ -153,8 +153,8 @@ public:
 class NullPin
 	{
 public:
-	static void out() { }
-	static void in() { }
+	static void modeOutput() { }
+	static void modeInput() { }
 	static void set() { }
 	static void clear() { }
 	static byte read() { return 0; }

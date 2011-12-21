@@ -153,16 +153,16 @@ public:
 	// initialize I/O
 	// ss as output:
 	//pinMode(ENC28J60_CONTROL_CS, OUTPUT);
-	CSPin::out();
+	CSPin::modeOutput();
 	//CSPASSIVE; // ss=0
 	Deselect();
 
 	//pinMode(SPI_MOSI, OUTPUT);
-	Pin::SPI_MOSI::out();
+	Pin::SPI_MOSI::modeOutput();
 	//pinMode(SPI_SCK, OUTPUT);
-	Pin::SPI_SCK::out();
+	Pin::SPI_SCK::modeOutput();
 	//pinMode(SPI_MISO, INPUT);
-	Pin::SPI_MISO::in();
+	Pin::SPI_MISO::modeInput();
 	
 	//digitalWrite(SPI_MOSI, LOW);
 	Pin::SPI_MOSI::clear();

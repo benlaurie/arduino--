@@ -10,7 +10,7 @@
 int main(void)
 	{
 	// Arduino Pin D13 is an output
-	Arduino::D13::out();
+	Arduino::D13::modeOutput();
 
 	while(true)
 		{
