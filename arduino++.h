@@ -65,14 +65,14 @@ public:
             ;
         }
     
-    static void constantDelay(float ms) 
+    static void constantDelay(double ms) 
         {
         _delay_ms(ms);
         }
     
     static void delayMicroseconds(unsigned int us);
 
-    static void constantDelayMicroseconds(float ms) 
+    static void constantDelayMicroseconds(double ms) 
         {
         _delay_us(ms);
         }

@@ -8,3 +8,4 @@ test_enc28j60
 .depend
 avr-ports.h
 libarduino++.a
+Makefile.local
