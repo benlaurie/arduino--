@@ -1,4 +1,3 @@
-MCU_TARGET = atmega328p
 OPTIMIZE = -O3 -Os
 DEFS = -I /usr/local/avr/avr/include -DF_CPU=16000000
 LIBS = -B /usr/local/avr/avr/lib
@@ -12,11 +11,13 @@ CFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 
+.include "Makefile.local"
+
 # Define all object files.
 OBJ = arduino++.o
 
-all: avr-ports.h .depend blink.bin blink.lst test_enc28j60.bin \
-	test_enc28j60.lst libarduino++.a 
+all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
+     test_enc28j60.bin test_enc28j60.lst libarduino++.a 
 
 .depend: *.cc *.h
 	$(CC) -MM *.cc > .depend
