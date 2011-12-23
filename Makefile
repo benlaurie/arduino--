@@ -1,4 +1,4 @@
-OPTIMIZE = -O3
+OPTIMIZE = -O3 -Os
 DEFS = -I /usr/local/avr/avr/include -DF_CPU=16000000
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
