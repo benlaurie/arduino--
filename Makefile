@@ -1,4 +1,4 @@
-OPTIMIZE = -O3 -Os
+OPTIMIZE = -O3
 DEFS = -I /usr/local/avr/avr/include -DF_CPU=16000000
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
@@ -17,7 +17,8 @@ LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 OBJ = arduino++.o
 
 all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
-     test_enc28j60.bin test_enc28j60.lst libarduino++.a 
+     test_enc28j60.bin test_enc28j60.lst onewire_test.bin onewire_test.lst \
+     libarduino++.a 
 
 .depend: *.cc *.h
 	$(CC) -MM *.cc > .depend
