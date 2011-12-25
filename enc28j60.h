@@ -332,6 +332,7 @@ public:
 	WriteOp(ENC28J60_BIT_FIELD_SET, ECON2, ECON2_PKTDEC);
 	return len;
 	}
+    static void phlcon(uint16_t val) { PhyWrite(PHLCON, val); }
 
 private:
     static const byte ADDR_MASK = 0x1f;
@@ -354,6 +355,7 @@ private:
     enum Register
 	{
 	PHCON2 = 0x10,
+	PHLCON = 0x14,
 	EIE = 0x1B,
 	EIR = 0x1C,
 	ECON2 = 0x1E,
