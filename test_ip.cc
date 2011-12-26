@@ -3,7 +3,7 @@
 
 typedef ENC28J60<Pin::B2> Ethernet;
 
-IP<Ethernet> ip;
+IP<Ethernet, 80> ip;
 Ethernet ethernet;
 
 template<class Pin> byte ENC28J60<Pin>::Enc28j60Bank;
@@ -52,7 +52,7 @@ void setup()
     _delay_ms(100);
 
     //init the ethernet/ip layer:
-    ip.init_ip_arp_udp_tcp(mymac,myip,80);
+    ip.init_ip_arp_udp_tcp(mymac,myip);
     }
 
 static char hexdigit(byte b)

@@ -24,14 +24,13 @@
 #include "net.h"
 #include "enc28j60.h"
 
-static uint8_t wwwport=80;
 static uint8_t macaddr[6];
 static uint8_t ipaddr[4];
 static int16_t info_hdr_len=0;
 static int16_t info_data_len=0;
 static uint8_t seqnum=0xa; // my initial tcp sequence number
 
-template <class Ethernet> class IP
+template <class Ethernet, byte wwwport> class IP
     {
 public:
     IP() : ip_identifier(1)
@@ -102,11 +101,10 @@ public:
 	}
 
 // you must call this function once before you use any of the other functions:
-    void init_ip_arp_udp_tcp(uint8_t *mymac, uint8_t *myip, uint8_t wwwp)
+    void init_ip_arp_udp_tcp(uint8_t *mymac, uint8_t *myip)
 	{
 	uint8_t i=0;
 
-	wwwport=wwwp;
 	while(i < 4)
 	    {
 	    ipaddr[i] = myip[i];
