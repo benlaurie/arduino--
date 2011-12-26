@@ -18,7 +18,7 @@ OBJ = arduino++.o
 
 all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
      test_enc28j60.bin test_enc28j60.lst onewire_test.bin onewire_test.lst \
-     test_ip.bin \
+     test_ip.bin test_ip.lst \
      libarduino++.a 
 
 .depend: *.cc *.h

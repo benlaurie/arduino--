@@ -59,7 +59,7 @@ public:
     // http://www.netfor2.com/checksum.html
     // http://www.msc.uky.edu/ken/cs471/notes/chap3.htm
     // The RFC has also a C code example: http://www.faqs.org/rfcs/rfc1071.html
-    uint16_t checksum(uint8_t *buf, uint16_t len, uint8_t type)
+    static uint16_t checksum(uint8_t *buf, uint16_t len, uint8_t type)
 	{
 	// type 0=ip 
 	//      1=udp
@@ -419,316 +419,325 @@ public:
 	Ethernet::PacketSend(UDP_HEADER_LEN+IP_HEADER_LEN+ETH_HEADER_LEN+datalen,buf);
 	}
 
-void make_tcp_synack_from_syn(uint8_t *buf)
-    {
-    uint16_t ck;
-    make_eth(buf);
-    // total length field in the IP header must be set:
-    // 20 bytes IP + 24 bytes (20tcp+4tcp options)
-    buf[IP_TOTLEN_H_P]=0;
-    buf[IP_TOTLEN_L_P]=IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+4;
-    make_ip(buf);
-    buf[TCP_FLAG_P]=TCP_FLAGS_SYNACK_V;
-    make_tcphead(buf,1,1,0);
-    // calculate the checksum, len=8 (start from ip.src) + TCP_HEADER_LEN_PLAIN + 4 (one option: mss)
-    ck=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN+4,2);
-    buf[TCP_CHECKSUM_H_P]=ck>>8;
-    buf[TCP_CHECKSUM_L_P]=ck& 0xff;
-    // add 4 for option mss:
-    Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+4+ETH_HEADER_LEN,
-			 buf);
-    }
-
-// get a pointer to the start of tcp data in buf
-// Returns 0 if there is no data
-// You must call init_len_info once before calling this function
-uint16_t get_tcp_data_pointer(void)
-    {
-    if (info_data_len)
-	return((uint16_t)TCP_SRC_PORT_H_P+info_hdr_len);
-    else
-	return(0);
-    }
-
-// do some basic length calculations and store the result in static varibales
-void init_len_info(uint8_t *buf)
-    {
-    info_data_len=(buf[IP_TOTLEN_H_P]<<8)|(buf[IP_TOTLEN_L_P]&0xff);
-    info_data_len-=IP_HEADER_LEN;
-    info_hdr_len=(buf[TCP_HEADER_LEN_P]>>4)*4; // generate len in bytes;
-    info_data_len-=info_hdr_len;
-    if (info_data_len<=0)
-	info_data_len=0;
-    }
-
-// fill in tcp data at position pos. pos=0 means start of
-// tcp data. Returns the position at which the string after
-// this string could be filled.
-uint16_t fill_tcp_data_p(uint8_t *buf,uint16_t pos, const prog_char *progmem_s)
-    {
-    char c;
-    // fill in tcp data at position pos
-    //
-    // with no options the data starts after the checksum + 2 more bytes (urgent ptr)
-    while ((c = pgm_read_byte(progmem_s++)))
+    void make_tcp_synack_from_syn(uint8_t *buf)
 	{
-	buf[TCP_CHECKSUM_L_P+3+pos]=c;
-	pos++;
-        }
-    return(pos);
-    }
-
-// fill in tcp data at position pos. pos=0 means start of
-// tcp data. Returns the position at which the string after
-// this string could be filled.
-uint16_t fill_tcp_data(uint8_t *buf,uint16_t pos, const char *s)
-    {
-    // fill in tcp data at position pos
-    //
-    // with no options the data starts after the checksum + 2 more bytes (urgent ptr)
-    while (*s)
-	{
-	buf[TCP_CHECKSUM_L_P+3+pos]=*s;
-	pos++;
-	s++;
-        }
-    return(pos);
-    }
-
-// Make just an ack packet with no tcp data inside
-// This will modify the eth/ip/tcp header 
-void make_tcp_ack_from_any(uint8_t *buf)
-    {
-    uint16_t j;
-    make_eth(buf);
-    // fill the header:
-    buf[TCP_FLAG_P]=TCP_FLAG_ACK_V;
-    if (info_data_len==0)
-	// if there is no data then we must still acknoledge one packet
-	make_tcphead(buf,1,0,1); // no options
-    else
-	make_tcphead(buf,info_data_len,0,1); // no options
-
-    // total length field in the IP header must be set:
-    // 20 bytes IP + 20 bytes tcp (when no options) 
-    j=IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN;
-    buf[IP_TOTLEN_H_P]=j>>8;
-    buf[IP_TOTLEN_L_P]=j& 0xff;
-    make_ip(buf);
-    // calculate the checksum, len=8 (start from ip.src) + TCP_HEADER_LEN_PLAIN + data len
-    j=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN,2);
-    buf[TCP_CHECKSUM_H_P]=j>>8;
-    buf[TCP_CHECKSUM_L_P]=j& 0xff;
-    Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+ETH_HEADER_LEN,buf);
-    }
-
-// you must have called init_len_info at some time before calling this function
-// dlen is the amount of tcp data (http data) we send in this packet
-// You can use this function only immediately after make_tcp_ack_from_any
-// This is because this function will NOT modify the eth/ip/tcp header except for
-// length and checksum
-void make_tcp_ack_with_data(uint8_t *buf,uint16_t dlen)
-    {
-    uint16_t j;
-    // fill the header:
-    // This code requires that we send only one data packet
-    // because we keep no state information. We must therefore set
-    // the fin here:
-    buf[TCP_FLAG_P]=TCP_FLAG_ACK_V|TCP_FLAG_PUSH_V|TCP_FLAG_FIN_V;
-    
-    // total length field in the IP header must be set:
-    // 20 bytes IP + 20 bytes tcp (when no options) + len of data
-    j=IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlen;
-    buf[IP_TOTLEN_H_P]=j>>8;
-    buf[IP_TOTLEN_L_P]=j& 0xff;
-    fill_ip_hdr_checksum(buf);
-    // zero the checksum
-    buf[TCP_CHECKSUM_H_P]=0;
-    buf[TCP_CHECKSUM_L_P]=0;
-    // calculate the checksum, len=8 (start from ip.src) + TCP_HEADER_LEN_PLAIN + data len
-    j=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN+dlen,2);
-    buf[TCP_CHECKSUM_H_P]=j>>8;
-    buf[TCP_CHECKSUM_L_P]=j& 0xff;
-    Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlen+ETH_HEADER_LEN,buf);
-    }
-
-
-/* new functions for web client interface */
-void make_arp_request(uint8_t *buf, uint8_t *server_ip)
-    {
-    uint8_t i=0;
-    
-    while(i<6)
-	{
-	buf[ETH_DST_MAC +i]=0xff;
-	buf[ETH_SRC_MAC +i]=macaddr[i];
-	i++;
-	}
-    
-    buf[ ETH_TYPE_H_P ] = ETHTYPE_ARP_H_V;
-    buf[ ETH_TYPE_L_P ] = ETHTYPE_ARP_L_V;
-    
-    // generate arp packet
-    buf[ARP_OPCODE_H_P]=ARP_OPCODE_REQUEST_H_V;
-    buf[ARP_OPCODE_L_P]=ARP_OPCODE_REQUEST_L_V;
-
-    // fill in arp request packet
-    // setup hardware type to ethernet 0x0001
-    buf[ ARP_HARDWARE_TYPE_H_P ] = ARP_HARDWARE_TYPE_H_V;
-    buf[ ARP_HARDWARE_TYPE_L_P ] = ARP_HARDWARE_TYPE_L_V;
-
-    // setup protocol type to ip 0x0800
-    buf[ ARP_PROTOCOL_H_P ] = ARP_PROTOCOL_H_V;
-    buf[ ARP_PROTOCOL_L_P ] = ARP_PROTOCOL_L_V;
-
-    // setup hardware length to 0x06
-    buf[ ARP_HARDWARE_SIZE_P ] = ARP_HARDWARE_SIZE_V;
-    
-    // setup protocol length to 0x04
-    buf[ ARP_PROTOCOL_SIZE_P ] = ARP_PROTOCOL_SIZE_V;
-
-    // setup arp destination and source mac address
-    for ( i=0; i<6; i++)
-	{
-	buf[ ARP_DST_MAC_P + i ] = 0x00;
-	buf[ ARP_SRC_MAC_P + i ] = macaddr[i];
+	uint16_t ck;
+	make_eth(buf);
+	// total length field in the IP header must be set:
+	// 20 bytes IP + 24 bytes (20tcp+4tcp options)
+	buf[IP_TOTLEN_H_P]=0;
+	buf[IP_TOTLEN_L_P]=IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+4;
+	make_ip(buf);
+	buf[TCP_FLAG_P]=TCP_FLAGS_SYNACK_V;
+	make_tcphead(buf,1,1,0);
+	// calculate the checksum, len=8 (start from ip.src) + TCP_HEADER_LEN_PLAIN + 4 (one option: mss)
+	ck=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN+4,2);
+	buf[TCP_CHECKSUM_H_P]=ck>>8;
+	buf[TCP_CHECKSUM_L_P]=ck& 0xff;
+	// add 4 for option mss:
+	Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+4+ETH_HEADER_LEN,
+			     buf);
 	}
 
-    // setup arp destination and source ip address
-    for ( i=0; i<4; i++)
+    // get a pointer to the start of tcp data in buf
+    // Returns 0 if there is no data
+    // You must call init_len_info once before calling this function
+    uint16_t get_tcp_data_pointer(void)
 	{
-	buf[ ARP_DST_IP_P + i ] = server_ip[i];
-	buf[ ARP_SRC_IP_P + i ] = ipaddr[i];
+	if (info_data_len)
+	    return((uint16_t)TCP_SRC_PORT_H_P+info_hdr_len);
+	else
+	    return(0);
 	}
 
-    // eth+arp is 42 bytes:
-    Ethernet::PacketSend(42,buf);
-    }
+    // do some basic length calculations and store the result in
+    // static varibales
+    void init_len_info(uint8_t *buf)
+	{
+	info_data_len=(buf[IP_TOTLEN_H_P]<<8)|(buf[IP_TOTLEN_L_P]&0xff);
+	info_data_len-=IP_HEADER_LEN;
+	info_hdr_len=(buf[TCP_HEADER_LEN_P]>>4)*4; // generate len in bytes;
+	info_data_len-=info_hdr_len;
+	if (info_data_len<=0)
+	    info_data_len=0;
+	}
 
-
-uint8_t arp_packet_is_myreply_arp ( uint8_t *buf )
-    {
-    uint8_t i;
-
-    // if packet type is not arp packet exit from function
-    if( buf[ ETH_TYPE_H_P ] != ETHTYPE_ARP_H_V || buf[ ETH_TYPE_L_P ] != ETHTYPE_ARP_L_V)
-	return 0;
-    // check arp request opcode
-    if ( buf[ ARP_OPCODE_H_P ] != ARP_OPCODE_REPLY_H_V || buf[ ARP_OPCODE_L_P ] != ARP_OPCODE_REPLY_L_V )
-	return 0;
-    // if destination ip address in arp packet not match with avr ip address
-    for(i=0; i<4; i++)
-	if(buf[ETH_ARP_DST_IP_P+i] != ipaddr[i])
-	    return 0;
-    return 1;
-    }
-
-// make a  tcp header
-void tcp_client_send_packet(uint8_t *buf,uint16_t dest_port, uint16_t src_port, uint8_t flags, uint8_t max_segment_size, 
-			    uint8_t clear_seqack, uint16_t next_ack_num, uint16_t dlength, uint8_t *dest_mac, uint8_t *dest_ip)
-    {
-    uint8_t i=0;
-    uint8_t tseq;
-    uint16_t ck;
-    
-    make_eth_ip_new(buf, dest_mac);
-
-    buf[TCP_DST_PORT_H_P]= (uint8_t) ( (dest_port>>8) & 0xff);
-    buf[TCP_DST_PORT_L_P]= (uint8_t) (dest_port & 0xff);
-
-    buf[TCP_SRC_PORT_H_P]= (uint8_t) ( (src_port>>8) & 0xff);
-    buf[TCP_SRC_PORT_L_P]= (uint8_t) (src_port & 0xff);
-
-    // sequence numbers:
-    // add the rel ack num to SEQACK
-
-    if(next_ack_num)
-	for(i=4; i>0; i--)
+    // fill in tcp data at position pos. pos=0 means start of
+    // tcp data. Returns the position at which the string after
+    // this string could be filled.
+    uint16_t fill_tcp_data_p(uint8_t *buf, uint16_t pos,
+			     const prog_char *progmem_s)
+	{
+	char c;
+	// fill in tcp data at position pos
+	//
+	// with no options the data starts after the checksum + 2 more bytes (urgent ptr)
+	while ((c = pgm_read_byte(progmem_s++)))
 	    {
-	    next_ack_num=buf[TCP_SEQ_H_P+i-1]+next_ack_num;
-	    tseq=buf[TCP_SEQACK_H_P+i-1];
-	    buf[TCP_SEQACK_H_P+i-1]=0xff&next_ack_num;
-	    // copy the acknum sent to us into the sequence number
-	    buf[TCP_SEQ_P + i - 1 ] = tseq;
-	    next_ack_num>>=8;
-            }
-
-    // initial tcp sequence number,require to setup for first transmit/receive
-    if(max_segment_size)
-	{
-	// put inital seq number
-	buf[TCP_SEQ_H_P+0]= 0;
-	buf[TCP_SEQ_H_P+1]= 0;
-	// we step only the second byte, this allows us to send packts
-	// with 255 bytes or 512 (if we step the initial seqnum by 2)
-	buf[TCP_SEQ_H_P+2]= seqnum;
-	buf[TCP_SEQ_H_P+3]= 0;
-	// step the inititial seq num by something we will not use
-	// during this tcp session:
-	seqnum+=2;
-
-	// setup maximum segment size
-	buf[TCP_OPTIONS_P]=2;
-	buf[TCP_OPTIONS_P+1]=4;
-	buf[TCP_OPTIONS_P+2]=0x05;
-	buf[TCP_OPTIONS_P+3]=0x80;
-	// 24 bytes:
-	buf[TCP_HEADER_LEN_P]=0x60;
-
-	dlength +=4;
+	    buf[TCP_CHECKSUM_L_P+3+pos]=c;
+	    pos++;
+	    }
+	return(pos);
 	}
-    else
+
+    // fill in tcp data at position pos. pos=0 means start of
+    // tcp data. Returns the position at which the string after
+    // this string could be filled.
+    uint16_t fill_tcp_data(uint8_t *buf,uint16_t pos, const char *s)
 	{
-	// no options:
-	// 20 bytes:
-	buf[TCP_HEADER_LEN_P]=0x50;
+	// fill in tcp data at position pos
+	//
+	// with no options the data starts after the checksum + 2 more bytes (urgent ptr)
+	while (*s)
+	    {
+	    buf[TCP_CHECKSUM_L_P+3+pos]=*s;
+	    pos++;
+	    s++;
+	    }
+	return(pos);
 	}
-    
-    make_ip_tcp_new(buf,IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlength, dest_ip);
 
-    // clear sequence ack numer before send tcp SYN packet
-    if(clear_seqack)
+    // Make just an ack packet with no tcp data inside
+    // This will modify the eth/ip/tcp header 
+    void make_tcp_ack_from_any(uint8_t *buf)
 	{
-	buf[TCP_SEQACK_P] = 0;
-	buf[TCP_SEQACK_P+1] = 0;
-	buf[TCP_SEQACK_P+2] = 0;
-	buf[TCP_SEQACK_P+3] = 0;
+	uint16_t j;
+	make_eth(buf);
+	// fill the header:
+	buf[TCP_FLAG_P]=TCP_FLAG_ACK_V;
+	if (info_data_len==0)
+	    // if there is no data then we must still acknoledge one packet
+	    make_tcphead(buf,1,0,1); // no options
+	else
+	    make_tcphead(buf,info_data_len,0,1); // no options
+
+	// total length field in the IP header must be set:
+	// 20 bytes IP + 20 bytes tcp (when no options) 
+	j=IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN;
+	buf[IP_TOTLEN_H_P]=j>>8;
+	buf[IP_TOTLEN_L_P]=j& 0xff;
+	make_ip(buf);
+	// calculate the checksum, len=8 (start from ip.src) +
+	// TCP_HEADER_LEN_PLAIN + data len
+	j=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN,2);
+	buf[TCP_CHECKSUM_H_P]=j>>8;
+	buf[TCP_CHECKSUM_L_P]=j& 0xff;
+	Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+ETH_HEADER_LEN,buf);
 	}
-    // zero the checksum
-    buf[TCP_CHECKSUM_H_P]=0;
-    buf[TCP_CHECKSUM_L_P]=0;
-    
-    // set up flags
-    buf[TCP_FLAG_P] = flags;
-    // setup maximum windows size
-    buf[ TCP_WINDOWSIZE_H_P ] = ((600 - IP_HEADER_LEN - ETH_HEADER_LEN)>>8) & 0xff;
-    buf[ TCP_WINDOWSIZE_L_P ] = (600 - IP_HEADER_LEN - ETH_HEADER_LEN) & 0xff;
 
-    // setup urgend pointer (not used -> 0)
-    buf[ TCP_URGENT_PTR_H_P ] = 0;
-    buf[ TCP_URGENT_PTR_L_P ] = 0;
+    // you must have called init_len_info at some time before calling
+    // this function dlen is the amount of tcp data (http data) we
+    // send in this packet You can use this function only immediately
+    // after make_tcp_ack_from_any This is because this function will
+    // NOT modify the eth/ip/tcp header except for length and checksum
+    void make_tcp_ack_with_data(uint8_t *buf,uint16_t dlen)
+	{
+	uint16_t j;
+	// fill the header:
+	// This code requires that we send only one data packet
+	// because we keep no state information. We must therefore set
+	// the fin here:
+	buf[TCP_FLAG_P]=TCP_FLAG_ACK_V|TCP_FLAG_PUSH_V|TCP_FLAG_FIN_V;
     
-    // check sum
-    ck=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN+dlength,2);
-    buf[TCP_CHECKSUM_H_P]=ck>>8;
-    buf[TCP_CHECKSUM_L_P]=ck& 0xff;
-    // add 4 for option mss:
-    Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlength+ETH_HEADER_LEN,buf);
-    }
+	// total length field in the IP header must be set:
+	// 20 bytes IP + 20 bytes tcp (when no options) + len of data
+	j=IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlen;
+	buf[IP_TOTLEN_H_P]=j>>8;
+	buf[IP_TOTLEN_L_P]=j& 0xff;
+	fill_ip_hdr_checksum(buf);
+	// zero the checksum
+	buf[TCP_CHECKSUM_H_P]=0;
+	buf[TCP_CHECKSUM_L_P]=0;
+	// calculate the checksum, len=8 (start from ip.src) + TCP_HEADER_LEN_PLAIN + data len
+	j=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN+dlen,2);
+	buf[TCP_CHECKSUM_H_P]=j>>8;
+	buf[TCP_CHECKSUM_L_P]=j& 0xff;
+	Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlen+ETH_HEADER_LEN,buf);
+	}
 
-uint16_t tcp_get_dlength ( uint8_t *buf )
-    {
-    int dlength, hlength;
+    /* new functions for web client interface */
+    void make_arp_request(uint8_t *buf, uint8_t *server_ip)
+	{
+	uint8_t i=0;
+    
+	while(i<6)
+	    {
+	    buf[ETH_DST_MAC +i]=0xff;
+	    buf[ETH_SRC_MAC +i]=macaddr[i];
+	    i++;
+	    }
+    
+	buf[ ETH_TYPE_H_P ] = ETHTYPE_ARP_H_V;
+	buf[ ETH_TYPE_L_P ] = ETHTYPE_ARP_L_V;
+    
+	// generate arp packet
+	buf[ARP_OPCODE_H_P]=ARP_OPCODE_REQUEST_H_V;
+	buf[ARP_OPCODE_L_P]=ARP_OPCODE_REQUEST_L_V;
+
+	// fill in arp request packet
+	// setup hardware type to ethernet 0x0001
+	buf[ ARP_HARDWARE_TYPE_H_P ] = ARP_HARDWARE_TYPE_H_V;
+	buf[ ARP_HARDWARE_TYPE_L_P ] = ARP_HARDWARE_TYPE_L_V;
+
+	// setup protocol type to ip 0x0800
+	buf[ ARP_PROTOCOL_H_P ] = ARP_PROTOCOL_H_V;
+	buf[ ARP_PROTOCOL_L_P ] = ARP_PROTOCOL_L_V;
+
+	// setup hardware length to 0x06
+	buf[ ARP_HARDWARE_SIZE_P ] = ARP_HARDWARE_SIZE_V;
+    
+	// setup protocol length to 0x04
+	buf[ ARP_PROTOCOL_SIZE_P ] = ARP_PROTOCOL_SIZE_V;
+
+	// setup arp destination and source mac address
+	for ( i=0; i<6; i++)
+	    {
+	    buf[ ARP_DST_MAC_P + i ] = 0x00;
+	    buf[ ARP_SRC_MAC_P + i ] = macaddr[i];
+	    }
+
+	// setup arp destination and source ip address
+	for ( i=0; i<4; i++)
+	    {
+	    buf[ ARP_DST_IP_P + i ] = server_ip[i];
+	    buf[ ARP_SRC_IP_P + i ] = ipaddr[i];
+	    }
+
+	// eth+arp is 42 bytes:
+	Ethernet::PacketSend(42,buf);
+	}
+
+    uint8_t arp_packet_is_myreply_arp ( uint8_t *buf )
+	{
+	uint8_t i;
+
+	// if packet type is not arp packet exit from function
+	if (buf[ETH_TYPE_H_P] != ETHTYPE_ARP_H_V
+	    || buf[ETH_TYPE_L_P] != ETHTYPE_ARP_L_V)
+	    return 0;
+	// check arp request opcode
+	if (buf[ARP_OPCODE_H_P] != ARP_OPCODE_REPLY_H_V
+	    || buf[ARP_OPCODE_L_P] != ARP_OPCODE_REPLY_L_V )
+	    return 0;
+	// if destination ip address in arp packet not match with avr ip address
+	for(i=0; i<4; i++)
+	    if(buf[ETH_ARP_DST_IP_P+i] != ipaddr[i])
+		return 0;
+	return 1;
+	}
+
+    // make a  tcp header
+    void tcp_client_send_packet(uint8_t *buf,uint16_t dest_port,
+				uint16_t src_port, uint8_t flags,
+				uint8_t max_segment_size, 
+				uint8_t clear_seqack, uint16_t next_ack_num,
+				uint16_t dlength, uint8_t *dest_mac,
+				uint8_t *dest_ip)
+	{
+	uint8_t i=0;
+	uint8_t tseq;
+	uint16_t ck;
+    
+	make_eth_ip_new(buf, dest_mac);
+
+	buf[TCP_DST_PORT_H_P]= (uint8_t) ( (dest_port>>8) & 0xff);
+	buf[TCP_DST_PORT_L_P]= (uint8_t) (dest_port & 0xff);
+
+	buf[TCP_SRC_PORT_H_P]= (uint8_t) ( (src_port>>8) & 0xff);
+	buf[TCP_SRC_PORT_L_P]= (uint8_t) (src_port & 0xff);
+
+	// sequence numbers:
+	// add the rel ack num to SEQACK
+
+	if(next_ack_num)
+	    for(i=4; i>0; i--)
+		{
+		next_ack_num=buf[TCP_SEQ_H_P+i-1]+next_ack_num;
+		tseq=buf[TCP_SEQACK_H_P+i-1];
+		buf[TCP_SEQACK_H_P+i-1]=0xff&next_ack_num;
+		// copy the acknum sent to us into the sequence number
+		buf[TCP_SEQ_P + i - 1 ] = tseq;
+		next_ack_num>>=8;
+		}
+
+	// initial tcp sequence number,require to setup for first
+	// transmit/receive
+	if(max_segment_size)
+	    {
+	    // put inital seq number
+	    buf[TCP_SEQ_H_P+0]= 0;
+	    buf[TCP_SEQ_H_P+1]= 0;
+	    // we step only the second byte, this allows us to send packts
+	    // with 255 bytes or 512 (if we step the initial seqnum by 2)
+	    buf[TCP_SEQ_H_P+2]= seqnum;
+	    buf[TCP_SEQ_H_P+3]= 0;
+	    // step the inititial seq num by something we will not use
+	    // during this tcp session:
+	    seqnum+=2;
+
+	    // setup maximum segment size
+	    buf[TCP_OPTIONS_P]=2;
+	    buf[TCP_OPTIONS_P+1]=4;
+	    buf[TCP_OPTIONS_P+2]=0x05;
+	    buf[TCP_OPTIONS_P+3]=0x80;
+	    // 24 bytes:
+	    buf[TCP_HEADER_LEN_P]=0x60;
+
+	    dlength +=4;
+	    }
+	else
+	    {
+	    // no options:
+	    // 20 bytes:
+	    buf[TCP_HEADER_LEN_P]=0x50;
+	    }
+    
+	make_ip_tcp_new(buf, IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlength,
+			dest_ip);
+
+	// clear sequence ack number before send tcp SYN packet
+	if(clear_seqack)
+	    {
+	    buf[TCP_SEQACK_P] = 0;
+	    buf[TCP_SEQACK_P+1] = 0;
+	    buf[TCP_SEQACK_P+2] = 0;
+	    buf[TCP_SEQACK_P+3] = 0;
+	    }
+	// zero the checksum
+	buf[TCP_CHECKSUM_H_P]=0;
+	buf[TCP_CHECKSUM_L_P]=0;
+    
+	// set up flags
+	buf[TCP_FLAG_P] = flags;
+	// setup maximum windows size
+	buf[ TCP_WINDOWSIZE_H_P ] = ((600 - IP_HEADER_LEN - ETH_HEADER_LEN)>>8) & 0xff;
+	buf[ TCP_WINDOWSIZE_L_P ] = (600 - IP_HEADER_LEN - ETH_HEADER_LEN) & 0xff;
+
+	// setup urgend pointer (not used -> 0)
+	buf[ TCP_URGENT_PTR_H_P ] = 0;
+	buf[ TCP_URGENT_PTR_L_P ] = 0;
+    
+	// check sum
+	ck=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN+dlength,2);
+	buf[TCP_CHECKSUM_H_P]=ck>>8;
+	buf[TCP_CHECKSUM_L_P]=ck& 0xff;
+	// add 4 for option mss:
+	Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlength+ETH_HEADER_LEN,buf);
+	}
+
+    uint16_t tcp_get_dlength ( uint8_t *buf )
+	{
+	int dlength, hlength;
 	
-    dlength = ( buf[ IP_TOTLEN_H_P ] <<8 ) | ( buf[ IP_TOTLEN_L_P ] );
-    dlength -= IP_HEADER_LEN;
-    hlength = (buf[ TCP_HEADER_LEN_P ]>>4) * 4; // generate len in bytes;
-    dlength -= hlength;
-    if ( dlength <= 0 )
-	dlength=0;
+	dlength = ( buf[ IP_TOTLEN_H_P ] <<8 ) | ( buf[ IP_TOTLEN_L_P ] );
+	dlength -= IP_HEADER_LEN;
+	hlength = (buf[ TCP_HEADER_LEN_P ]>>4) * 4; // generate len in bytes;
+	dlength -= hlength;
+	if ( dlength <= 0 )
+	    dlength=0;
 
-    return ((uint16_t)dlength);
-    }
+	return ((uint16_t)dlength);
+	}
     };
 
 /* end of ip_arp_udp.c */
