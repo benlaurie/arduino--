@@ -26,6 +26,8 @@ public:
     static void modeInput() { _SFR_IO8(ddr) &= ~_BV(bit); }
     static void set() { _SFR_IO8(port) |= _BV(bit); }
     static void clear() { _SFR_IO8(port) &= ~_BV(bit); }
+
+    /** Return true if the Pin reads HIGH */
     static byte read() { return !!(_SFR_IO8(in) & _BV(bit)); }
     static byte toggle() { return (_SFR_IO8(port) ^= _BV(bit)); }
     };
@@ -75,7 +77,12 @@ public:
         while (millis() - start <= ms)
             ;
         }
-    
+
+    /** Use this function if the expression for ms is a constant.
+
+        If ms cannot be calculated at compile time, gcc will drag in floating
+        point support.
+     */
     static void constantDelay(double ms) 
         {
         _delay_ms(ms);
@@ -83,9 +90,14 @@ public:
     
     static void delayMicroseconds(unsigned int us);
 
-    static void constantDelayMicroseconds(double ms) 
+    /** Use this function if the expression for us is a constant 
+
+        If us cannot be calculated at compile time, gcc will drag in floating
+        point support.
+     */
+    static void constantDelayMicroseconds(double us)
         {
-        _delay_us(ms);
+        _delay_us(us);
         }
     
     static void interrupts() { sei(); }
