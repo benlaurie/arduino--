@@ -18,7 +18,7 @@ OBJ = arduino++.o
 
 all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
      test_enc28j60.bin test_enc28j60.lst onewire_test.bin onewire_test.lst \
-     test_ip.bin pcint.bin \
+     test_ip.bin pcint.bin test_pushbutton.bin \
      libarduino++.a 
 
 .depend: *.cc *.h
@@ -56,3 +56,7 @@ blink: all
 pcint: all
 	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:pcint.bin
 
+test_pushbutton: all
+	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:test_pushbutton.bin
+
+-include .depend
