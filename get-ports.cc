@@ -19,5 +19,11 @@ int main(int argc, char **argv)
     D(DDRD);
     D(PIND);
 
+    D(PCICR);
+    D(PCIFR);
+    D(PCMSK0);
+    D(PCMSK1);
+    D(PCMSK2);
+
     return 0;
     }

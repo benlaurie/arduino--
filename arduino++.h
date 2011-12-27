@@ -8,9 +8,20 @@
 
 typedef uint8_t byte;
 
-template <byte ddr, byte port, byte in, byte bit> class _Pin
+template <byte ddr, byte port, byte in, byte bit, byte pcport, 
+  byte pcbit, byte pcen> class _Pin
     {
 public:
+    static void enablePCInterrupt() { 
+    PCICR |= _BV(pcen);
+    _SFR_IO8(pcport) |= _BV(pcbit); 
+    }
+    static void disablePCInterrupt() { 
+    if (_SFR_IO8(pcport) &= ~_BV(pcbit))
+        PCICR &= ~_BV(pcen);
+        
+    }
+
     static void modeOutput() { _SFR_IO8(ddr) |= _BV(bit); }
     static void modeInput() { _SFR_IO8(ddr) &= ~_BV(bit); }
     static void set() { _SFR_IO8(port) |= _BV(bit); }
@@ -22,27 +33,27 @@ public:
 class Pin
     {
 public:
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB0> B0;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB1> B1;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB2> B2;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB3> B3;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB4> B4;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB5> B5;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB0, NPCMSK0, PCINT0, PCIE0> B0;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB1, NPCMSK0, PCINT1, PCIE0> B1;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB2, NPCMSK0, PCINT2, PCIE0> B2;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB3, NPCMSK0, PCINT3, PCIE0> B3;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB4, NPCMSK0, PCINT4, PCIE0> B4;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB5, NPCMSK0, PCINT5, PCIE0> B5;
         
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC0> C0;
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC1> C1;
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC2> C2;
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC3> C3;
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC4> C4;
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC0, NPCMSK1, PCINT8, PCIE1> C0;
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC1, NPCMSK1, PCINT9, PCIE1> C1;
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC2, NPCMSK1, PCINT10, PCIE1> C2;
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC3, NPCMSK1, PCINT11, PCIE1> C3;
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC4, NPCMSK1, PCINT12, PCIE1> C4;
 
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD0> D0;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD1> D1;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD2> D2;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD3> D3;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD4> D4;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD5> D5;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD6> D6;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD7> D7;
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD0, NPCMSK2, PCINT16, PCIE2> D0;
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD1, NPCMSK2, PCINT17, PCIE2> D1;
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD2, NPCMSK2, PCINT18, PCIE2> D2;
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD3, NPCMSK2, PCINT19, PCIE2> D3;
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD4, NPCMSK2, PCINT20, PCIE2> D4;
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD5, NPCMSK2, PCINT21, PCIE2> D5;
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD6, NPCMSK2, PCINT22, PCIE2> D6;
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD7, NPCMSK2, PCINT23, PCIE2> D7;
 
     typedef Pin::B3 SPI_MOSI;
     typedef Pin::B4 SPI_MISO;
