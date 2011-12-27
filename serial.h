@@ -35,84 +35,63 @@
 // is the index of the location from which to read.
 #define RX_BUFFER_SIZE 128
 
-struct ring_buffer {
-  unsigned char buffer[RX_BUFFER_SIZE];
-  byte head;
-  byte tail;
-};
+class RingBuffer
+    {
+ public:
+    void store(byte c)
+	{
+	int i = (_head + 1) % RX_BUFFER_SIZE;
 
-ring_buffer rx_buffer = { { 0 }, 0, 0 };
+	// if we should be storing the received character into the location
+	// just before the tail (meaning that the head would advance to the
+	// current location of the tail), we're about to overflow the buffer
+	// and so we don't write the character or advance the head.
+	if (i != _tail)
+	    {
+	    _buffer[_head] = c;
+	    _head = i;
+	    }
+	}
+    int available(void) const
+	{ return (RX_BUFFER_SIZE + _head - _tail) % RX_BUFFER_SIZE; }
+    int peek(void) const
+	{
+	if (_head == _tail)
+	    return -1;
+	else
+	    return _buffer[_tail];
+	}
+    int read(void)
+	{
+	// if the head isn't ahead of the tail, we don't have any characters
+	if (_head == _tail)
+	    return -1;
+	else
+	    {
+	    byte c = _buffer[_tail];
+	    _tail = (_tail + 1) % RX_BUFFER_SIZE;
+	    return c;
+	    }
+	}
+    void flush(void)
+	{
+	// don't reverse this or there may be problems if the RX interrupt
+	// occurs after reading the value of rx_buffer_head but before writing
+	// the value to rx_buffer_tail; the previous value of rx_buffer_head
+	// may be written to rx_buffer_tail, making it appear as if the buffer
+	// were full, not empty.
+	_head = _tail;
+	}
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-ring_buffer rx_buffer1 = { { 0 }, 0, 0 };
-ring_buffer rx_buffer2 = { { 0 }, 0, 0 };
-ring_buffer rx_buffer3 = { { 0 }, 0, 0 };
-#endif
+ private:
+    unsigned char _buffer[RX_BUFFER_SIZE];
+    byte _head;
+    byte _tail;
+    };
 
-inline void store_char(unsigned char c, ring_buffer *rx_buffer)
-{
-  int i = (rx_buffer->head + 1) % RX_BUFFER_SIZE;
-
-  // if we should be storing the received character into the location
-  // just before the tail (meaning that the head would advance to the
-  // current location of the tail), we're about to overflow the buffer
-  // and so we don't write the character or advance the head.
-  if (i != rx_buffer->tail) {
-    rx_buffer->buffer[rx_buffer->head] = c;
-    rx_buffer->head = i;
-  }
-}
-
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-
-SIGNAL(SIG_USART0_RECV)
-{
-  unsigned char c = UDR0;
-  store_char(c, &rx_buffer);
-}
-
-SIGNAL(SIG_USART1_RECV)
-{
-  unsigned char c = UDR1;
-  store_char(c, &rx_buffer1);
-}
-
-SIGNAL(SIG_USART2_RECV)
-{
-  unsigned char c = UDR2;
-  store_char(c, &rx_buffer2);
-}
-
-SIGNAL(SIG_USART3_RECV)
-{
-  unsigned char c = UDR3;
-  store_char(c, &rx_buffer3);
-}
-
-#else
-
-#if defined(__AVR_ATmega8__)
-SIGNAL(SIG_UART_RECV)
-#else
-SIGNAL(USART_RX_vect)
-#endif
-{
-#if defined(__AVR_ATmega8__)
-  unsigned char c = UDR;
-#else
-  unsigned char c = UDR0;
-#endif
-  store_char(c, &rx_buffer);
-}
-
-#endif
-
-// Constructors ////////////////////////////////////////////////////////////////
-
-class HardwareSerial
+class HardwareSerial : public RingBuffer
     {
  private:
-    ring_buffer *_rx_buffer;
     volatile uint8_t *_ubrrh;
     volatile uint8_t *_ubrrl;
     volatile uint8_t *_ucsra;
@@ -124,13 +103,11 @@ class HardwareSerial
     uint8_t _udre;
     uint8_t _u2x;
  public:
-    HardwareSerial(ring_buffer *rx_buffer,
-		   volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
+    HardwareSerial(volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
 		   volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
 		   volatile uint8_t *udr,
 		   uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udre, uint8_t u2x)
 	{
-	_rx_buffer = rx_buffer;
 	_ubrrh = ubrrh;
 	_ubrrl = ubrrl;
 	_ucsra = ucsra;
@@ -190,39 +167,6 @@ class HardwareSerial
 	cbi(*_ucsrb, _txen);
 	cbi(*_ucsrb, _rxcie);  
 	}
-    virtual int available(void)
-	{
-	return (RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
-	}
-    virtual int peek(void)
-	{
-	if (_rx_buffer->head == _rx_buffer->tail)
-	    return -1;
-	else
-	    return _rx_buffer->buffer[_rx_buffer->tail];
-	}
-
-    virtual int read(void)
-	{
-	// if the head isn't ahead of the tail, we don't have any characters
-	if (_rx_buffer->head == _rx_buffer->tail)
-	    return -1;
-	else
-	    {
-	    unsigned char c = _rx_buffer->buffer[_rx_buffer->tail];
-	    _rx_buffer->tail = (_rx_buffer->tail + 1) % RX_BUFFER_SIZE;
-	    return c;
-	    }
-	}
-    virtual void flush(void)
-	{
-	// don't reverse this or there may be problems if the RX interrupt
-	// occurs after reading the value of rx_buffer_head but before writing
-	// the value to rx_buffer_tail; the previous value of rx_buffer_head
-	// may be written to rx_buffer_tail, making it appear as if the buffer
-	// were full, not empty.
-	_rx_buffer->head = _rx_buffer->tail;
-	}
     virtual void write(uint8_t c)
 	{
 	while (!((*_ucsra) & (1 << _udre)))
@@ -235,13 +179,57 @@ class HardwareSerial
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
 #if defined(__AVR_ATmega8__)
-HardwareSerial Serial(&rx_buffer, &UBRRH, &UBRRL, &UCSRA, &UCSRB, &UDR, RXEN, TXEN, RXCIE, UDRE, U2X);
+HardwareSerial Serial(&UBRRH, &UBRRL, &UCSRA, &UCSRB, &UDR, RXEN, TXEN, RXCIE, UDRE, U2X);
 #else
-HardwareSerial Serial(&rx_buffer, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRE0, U2X0);
+HardwareSerial Serial(&UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRE0, U2X0);
 #endif
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-HardwareSerial Serial1(&rx_buffer1, &UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UDR1, RXEN1, TXEN1, RXCIE1, UDRE1, U2X1);
-HardwareSerial Serial2(&rx_buffer2, &UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UDR2, RXEN2, TXEN2, RXCIE2, UDRE2, U2X2);
-HardwareSerial Serial3(&rx_buffer3, &UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UDR3, RXEN3, TXEN3, RXCIE3, UDRE3, U2X3);
+HardwareSerial Serial1(&UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UDR1, RXEN1, TXEN1, RXCIE1, UDRE1, U2X1);
+HardwareSerial Serial2(&UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UDR2, RXEN2, TXEN2, RXCIE2, UDRE2, U2X2);
+HardwareSerial Serial3(&UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UDR3, RXEN3, TXEN3, RXCIE3, UDRE3, U2X3);
+#endif
+
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+
+SIGNAL(SIG_USART0_RECV)
+    {
+    unsigned char c = UDR0;
+    Serial.store(c);
+    }
+
+SIGNAL(SIG_USART1_RECV)
+    {
+    unsigned char c = UDR1;
+    Serial1.store(c);
+    }
+
+SIGNAL(SIG_USART2_RECV)
+    {
+    unsigned char c = UDR2;
+    Serial2.store(c);
+    }
+
+SIGNAL(SIG_USART3_RECV)
+    {
+    unsigned char c = UDR3;
+    Serial3.store(c);
+    }
+
+#else
+
+#if defined(__AVR_ATmega8__)
+SIGNAL(SIG_UART_RECV)
+#else
+SIGNAL(USART_RX_vect)
+#endif
+    {
+#if defined(__AVR_ATmega8__)
+    unsigned char c = UDR;
+#else
+    unsigned char c = UDR0;
+#endif
+    Serial.store(c);
+    }
+
 #endif
