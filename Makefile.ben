@@ -1,1 +1,1 @@
-MCU_TARGET = atmega168
+MCU_TARGET = atmega328p
