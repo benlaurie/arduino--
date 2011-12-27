@@ -100,7 +100,8 @@ public:
 	return (uint16_t) sum ^ 0xFFFF;
 	}
 
-// you must call this function once before you use any of the other functions:
+    // you must call this function once before you use any of the
+    // other functions:
     void init_ip_arp_udp_tcp(uint8_t *mymac, uint8_t *myip)
 	{
 	uint8_t i=0;
@@ -185,8 +186,8 @@ public:
 	    i++;
 	    }
 		
-	buf[ ETH_TYPE_H_P ] = ETHTYPE_IP_H_V;
-	buf[ ETH_TYPE_L_P ] = ETHTYPE_IP_L_V;
+	buf[ETH_TYPE_H_P] = ETHTYPE_IP_H_V;
+	buf[ETH_TYPE_L_P] = ETHTYPE_IP_L_V;
 	}
 
     void fill_ip_hdr_checksum(uint8_t *buf)
