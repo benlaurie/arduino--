@@ -29,13 +29,7 @@
 #include <avr/interrupt.h>
 #include <compat/deprecated.h>  // for sbi, cbi
 
-// Define constants and variables for buffering incoming serial data.  We're
-// using a ring buffer (I think), in which rx_buffer_head is the index of the
-// location to which to write the next incoming character and rx_buffer_tail
-// is the index of the location from which to read.
-#define RX_BUFFER_SIZE 128
-
-class RingBuffer
+template <byte RX_BUFFER_SIZE> class RingBuffer
     {
  public:
     void store(byte c)
@@ -89,7 +83,7 @@ class RingBuffer
     byte _tail;
     };
 
-class HardwareSerial : public RingBuffer
+class HardwareSerial : public RingBuffer<128>
     {
  private:
     volatile uint8_t *_ubrrh;
@@ -97,9 +91,7 @@ class HardwareSerial : public RingBuffer
     volatile uint8_t *_ucsra;
     volatile uint8_t *_ucsrb;
     volatile uint8_t *_udr;
-    uint8_t _rxen;
-    uint8_t _txen;
-    uint8_t _rxcie;
+    byte _ucsrbmask;
     uint8_t _udre;
     uint8_t _u2x;
  public:
@@ -113,9 +105,7 @@ class HardwareSerial : public RingBuffer
 	_ucsra = ucsra;
 	_ucsrb = ucsrb;
 	_udr = udr;
-	_rxen = rxen;
-	_txen = txen;
-	_rxcie = rxcie;
+	_ucsrbmask = (1 << rxen) | (1 << txen) | (1 << rxcie);
 	_udre = udre;
 	_u2x = u2x;
 	}
@@ -157,16 +147,10 @@ class HardwareSerial : public RingBuffer
 	*_ubrrh = baud_setting >> 8;
 	*_ubrrl = baud_setting;
 
-	sbi(*_ucsrb, _rxen);
-	sbi(*_ucsrb, _txen);
-	sbi(*_ucsrb, _rxcie);
+	*_ucsrb |= _ucsrbmask;
 	}
     void end()
-	{
-	cbi(*_ucsrb, _rxen);
-	cbi(*_ucsrb, _txen);
-	cbi(*_ucsrb, _rxcie);  
-	}
+	{ *_ucsrb &= ~_ucsrbmask; }
     virtual void write(uint8_t c)
 	{
 	while (!((*_ucsra) & (1 << _udre)))
