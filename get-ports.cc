@@ -19,5 +19,9 @@ int main(int argc, char **argv)
     D(DDRD);
     D(PIND);
 
+    D(SPCR);
+    D(EICRA);
+    D(EIMSK);
+
     return 0;
     }
