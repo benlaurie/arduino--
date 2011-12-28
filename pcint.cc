@@ -7,24 +7,24 @@
 
 ISR(PCINT0_vect) 
     {
-    Arduino::D11::read() ? Arduino::D13::clear() : Arduino::D13::set();
+    Arduino16::D11::read() ? Arduino16::D13::clear() : Arduino16::D13::set();
     }
 
 int main(void)
     {
-    Arduino::interrupts();
-    // Arduino Pin D13 is an output
-    Arduino::D13::modeOutput();
+    Arduino16::interrupts();
+    // Arduino Pin D13 is typically connected to an LED
+    Arduino16::D13::modeOutput();
     
     // make D11 input and activate internal pullups
-    Arduino::D11::modeInput();
-    Arduino::D11::set();
+    Arduino16::D11::modeInput();
+    Arduino16::D11::set();
 
     // Initialise the LED on D13
-    Arduino::D11::read() ? Arduino::D13::clear() : Arduino::D13::set();
+    Arduino16::D11::read() ? Arduino16::D13::clear() : Arduino16::D13::set();
 
 	// enable the pin change interrupt
-    Arduino::D11::enablePCInterrupt();
+    Arduino16::D11::enablePCInterrupt();
 
     set_sleep_mode(SLEEP_MODE_IDLE);
     while(true)

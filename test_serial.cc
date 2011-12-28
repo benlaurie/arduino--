@@ -4,7 +4,7 @@
 int main()
     {
     // Without this it sends but does not receive.
-    Arduino::init();
+    Arduino16::init();
     Serial.begin(57600);
     char c = 'x';
     for( ; ; )

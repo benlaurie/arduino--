@@ -15,6 +15,7 @@
  *********************************************/
 
 #include "arduino++.h"
+#include "spi.h"
 #include <util/delay.h>
 
 template <class CSPin> class ENC28J60

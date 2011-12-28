@@ -13,9 +13,6 @@ LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 
 include Makefile.local
 
-# Define all object files.
-OBJ = arduino++.o
-
 all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
      test_enc28j60.bin test_enc28j60.lst onewire_test.bin onewire_test.lst \
      test_ip.bin test_ip.lst test_serial.bin test_serial.lst \
@@ -23,9 +20,6 @@ all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
 
 .depend: *.cc *.h
 	$(CC) -mmcu=$(MCU_TARGET) -MM *.cc > .depend
-
-libarduino++.a: $(OBJ)
-	@for i in $(OBJ); do echo $(AR) $@ rcs $$i; $(AR) rcs $@ $$i; done
 
 .SUFFIXES: .lst .elf .bin
 
@@ -42,13 +36,13 @@ libarduino++.a: $(OBJ)
 	$(OBJDUMP) -h -S $< > $@
 
 .o.elf:
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< libarduino++.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl < get-ports.lst > avr-ports.h
 
 clean:
-	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend libarduino.a
+	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend
 
 blink: all
 	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:blink.bin

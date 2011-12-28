@@ -1,12 +1,13 @@
 #include "arduino++.h"
+#include "arduino++timer16.h"
 #include "pushbutton.h"
 
-PushButton<Arduino::D11, 20, uint16_t> Button;
+PushButton<Arduino16, Arduino16::D11, 20> Button;
 
 int main(void) 
     {
-    Arduino::init();
-    Arduino::D13::modeOutput();
+    Arduino16::init();
+    Arduino16::D13::modeOutput();
 
     Button.init();
 
@@ -14,9 +15,9 @@ int main(void)
         {
         if (Button.read() == Button.keyup)
             {
-            Arduino::D13::set();
-            Arduino::delay(Button.duration());
-            Arduino::D13::clear();
+            Arduino16::D13::set();
+            Arduino16::delay(Button.duration());
+            Arduino16::D13::clear();
             }
         }
     }

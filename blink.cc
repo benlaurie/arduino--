@@ -6,18 +6,19 @@
 */
 
 #include "arduino++.h"
+#include <avr/sleep.h>
 
 int main(void)
     {
     // Arduino Pin D13 is an output
-    Arduino::D13::modeOutput();
+    Arduino16::D13::modeOutput();
 
     while(true)
         {
         // toggle the pin
-        Arduino::D13::toggle();
+        Arduino16::D13::toggle();
         // wait
-        Arduino::constantDelay(2000);
+        _delay_ms(2000);
         }
     
     return 0;
