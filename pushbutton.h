@@ -25,7 +25,7 @@ public:
         duration_ = 0;
         }
 
-	event_type read()
+    event_type read()
         {
         const int_t now = static_cast<int_t>(Arduino::millis());
         // The button is active low
@@ -38,7 +38,7 @@ public:
             previous_ = pressed;
             const int_t delta = now - changed_;
             changed_ = now;
-	
+    
             if (delta > debounce) 
                 {
                 if (pressed)
@@ -58,8 +58,8 @@ public:
     int_t duration() { return duration_; }
 
 private:
-	bool previous_;
-	int_t changed_;
+    bool previous_;
+    int_t changed_;
     int_t duration_;
 };
 

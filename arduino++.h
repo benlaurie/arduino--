@@ -12,22 +12,23 @@ template <byte ddr, byte port, byte in, byte bit, byte pcport,
   byte pcbit, byte pcen> class _Pin
     {
 public:
-    static void enablePCInterrupt() { 
-    PCICR |= _BV(pcen);
-    _SFR_IO8(pcport) |= _BV(pcbit); 
-    }
-    static void disablePCInterrupt() { 
-    if (_SFR_IO8(pcport) &= ~_BV(pcbit))
-        PCICR &= ~_BV(pcen);
-        
-    }
+    static void enablePCInterrupt() 
+        {
+        PCICR |= _BV(pcen);
+        _SFR_IO8(pcport) |= _BV(pcbit); 
+        }
+    static void disablePCInterrupt() 
+        { 
+        if (_SFR_IO8(pcport) &= ~_BV(pcbit))
+            PCICR &= ~_BV(pcen);
+        }
 
     static void modeOutput() { _SFR_IO8(ddr) |= _BV(bit); }
     static void modeInput() { _SFR_IO8(ddr) &= ~_BV(bit); }
     static void set() { _SFR_IO8(port) |= _BV(bit); }
     static void clear() { _SFR_IO8(port) &= ~_BV(bit); }
 
-    /** Return true if the Pin reads HIGH */
+    /** Return 1 if the Pin reads HIGH */
     static byte read() { return !!(_SFR_IO8(in) & _BV(bit)); }
     static byte toggle() { return (_SFR_IO8(port) ^= _BV(bit)); }
     };
