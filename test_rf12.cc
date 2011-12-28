@@ -1,6 +1,9 @@
 #include "rf12.h"
 #include "serial.h"
 
+// We seem to receive our own packets (without an ack needed), is this right,
+// or a bug?
+
 // You need to set these the other way round for the second test node.
 static const byte id = 2;
 static const byte dest = 1;
