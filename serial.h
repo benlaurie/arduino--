@@ -97,8 +97,8 @@ class HardwareSerial : public RingBuffer<128>
  public:
     HardwareSerial(volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
 		   volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
-		   volatile uint8_t *udr,
-		   uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udre, uint8_t u2x)
+		   volatile uint8_t *udr, uint8_t rxen, uint8_t txen,
+		   uint8_t rxcie, uint8_t udre, uint8_t u2x)
 	{
 	_ubrrh = ubrrh;
 	_ubrrl = ubrrl;
@@ -121,12 +121,16 @@ class HardwareSerial : public RingBuffer<128>
 	    }
 	else
 	    {
-	    // figure out if U2X mode would allow for a better connection
-    
-	    // calculate the percent difference between the baud-rate specified and
-	    // the real baud rate for both U2X and non-U2X mode (0-255 error percent)
-	    uint8_t nonu2x_baud_error = abs((int)(255-((F_CPU/(16*(((F_CPU/8/baud-1)/2)+1))*255)/baud)));
-	    uint8_t u2x_baud_error = abs((int)(255-((F_CPU/(8*(((F_CPU/4/baud-1)/2)+1))*255)/baud)));
+	    // figure out if U2X mode would allow for a better
+	    // connection calculate the percent difference between the
+	    // baud-rate specified and the real baud rate for both U2X
+	    // and non-U2X mode (0-255 error percent)
+	    uint8_t nonu2x_baud_error
+		= abs((int)(255 - ((F_CPU / (16 * (((F_CPU / 8 / baud - 1) / 2)
+						   + 1)) * 255) / baud)));
+	    uint8_t u2x_baud_error
+		= abs((int)(255 - ((F_CPU / (8 * (((F_CPU / 4 / baud - 1) / 2)
+						  + 1)) * 255) / baud)));
     
 	    // prefer non-U2X mode because it handles clock skew better
 	    use_u2x = (nonu2x_baud_error > u2x_baud_error);
