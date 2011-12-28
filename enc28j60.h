@@ -179,7 +179,7 @@ public:
 	*/
 	// initialize SPI interface
 	// master mode and Fosc/2 clock:
-	SPCR = (1<<SPE)|(1<<MSTR);
+	::Register::SPCR = (1 << SPE) | (1 << MSTR);
 	SPSR |= (1<<SPI2X);
 	// perform system reset
 	WriteOp(ENC28J60_SOFT_RESET, 0, ENC28J60_SOFT_RESET);

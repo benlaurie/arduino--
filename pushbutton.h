@@ -59,8 +59,13 @@ public:
 
 private:
     bool previous_;
+<<<<<<< HEAD
     typename Arduino_::time_res_t changed_;
     typename Arduino_::time_res_t duration_;
+=======
+    int_t changed_;
+    int_t duration_;
+>>>>>>> master
 };
 
 #endif

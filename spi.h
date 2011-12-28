@@ -15,7 +15,7 @@ public:
         }
     
     // Default is MSB first, SPI mode 0, FOSC/4
-    static void init(byte config = 0)
+    static void init(byte config = 0, bool double_speed = false)
         {
         // initialize the SPI pins
         Sck::modeOutput();
@@ -24,17 +24,21 @@ public:
         Ss::modeOutput();
         Ss::set();
         
-        mode(config);
+        mode(config, double_speed);
         }
     
-    static void mode(byte config)
+    static void mode(byte config, bool double_speed)
         {
         byte tmp;
-        
+
         // enable SPI master with configuration byte specified
-        SPCR = 0;
-        SPCR = (config & 0x7F) | (1 << SPE) | (1 << MSTR);
-        tmp = SPSR;
+        Register::SPCR = 0;
+        Register::SPCR = (config & 0x7F) | (1 << SPE) | (1 << MSTR);
+        // clear any pending conditions and set double speed if needed.
+        if (double_speed)
+            SPSR |= (1 << SPI2X);
+        else
+            tmp = SPSR;
         tmp = SPDR;
         }
     
@@ -62,5 +66,6 @@ public:
 
 
 typedef _SPI<Pin::SPI_SCK, Pin::SPI_MISO, Pin::SPI_MOSI, NullPin> SPI;
+typedef _SPI<Pin::SPI_SCK, Pin::SPI_MISO, Pin::SPI_MOSI, Pin::SPI_SS> SPISS;
 
 #endif

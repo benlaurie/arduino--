@@ -25,5 +25,9 @@ int main(int argc, char **argv)
     D(PCMSK1);
     D(PCMSK2);
 
+    D(SPCR);
+    D(EICRA);
+    D(EIMSK);
+
     return 0;
     }
