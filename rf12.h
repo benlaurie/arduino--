@@ -268,6 +268,7 @@ public:
         }
 
     static bool goodCRC() { return _crc == 0; }
+    static byte header() { return _buf[HEADER]; }
     static byte length() { return _buf[LENGTH]; }
     static const volatile byte *data() { return &_buf[DATA]; }
 
@@ -309,8 +310,9 @@ public:
             hdr = RF12_HDR_CTL;
         else
             hdr = RF12_HDR_CTL | RF12_HDR_DST | (_buf[HEADER] & RF12_HDR_MASK);
-        sendStart(hdr);
+        sendStart(hdr, 0, 0);
         }
+    static bool isAckReply() { return (header() & RF12_HDR_CTL) != 0; }
 
     // call this only when rf12_recvDone() or rf12_canSend() return true
     static void sendStart(uint8_t hdr)

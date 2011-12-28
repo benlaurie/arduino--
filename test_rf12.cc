@@ -11,6 +11,7 @@ static const byte dest = 1;
 int main()
     {
     unsigned long last = 0;
+    byte seq = 0;
 
     Arduino::init();
     Serial.begin(57600);
@@ -21,26 +22,35 @@ int main()
 	if (t > last + 100 && RF12B::canSend())
 	    {
 	    last = t;
-	    char buf[1];
+	    char buf[2];
 	    buf[0] = id;
+	    buf[1] = ++seq;
 	    RF12B::sendStart(RF12_HDR_ACK | RF12_HDR_DST | dest, buf,
-			     sizeof buf);
-	    Serial.write('s');
-	    }
+                             sizeof buf);
+            Serial.write('s');
+	    Serial.writeHex(RF12B::header());
+            }
 
-	if (RF12B::recvDone())
-	    {
-	    if (!RF12B::goodCRC())
-		Serial.write('?');
-	    else
-		{	
-		Serial.write('r');
+        if (RF12B::recvDone())
+            {
+            if (!RF12B::goodCRC())
+                Serial.write('?');
+            else
+                {       
+                Serial.write('r');
+                Serial.writeHex(RF12B::header());
 		Serial.write(RF12B::length() + '0');
-		Serial.write(RF12B::data()[0] + '0');
-		if (RF12B::wantsAck())
+		if (RF12B::isAckReply())
+		    Serial.write('A');
+		else
 		    {
-		    RF12B::sendAckReply();
-		    Serial.write('a');
+		    Serial.write(RF12B::data()[0] + '0');
+		    Serial.writeHex(RF12B::data()[1]);
+		    if (RF12B::wantsAck())
+			{
+			RF12B::sendAckReply();
+			Serial.write('a');
+			}
 		    }
 		}
 	    }

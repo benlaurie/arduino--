@@ -155,13 +155,14 @@ class HardwareSerial : public RingBuffer<128>
 	}
     void end()
 	{ *_ucsrb &= ~_ucsrbmask; }
-    virtual void write(uint8_t c)
+    void write(uint8_t c)
 	{
 	while (!((*_ucsra) & (1 << _udre)))
 	    ;
 	
 	*_udr = c;
 	}
+    void writeHex(byte b) { HexWriter<HardwareSerial>::write(this, b); }
 };
 
 // Preinstantiate Objects //////////////////////////////////////////////////////

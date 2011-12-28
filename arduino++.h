@@ -219,4 +219,21 @@ public:
 typedef _SPI<Pin::SPI_SCK, Pin::SPI_MISO, Pin::SPI_MOSI, NullPin> SPI;
 typedef _SPI<Pin::SPI_SCK, Pin::SPI_MISO, Pin::SPI_MOSI, Pin::SPI_SS> SPISS;
 
+template <class Out> class HexWriter
+    {
+public:
+    static void write(Out *out, byte b)
+        {
+        writeNibble(out, b >> 4);
+        writeNibble(out, b & 0x0f);
+        }
+    static void writeNibble(Out *out, byte b)
+        {
+        if (b < 10)
+            out->write(b + '0');
+        else
+            out->write(b + 'a' - 10);
+        }
+    };
+
 #endif // ARDUINO_MINUS_MINUS
