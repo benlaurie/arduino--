@@ -1,3 +1,4 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
 #include "rf12.h"
 #include "serial.h"
 
@@ -17,18 +18,18 @@ int main()
     Serial.begin(57600);
     RF12B::init(id, RF12B::MHZ868);
     for ( ; ; )
-	{
-	unsigned long t = Arduino::millis();
-	if (t > last + 100 && RF12B::canSend())
-	    {
-	    last = t;
-	    char buf[2];
-	    buf[0] = id;
-	    buf[1] = ++seq;
-	    RF12B::sendStart(RF12_HDR_ACK | RF12_HDR_DST | dest, buf,
+        {
+        unsigned long t = Arduino::millis();
+        if (t > last + 100 && RF12B::canSend())
+            {
+            last = t;
+            char buf[2];
+            buf[0] = id;
+            buf[1] = ++seq;
+            RF12B::sendStart(RF12_HDR_ACK | RF12_HDR_DST | dest, buf,
                              sizeof buf);
             Serial.write('s');
-	    Serial.writeHex(RF12B::header());
+            Serial.writeHex(RF12B::header());
             }
 
         if (RF12B::recvDone())
@@ -39,20 +40,20 @@ int main()
                 {       
                 Serial.write('r');
                 Serial.writeHex(RF12B::header());
-		Serial.write(RF12B::length() + '0');
-		if (RF12B::isAckReply())
-		    Serial.write('A');
-		else
-		    {
-		    Serial.write(RF12B::data()[0] + '0');
-		    Serial.writeHex(RF12B::data()[1]);
-		    if (RF12B::wantsAck())
-			{
-			RF12B::sendAckReply();
-			Serial.write('a');
-			}
-		    }
-		}
-	    }
-	}
+                Serial.write(RF12B::length() + '0');
+                if (RF12B::isAckReply())
+                    Serial.write('A');
+                else
+                    {
+                    Serial.write(RF12B::data()[0] + '0');
+                    Serial.writeHex(RF12B::data()[1]);
+                    if (RF12B::wantsAck())
+                        {
+                        RF12B::sendAckReply();
+                        Serial.write('a');
+                        }
+                    }
+                }
+            }
+        }
     }
