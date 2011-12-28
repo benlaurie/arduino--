@@ -1,4 +1,4 @@
-/* -*- mode: c++; indent-tabs-mode: nil; -*- */
+// -*- mode: c++; indent-tabs-mode: nil; -*-
 // RFM12B driver definitions
 // 2009-02-09 <jc@wippler.nl> http://opensource.org/licenses/mit-license.php
 // 2011-12-28 Ben Laurie <ben@links.org>
@@ -126,16 +126,16 @@
 template <class RFM_IRQ> class _RF12
     {
     static volatile uint16_t _crc;  // running crc value, should be
-				    // zero at end
+                                    // zero at end
     enum BufferOffset
-	{
-	GROUP = 0,
-	HEADER = 1,
-	LENGTH = 2,
-	DATA = 3
-	};
+        {
+        GROUP = 0,
+        HEADER = 1,
+        LENGTH = 2,
+        DATA = 3
+        };
     static volatile byte _buf[]; // recv/xmit buf including hdr &
-				    // crc bytes
+                                    // crc bytes
     static long _seq;               // seq number of encrypted packet (or -1)
 
     // transceiver states, these determine what to do with each interrupt
@@ -189,83 +189,83 @@ public:
         }
 
     enum Band
-	{
-	MHZ433 = 1,
-	MHZ868 = 2,
-	MHZ915 = 3,
-	};
+        {
+        MHZ433 = 1,
+        MHZ868 = 2,
+        MHZ915 = 3,
+        };
 
     // call this once with the node ID, frequency band, and optional group
     static void init(uint8_t id, uint8_t band, uint8_t group = 0xD4)
-	{
-	_nodeid = id;
-	_group = group;
+        {
+        _nodeid = id;
+        _group = group;
     
-	spiInit();
+        spiInit();
 
-	xfer(0x0000); // intitial SPI transfer added to avoid power-up problem
-	xfer(RF_SLEEP_MODE); // DC (disable clk pin), enable lbd
+        xfer(0x0000); // intitial SPI transfer added to avoid power-up problem
+        xfer(RF_SLEEP_MODE); // DC (disable clk pin), enable lbd
     
-	// wait until RFM12B is out of power-up reset, this takes
-	// several *seconds*
-	xfer(RF_TXREG_WRITE); // in case we're still in OOK mode
-	while (RFM_IRQ::read() == 0)
-	    xfer(0x0000);
+        // wait until RFM12B is out of power-up reset, this takes
+        // several *seconds*
+        xfer(RF_TXREG_WRITE); // in case we're still in OOK mode
+        while (RFM_IRQ::read() == 0)
+            xfer(0x0000);
         
-	xfer(0x80C7 | (band << 4));      // EL (ena TX), EF (ena RX
-					 // FIFO), 12.0pF
-	xfer(0xA640); // 868MHz 
-	xfer(0xC606); // approx 49.2 Kbps, i.e. 10000/29/(1+6) Kbps
-	xfer(0x94A2); // VDI,FAST,134kHz,0dBm,-91dBm 
-	xfer(0xC2AC); // AL,!ml,DIG,DQD4 
-	if (group != 0)
-	    {
-	    xfer(0xCA83); // FIFO8,2-SYNC,!ff,DR 
-	    xfer(0xCE00 | group); // SYNC=2DXX； 
-	    }
-	else
-	    {
-	    xfer(0xCA8B); // FIFO8,1-SYNC,!ff,DR 
-	    xfer(0xCE2D); // SYNC=2D； 
-	    }
-	xfer(0xC483); // @PWR,NO RSTRIC,!st,!fi,OE,EN 
-	xfer(0x9850); // !mp,90kHz,MAX OUT 
-	xfer(0xCC77); // OB1，OB0, LPX,！ddy，DDIT，BW0 
-	xfer(0xE000); // NOT USE 
-	xfer(0xC800); // NOT USE 
-	xfer(0xC049); // 1.66MHz,3.1V 
+        xfer(0x80C7 | (band << 4));      // EL (ena TX), EF (ena RX
+                                         // FIFO), 12.0pF
+        xfer(0xA640); // 868MHz 
+        xfer(0xC606); // approx 49.2 Kbps, i.e. 10000/29/(1+6) Kbps
+        xfer(0x94A2); // VDI,FAST,134kHz,0dBm,-91dBm 
+        xfer(0xC2AC); // AL,!ml,DIG,DQD4 
+        if (group != 0)
+            {
+            xfer(0xCA83); // FIFO8,2-SYNC,!ff,DR 
+            xfer(0xCE00 | group); // SYNC=2DXX； 
+            }
+        else
+            {
+            xfer(0xCA8B); // FIFO8,1-SYNC,!ff,DR 
+            xfer(0xCE2D); // SYNC=2D； 
+            }
+        xfer(0xC483); // @PWR,NO RSTRIC,!st,!fi,OE,EN 
+        xfer(0x9850); // !mp,90kHz,MAX OUT 
+        xfer(0xCC77); // OB1，OB0, LPX,！ddy，DDIT，BW0 
+        xfer(0xE000); // NOT USE 
+        xfer(0xC800); // NOT USE 
+        xfer(0xC049); // 1.66MHz,3.1V 
 
-	_rxstate = TXIDLE;
-	if ((_nodeid & NODE_ID) != 0)
-	    Interrupt0::enable(Interrupt0::LOW);
-	else
-	    Interrupt0::disable();
-	}
+        _rxstate = TXIDLE;
+        if ((_nodeid & NODE_ID) != 0)
+            Interrupt0::enable(Interrupt0::LOW);
+        else
+            Interrupt0::disable();
+        }
 
     // call this frequently, returns true if a packet has been received
     static bool recvDone(void)
-	{
-	if (_rxstate == TXRECV && (_rxfill >= _buf[LENGTH] + 5
-				   || _rxfill >= RF_MAX))
-	    {
-	    _rxstate = TXIDLE;
-	    if (_buf[LENGTH] > RF12_MAXDATA)
-		_crc = 1; // force bad crc if packet length is invalid
-	    if (!(_buf[HEADER] & RF12_HDR_DST) || (_nodeid & NODE_ID) == 31 ||
+        {
+        if (_rxstate == TXRECV && (_rxfill >= _buf[LENGTH] + 5
+                                   || _rxfill >= RF_MAX))
+            {
+            _rxstate = TXIDLE;
+            if (_buf[LENGTH] > RF12_MAXDATA)
+                _crc = 1; // force bad crc if packet length is invalid
+            if (!(_buf[HEADER] & RF12_HDR_DST) || (_nodeid & NODE_ID) == 31 ||
                 (_buf[HEADER] & RF12_HDR_MASK) == (_nodeid & NODE_ID))
-		{
-		if (_crc == 0 && _crypter != 0)
-		    _crypter(0);
-		else
-		    _seq = -1;
-		return true; // it's a broadcast packet or it's addressed
-			  // to this node
-		}
-	    }
-	if (_rxstate == TXIDLE)
-	    recvStart();
-	return false;
-	}
+                {
+                if (_crc == 0 && _crypter != 0)
+                    _crypter(0);
+                else
+                    _seq = -1;
+                return true; // it's a broadcast packet or it's addressed
+                          // to this node
+                }
+            }
+        if (_rxstate == TXIDLE)
+            recvStart();
+        return false;
+        }
 
     static bool goodCRC() { return _crc == 0; }
     static byte length() { return _buf[LENGTH]; }
@@ -275,65 +275,65 @@ public:
     // returns true when a new transmission may be started with
     // rf12_sendStart()
     static bool canSend(void)
-	{
-	// no need to test with interrupts disabled: state TXRECV is
-	// only reached outside of ISR and we don't care if rxfill
-	// jumps from 0 to 1 here
-	if (_rxstate == TXRECV && _rxfill == 0 &&
+        {
+        // no need to test with interrupts disabled: state TXRECV is
+        // only reached outside of ISR and we don't care if rxfill
+        // jumps from 0 to 1 here
+        if (_rxstate == TXRECV && _rxfill == 0 &&
             (xferByte(0x00) & (RF_RSSI_BIT >> 8)) == 0)
-	    {
-	    xfer(RF_IDLE_MODE); // stop receiver
-	    //XXX just in case, don't know whether these RF12 reads are needed!
-	    // rf12_xfer(0x0000); // status register
-	    // rf12_xfer(RF_RX_FIFO_READ); // fifo read
-	    _rxstate = TXIDLE;
-	    _buf[GROUP] = _group;
-	    return true;
-	    }
-	return false;
-	}
+            {
+            xfer(RF_IDLE_MODE); // stop receiver
+            //XXX just in case, don't know whether these RF12 reads are needed!
+            // rf12_xfer(0x0000); // status register
+            // rf12_xfer(RF_RX_FIFO_READ); // fifo read
+            _rxstate = TXIDLE;
+            _buf[GROUP] = _group;
+            return true;
+            }
+        return false;
+        }
 
     // returns true if the buffer currently contains a packet that
     // needs ACKing.
     static bool wantsAck()
-	{
-	return (_buf[HEADER] & RF12_HDR_ACK) && !(_buf[HEADER] & RF12_HDR_CTL);
-	}
+        {
+        return (_buf[HEADER] & RF12_HDR_ACK) && !(_buf[HEADER] & RF12_HDR_CTL);
+        }
 
     // Send an ack reply to the packet in the buffer (wantsAck() must be true)
     static void sendAckReply()
-	{
-	byte hdr;
+        {
+        byte hdr;
 
-	if (_buf[HEADER] & RF12_HDR_DST)
-	    hdr = RF12_HDR_CTL;
-	else
+        if (_buf[HEADER] & RF12_HDR_DST)
+            hdr = RF12_HDR_CTL;
+        else
             hdr = RF12_HDR_CTL | RF12_HDR_DST | (_buf[HEADER] & RF12_HDR_MASK);
-	sendStart(hdr);
-	}
+        sendStart(hdr);
+        }
 
     // call this only when rf12_recvDone() or rf12_canSend() return true
     static void sendStart(uint8_t hdr)
-	{
-	_buf[HEADER] = hdr & RF12_HDR_DST ? hdr :
-	    (hdr & ~RF12_HDR_MASK) + (_nodeid & NODE_ID);
-	if (_crypter != 0)
-	    _crypter(1);
+        {
+        _buf[HEADER] = hdr & RF12_HDR_DST ? hdr :
+            (hdr & ~RF12_HDR_MASK) + (_nodeid & NODE_ID);
+        if (_crypter != 0)
+            _crypter(1);
     
-	_crc = ~0;
+        _crc = ~0;
 #if RF12_VERSION >= 2
-	_crc = _crc16_update(_crc, _buf[GROUP]);
+        _crc = _crc16_update(_crc, _buf[GROUP]);
 #endif
-	_rxstate = TXPRE1;
-	xfer(RF_XMITTER_ON); // bytes will be fed via interrupts
-	}
+        _rxstate = TXPRE1;
+        xfer(RF_XMITTER_ON); // bytes will be fed via interrupts
+        }
 
     static void sendStart(uint8_t hdr, const void* ptr, uint8_t len)
-	{
-	_buf[LENGTH] = len;
-	memcpy((void *)&_buf[DATA], ptr, len);
-	sendStart(hdr);
-	}
+        {
+        _buf[LENGTH] = len;
+        memcpy((void *)&_buf[DATA], ptr, len);
+        sendStart(hdr);
+        }
 
 // wait for send to finish, sleep mode: 0=none, 1=idle, 2=standby, 3=powerdown
 void rf12_sendWait(uint8_t mode);
@@ -387,137 +387,137 @@ enum rf12DataRates {
 };
 
     static void interrupt()
-	{
-	// a transfer of 2x 16 bits @ 2 MHz over SPI takes 2x 8 us
-	// inside this ISR correction: now takes 2 + 8 µs, since
-	// sending can be done at 8 MHz
-	xfer(0x0000);
+        {
+        // a transfer of 2x 16 bits @ 2 MHz over SPI takes 2x 8 us
+        // inside this ISR correction: now takes 2 + 8 µs, since
+        // sending can be done at 8 MHz
+        xfer(0x0000);
     
-	if (_rxstate == TXRECV)
-	    {
-	    uint8_t in = xferSlow(RF_RX_FIFO_READ);
+        if (_rxstate == TXRECV)
+            {
+            uint8_t in = xferSlow(RF_RX_FIFO_READ);
 
-	    if (_rxfill == 0 && _group != 0)
-		_buf[_rxfill++] = _group;
+            if (_rxfill == 0 && _group != 0)
+                _buf[_rxfill++] = _group;
             
-	    _buf[_rxfill++] = in;
-	    _crc = _crc16_update(_crc, in);
+            _buf[_rxfill++] = in;
+            _crc = _crc16_update(_crc, in);
 
-	    if (_rxfill >= _buf[LENGTH] + 5 || _rxfill >= RF_MAX)
-		xfer(RF_IDLE_MODE);
-	    }
-	else
-	    {
-	    uint8_t out;
+            if (_rxfill >= _buf[LENGTH] + 5 || _rxfill >= RF_MAX)
+                xfer(RF_IDLE_MODE);
+            }
+        else
+            {
+            uint8_t out;
 
-	    if (_rxstate < 0)
-		{
-		uint8_t pos = 3 + _buf[LENGTH] + _rxstate++;
-		out = _buf[pos];
-		_crc = _crc16_update(_crc, out);
-		}
-	    else
-		switch (_rxstate++)
-		    {
+            if (_rxstate < 0)
+                {
+                uint8_t pos = 3 + _buf[LENGTH] + _rxstate++;
+                out = _buf[pos];
+                _crc = _crc16_update(_crc, out);
+                }
+            else
+                switch (_rxstate++)
+                    {
                 case TXSYN1: out = 0x2D; break;
                 case TXSYN2:
-		    out = _buf[GROUP];
-		    _rxstate = - (2 + _buf[LENGTH]);
-		    break;
+                    out = _buf[GROUP];
+                    _rxstate = - (2 + _buf[LENGTH]);
+                    break;
                 case TXCRC1: out = _crc; break;
                 case TXCRC2: out = _crc >> 8; break;
                 case TXDONE: xfer(RF_IDLE_MODE); // fall through
                 default:     out = 0xAA;
-		    }
+                    }
             
-	    xfer(RF_TXREG_WRITE + out);
-	    }
-	}
+            xfer(RF_TXREG_WRITE + out);
+            }
+        }
 
 private:
     // FIXME: unify with arduino++.h
     static uint8_t xferByte(uint8_t out)
-	{
+        {
 #ifdef SPDR
-	SPDR = out;
-	// this loop spins 4 usec with a 2 MHz SPI clock
-	while (!(SPSR & _BV(SPIF)))
-	    ;
-	return SPDR;
+        SPDR = out;
+        // this loop spins 4 usec with a 2 MHz SPI clock
+        while (!(SPSR & _BV(SPIF)))
+            ;
+        return SPDR;
 #else
-	// ATtiny
-	USIDR = out;
-	byte v1 = bit(USIWM0) | bit(USITC);
-	byte v2 = bit(USIWM0) | bit(USITC) | bit(USICLK);
+        // ATtiny
+        USIDR = out;
+        byte v1 = bit(USIWM0) | bit(USITC);
+        byte v2 = bit(USIWM0) | bit(USITC) | bit(USICLK);
 #if F_CPU <= 5000000
-	// only unroll if resulting clock stays under 2.5 MHz
-	USICR = v1; USICR = v2;
-	USICR = v1; USICR = v2;
-	USICR = v1; USICR = v2;
-	USICR = v1; USICR = v2;
-	USICR = v1; USICR = v2;
-	USICR = v1; USICR = v2;
-	USICR = v1; USICR = v2;
-	USICR = v1; USICR = v2;
+        // only unroll if resulting clock stays under 2.5 MHz
+        USICR = v1; USICR = v2;
+        USICR = v1; USICR = v2;
+        USICR = v1; USICR = v2;
+        USICR = v1; USICR = v2;
+        USICR = v1; USICR = v2;
+        USICR = v1; USICR = v2;
+        USICR = v1; USICR = v2;
+        USICR = v1; USICR = v2;
 #else
-	for (uint8_t i = 0; i < 8; ++i)
-	    {
-	    USICR = v1;
-	    USICR = v2;
-	    }
+        for (uint8_t i = 0; i < 8; ++i)
+            {
+            USICR = v1;
+            USICR = v2;
+            }
 #endif
-	return USIDR;
+        return USIDR;
 #endif
-	}
+        }
 
     static uint16_t xferSlow(uint16_t cmd)
-	{
-	// slow down to under 2.5 MHz
+        {
+        // slow down to under 2.5 MHz
 #if F_CPU > 10000000
-	//bitSet(SPCR, SPR0);
-	//SPCR |= (1 << SPR0);
-	Register::SPCR.set(SPR0);
+        //bitSet(SPCR, SPR0);
+        //SPCR |= (1 << SPR0);
+        Register::SPCR.set(SPR0);
 #endif
-	//bitClear(SS_PORT, SS_BIT);
-	Pin::SPI_SS::clear();
-	uint16_t reply = xferByte(cmd >> 8) << 8;
-	reply |= xferByte(cmd);
-	//bitSet(SS_PORT, SS_BIT);
-	Pin::SPI_SS::set();
+        //bitClear(SS_PORT, SS_BIT);
+        Pin::SPI_SS::clear();
+        uint16_t reply = xferByte(cmd >> 8) << 8;
+        reply |= xferByte(cmd);
+        //bitSet(SS_PORT, SS_BIT);
+        Pin::SPI_SS::set();
 #if F_CPU > 10000000
-	//bitClear(SPCR, SPR0);
-	//SPCR &= ~(1 << SPR0);
-	Register::SPCR.clear(SPR0);
+        //bitClear(SPCR, SPR0);
+        //SPCR &= ~(1 << SPR0);
+        Register::SPCR.clear(SPR0);
 #endif
-	return reply;
-	}
+        return reply;
+        }
 
     static void xfer(uint16_t cmd)
-	{
+        {
 #if OPTIMIZE_SPI
-	// writing can take place at full speed, even 8 MHz works
-	//bitClear(SS_PORT, SS_BIT);
-	Pin::SPI_SS::clear();
-	xferByte(cmd >> 8);
-	xferByte(cmd);
-	//bitSet(SS_PORT, SS_BIT);
-	Pin::SPI_SS::set();
+        // writing can take place at full speed, even 8 MHz works
+        //bitClear(SS_PORT, SS_BIT);
+        Pin::SPI_SS::clear();
+        xferByte(cmd >> 8);
+        xferByte(cmd);
+        //bitSet(SS_PORT, SS_BIT);
+        Pin::SPI_SS::set();
 #else
-	xferSlow(cmd);
+        xferSlow(cmd);
 #endif
-	}
+        }
 
     static void recvStart ()
-	{
-	_rxfill = _buf[LENGTH] = 0;
-	_crc = ~0;
+        {
+        _rxfill = _buf[LENGTH] = 0;
+        _crc = ~0;
 #if RF12_VERSION >= 2
-	if (_group != 0)
-	    _crc = _crc16_update(~0, _group);
+        if (_group != 0)
+            _crc = _crc16_update(~0, _group);
 #endif
-	_rxstate = TXRECV;
-	xfer(RF_RECEIVER_ON);
-	}
+        _rxstate = TXRECV;
+        xfer(RF_RECEIVER_ON);
+        }
   
     };
 

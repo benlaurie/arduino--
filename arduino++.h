@@ -1,3 +1,5 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
+
 #ifndef ARDUINO_MINUS_MINUS
 #define ARDUINO_MINUS_MINUS
 
@@ -34,19 +36,19 @@ template <byte lsb, byte maskbit> class _Interrupt
     {
  public:
     enum Mode
-	{
-	LOW = 0,
-	CHANGE = 1,
-	FALLING_EDGE = 2,
-	RISING_EDGE = 3
-	};
+        {
+        LOW = 0,
+        CHANGE = 1,
+        FALLING_EDGE = 2,
+        RISING_EDGE = 3
+        };
     static void enable(Mode mode)
-	{
-	Register::EICRA = (Register::EICRA & ~(3 << lsb)) | (mode << lsb);
-	Register::EIMSK.set(maskbit);
-	}
+        {
+        Register::EICRA = (Register::EICRA & ~(3 << lsb)) | (mode << lsb);
+        Register::EIMSK.set(maskbit);
+        }
     static void disable()
-	{ Register::EIMSK.clear(maskbit); }
+        { Register::EIMSK.clear(maskbit); }
     };
 
 typedef class _Interrupt<ISC00, INT0> Interrupt0;
@@ -181,13 +183,13 @@ public:
         byte tmp;
         
         // enable SPI master with configuration byte specified
-	Register::SPCR = 0;
-	Register::SPCR = (config & 0x7F) | (1 << SPE) | (1 << MSTR);
-	// clear any pending conditions and set double speed if needed.
-	if (double_speed)
-	    SPSR |= (1 << SPI2X);
-	else
-	    tmp = SPSR;
+        Register::SPCR = 0;
+        Register::SPCR = (config & 0x7F) | (1 << SPE) | (1 << MSTR);
+        // clear any pending conditions and set double speed if needed.
+        if (double_speed)
+            SPSR |= (1 << SPI2X);
+        else
+            tmp = SPSR;
         tmp = SPDR;
         }
     
