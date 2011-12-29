@@ -8,7 +8,7 @@ static const byte dest = 1;
 
 int main()
     {
-    unsigned long last = 0;
+    typename Arduino16::time_res_t last = 0;
     byte seq = 0;
 
     Arduino16::init();
@@ -16,7 +16,7 @@ int main()
     RF12B::init(id, RF12B::MHZ868);
     for ( ; ; )
         {
-        unsigned long t = Arduino16::millis();
+        typename Arduino16::time_res_t t = Arduino16::millis();
         if (t > last + 100 && RF12B::canSend())
             {
             last = t;
