@@ -16,7 +16,7 @@ include Makefile.local
 all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
      test_enc28j60.bin test_enc28j60.lst onewire_test.bin onewire_test.lst \
      test_ip.bin test_ip.lst test_serial.bin test_serial.lst test_rf12.bin \
-     test_rf12.lst \
+     test_rf12.lst test_pushbutton.bin test_pushbutton.lst \
      libarduino++.a
 
 .depend: *.cc *.h
