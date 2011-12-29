@@ -63,4 +63,4 @@ pcint: all
 test_pushbutton: all
 	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:test_pushbutton.bin
 
--include .depend
+.sinclude ".depend"
