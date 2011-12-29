@@ -5,6 +5,13 @@
 #error "Only one timer resolution can be used"
 #endif
 
+/* This file should be included - once - in the main C++ file of the 
+   application.
+
+   Other headers should - if at all possible - not include this file and
+   use a template instead.
+ */
+
 /** This is a Timer with 32bit timer resolution.
     
     The recommended way to use a timer value in user code is:

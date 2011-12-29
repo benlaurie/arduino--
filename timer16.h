@@ -5,6 +5,13 @@
 #error "Only one timer resolution can be used"
 #endif
 
+/* This file should be included - once - in the main C++ file of the 
+   application.
+
+   Other headers should - if at all possible - not include this file and
+   use a template instead.
+ */
+
 /** This is a Timer with 16bit timer resolution.
     
     The value from Timer16::millis() will wrap around after about 65 seconds.
