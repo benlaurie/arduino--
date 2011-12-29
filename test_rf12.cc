@@ -1,5 +1,6 @@
 // -*- mode: c++; indent-tabs-mode: nil; -*-
 #include "rf12.h"
+#include "timer16.h"
 #include "serial.h"
 
 // You need to set these the other way round for the second test node.
@@ -8,15 +9,15 @@ static const byte dest = 1;
 
 int main()
     {
-    typename Arduino16::time_res_t last = 0;
+    typename Timer16::time_res_t last = 0;
     byte seq = 0;
 
-    Arduino16::init();
+    Arduino::init();
     Serial.begin(57600);
     RF12B::init(id, RF12B::MHZ868);
     for ( ; ; )
         {
-        typename Arduino16::time_res_t t = Arduino16::millis();
+        typename Timer16::time_res_t t = Timer16::millis();
         if (t > last + 100 && RF12B::canSend())
             {
             last = t;

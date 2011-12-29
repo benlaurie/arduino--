@@ -3,7 +3,7 @@
 
 #include "arduino++.h"
 
-template<class Arduino_, class Pin, int debounce>
+template<class Timer_, class Pin, int debounce>
 class PushButton
     {
 public:
@@ -21,13 +21,13 @@ public:
         // aktivate pullup
         Pin::set();
         previous_ = !Pin::read();
-        changed_ = Arduino_::millis();
+        changed_ = Timer_::millis();
         duration_ = 0;
         }
 
     event_type read()
         {
-        const typename Arduino_::time_res_t now = Arduino_::millis();
+        const typename Timer_::time_res_t now = Timer_::millis();
         // The button is active low
         const bool pressed = !Pin::read();
 
@@ -36,7 +36,7 @@ public:
             {
             // reset the debouncing timer
             previous_ = pressed;
-            const typename Arduino_::time_res_t delta = now - changed_;
+            const typename Timer_::time_res_t delta = now - changed_;
             changed_ = now;
     
             if (delta > debounce) 
@@ -55,12 +55,12 @@ public:
         }
 
     // duration is only valid after a keyup event
-    typename Arduino_::time_res_t duration() { return duration_; }
+    typename Timer_::time_res_t duration() { return duration_; }
 
 private:
     bool previous_;
-    typename Arduino_::time_res_t changed_;
-    typename Arduino_::time_res_t duration_;
+    typename Timer_::time_res_t changed_;
+    typename Timer_::time_res_t duration_;
 };
 
 #endif

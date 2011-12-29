@@ -111,14 +111,9 @@ public:
     typedef Pin::B5 SPI_SCK;
     };
 
-/** Don't use this directly, use Arduino16 or Arduino32 instead
- */
-template<typename timeres_t>
-class _Arduino
+class Arduino
     {
 public:
-
-    typedef timeres_t time_res_t;
 
     // The analog pins in Arduino numbering
     typedef Pin::C0 A0;
@@ -224,7 +219,16 @@ public:
         UCSR0B = 0;
 #endif
         }
-    
+    };
+
+/** Don't use this directly, use Timer16 or Timer32 instead
+ */
+template<typename timeres_t>
+class _Timer
+    {
+public:
+    typedef timeres_t time_res_t;
+
     static timeres_t millis()
         {
         const uint8_t oldSREG = SREG;
@@ -238,27 +242,28 @@ public:
         return m;
         }
 
-    static timeres_t micros()
+    static uint16_t micros()
         {
-        timeres_t m;
-        uint16_t t;
-        uint8_t oldSREG = SREG;
+        uint8_t m;
+        uint8_t t;
+        const uint8_t oldSREG = SREG;
     
         cli();
         t = TCNT0;
+
+        m = timer0_overflow_count % (1 << TIMER16_MICRO_SCALE);
   
 #ifdef TIFR0
         if ((TIFR0 & _BV(TOV0)) && (t == 0))
-            t = 256;
+            m++;
 #else
         if ((TIFR & _BV(TOV0)) && (t == 0))
-            t = 256;
+            m++;
 #endif
 
-        m = timer0_overflow_count;
         SREG = oldSREG;
     
-        return ((m << 8) + t) * 64 / (F_CPU / 1000000L);
+        return ((m << 8) + t) * (64 / (F_CPU / 1000000L));
         }
 
     static void delay(timeres_t ms)
@@ -274,41 +279,9 @@ public:
     volatile static timeres_t timer0_millis;
     };
 
-template<typename T> volatile T _Arduino<T>::timer0_overflow_count = 0;
-template<typename T> volatile T _Arduino<T>::timer0_clock_cycles = 0;
-template<typename T> volatile T _Arduino<T>::timer0_millis = 0;
-
-/** This is an Arduino with 16bit timer resolution.
-    
-    The value from Arduino16::millis() will wrap around after about 65 seconds
-    and the value from Arduino16::micros() will wrap around after about 65 ms.
-
-    When you use Arduino16, you must #include "arduino++timer16.h", or 
-    Arduino16::millis() will always return 0.
-
-    The recommended way to use a timer value in user code is:
-
-    typename Arduino16::time_res_t now = Arduino16::millis();
-
-    Motivation: With Arduino16 instead of Arduino32, Lars has seen a code size 
-    reduction of 238 bytes with avr-gcc 4.6.1.
- */
-typedef _Arduino<uint16_t> Arduino16;
-
-/** This is an Arduino with 32bit timer resolution.
-    
-    When you use Arduino32, you must #include "arduino++timer32.h", or 
-    Arduino32::millis() will always return 0.
-
-    The recommended way to use a timer value in user code is:
-
-    typename Arduino32::time_res_t now = Arduino32::millis();
-
-    The value from Arduino32::millis() will wrap around after about 49 days
-    and the value from Arduino32::micros() will wrap around after about 
-    71 minutes.
- */
-typedef _Arduino<uint32_t> Arduino32;
+template<typename T> volatile T _Timer<T>::timer0_overflow_count = 0;
+template<typename T> volatile T _Timer<T>::timer0_clock_cycles = 0;
+template<typename T> volatile T _Timer<T>::timer0_millis = 0;
 
 void delayMicroseconds(unsigned int us)
     {

@@ -1,5 +1,7 @@
+include Makefile.local
+
 OPTIMIZE = -O3
-DEFS = -I /usr/local/avr/avr/include -DF_CPU=16000000
+DEFS = -I /usr/local/avr/avr/include -DF_CPU=$(CPU_FREQUENCY)
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
 CXX = avr-g++
@@ -10,8 +12,6 @@ OBJDUMP = avr-objdump
 CFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
-
-include Makefile.local
 
 all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
      test_enc28j60.bin test_enc28j60.lst onewire_test.bin onewire_test.lst \
@@ -40,7 +40,7 @@ all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 avr-ports.h: get-ports.lst extract-ports.pl
-	./extract-ports.pl < get-ports.lst > avr-ports.h
+	./extract-ports.pl -f $(CPU_FREQUENCY) < get-ports.lst > avr-ports.h
 
 clean:
 	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend

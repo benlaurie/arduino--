@@ -5,6 +5,16 @@
 #error "Only one timer resolution can be used"
 #endif
 
+/** This is a Timer with 32bit timer resolution.
+    
+    The recommended way to use a timer value in user code is:
+
+    typename Timer32::time_res_t now = Arduino32::millis();
+
+    The value from Timer32::millis() will wrap around after about 49 days.
+ */
+typedef _Arduino<uint32_t> Arduino32;
+
 /* 
  * Implementation of the timer ISR for 32 bits resolution 
  */
