@@ -3,9 +3,16 @@
 #include "timer16.h"
 #include "serial.h"
 
+// This test hangs randomly without a watchdog timer.
+#define WATCHDOG
+
+#ifdef WATCHDOG
+# include <avr/wdt.h>
+#endif
+
 // You need to set these the other way round for the second test node.
-static const byte id = 2;
-static const byte dest = 1;
+static const byte id = 1;
+static const byte dest = 2;
 
 int main()
     {
@@ -15,9 +22,17 @@ int main()
     Arduino::init();
     Serial.begin(57600);
     RF12B::init(id, RF12B::MHZ868);
+#ifdef WATCHDOG
+    wdt_enable(WDTO_2S);
+#endif
     for ( ; ; )
         {
+#ifdef WATCHDOG
+        wdt_reset();
+#endif
+        unsigned long t = Arduino::millis();
         typename Timer16::time_res_t t = Timer16::millis();
+
         if (t > last + 100 && RF12B::canSend())
             {
             last = t;
