@@ -40,12 +40,13 @@
 class NanodeMAC
     {
     typedef ::Pin::D7 Pin;
+    typedef ::Pin::D6 Debug;
 
     static const uint16_t UNIO_TSTBY_US = 600;
     static const byte UNIO_THDR_US = 6;
 #ifndef NANODEMAC_SLOW
-    static const double QUARTER_BIT = 5;
-    static const byte HALF_BIT = 10;
+    static const double QUARTER_BIT = 2.5;
+    static const byte HALF_BIT = 5;
 #else
     static const double QUARTER_BIT = 10;
     static const byte HALF_BIT = 20;
@@ -65,24 +66,25 @@ class NanodeMAC
 	{
 	Pin::clear();
 	AVRBase::constantDelayMicroseconds(UNIO_THDR_US);
-	//sendByte(B01010101);
 	sendByte(0x55);
 	}
-    void waitQuarterBit() { AVRBase::constantDelayMicroseconds(QUARTER_BIT); }
-    void waitHalfBit() { AVRBase::constantDelayMicroseconds(HALF_BIT); }
+    void waitQuarterBit(byte offset)
+	{ AVRBase::constantDelayMicroseconds(QUARTER_BIT - .0625*offset); }
+    void waitHalfBit(byte offset)
+	{ AVRBase::constantDelayMicroseconds(HALF_BIT - .0625*offset); }
     void bit0()
 	{
 	Pin::set();
-	waitHalfBit();
+	waitHalfBit(1);
 	Pin::clear();
-	waitHalfBit();
+	waitHalfBit(1);
 	}
     void bit1()
 	{
 	Pin::clear();
-	waitHalfBit();
+	waitHalfBit(1);
 	Pin::set();
-	waitHalfBit();
+	waitHalfBit(1);
 	}
     void sendByte(byte data)
 	{
@@ -121,11 +123,13 @@ class NanodeMAC
     bool readBit()
 	{
 	Pin::modeInput();
-	waitQuarterBit();
+	waitQuarterBit(0);
 	bool value1 = Pin::read();
-	waitHalfBit();
+	Debug::set();
+	waitHalfBit(1 + 1);
 	bool value2 = Pin::read();
-	waitQuarterBit();
+	Debug::clear();
+	waitQuarterBit(8 + 1);
 	return value2 && !value1;
 	}
     static byte macaddr_[6];
@@ -139,6 +143,8 @@ public:
 	// Turn off Interrupts while we read the mac address
 	AVRBase::noInterrupts();
 
+	Debug::clear();
+	Debug::modeOutput();
 	standby();
 	startHeader();
 	// address A0
