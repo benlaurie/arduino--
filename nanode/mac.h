@@ -41,8 +41,8 @@ class NanodeMAC
     {
     typedef ::Pin::D7 Pin;
 
-    static const uint16_t UNIO_TSTBY_US = 600;
-    static const byte UNIO_THDR_US = 6;
+    static const uint16_t TSTBY_US = 600;
+    static const byte THDR_US = 6;
 #ifndef NANODEMAC_SLOW
     static const double QUARTER_BIT = 2.5;
     static const byte HALF_BIT = 5;
@@ -59,12 +59,12 @@ class NanodeMAC
     void standby()
 	{
 	fastStandby();
-	AVRBase::constantDelayMicroseconds(UNIO_TSTBY_US);
+	AVRBase::constantDelayMicroseconds(TSTBY_US);
 	}
     void startHeader()
 	{
 	Pin::clear();
-	AVRBase::constantDelayMicroseconds(UNIO_THDR_US);
+	AVRBase::constantDelayMicroseconds(THDR_US);
 	sendByte(0x55);
 	}
     void waitQuarterBit(byte offset)
