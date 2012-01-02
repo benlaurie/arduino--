@@ -135,10 +135,13 @@ class NanodeMAC
 	bool value1 = Pin::read();
 	waitHalfBit(1);
 	bool value2 = Pin::read();
-	waitQuarterBit(8);
+	waitQuarterBit(18);
+	if (value1 == value2)
+	    ok_ = false;
 	return value2 && !value1;
 	}
     static byte macaddr_[6];
+    static bool ok_;
 
 public:
     // Note that this can be run before the chip is initialised, so a
@@ -149,6 +152,7 @@ public:
 	// Turn off Interrupts while we read the mac address
 	AVRBase::noInterrupts();
 
+	ok_ = true;
 	standby();
 	startHeader();
 	// address A0
@@ -170,6 +174,8 @@ public:
 	AVRBase::interrupts();
 	}
     operator const byte *() const { return macaddr_; }
+    bool ok() const { return ok_; }
     };
 
 byte NanodeMAC::macaddr_[6];
+bool NanodeMAC::ok_;
