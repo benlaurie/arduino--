@@ -39,7 +39,8 @@
 
 class NanodeMAC
     {
-private:
+    typedef ::Pin::D7 Pin;
+
     static const uint16_t UNIO_TSTBY_US = 600;
     static const byte UNIO_THDR_US = 6;
 #ifndef NANODEMAC_SLOW
@@ -49,8 +50,6 @@ private:
     static const double QUARTER_BIT = 10;
     static const byte HALF_BIT = 20;
 #endif
-
-    typedef ::Pin::D7 Pin;
 
     void fastStandby()
 	{
