@@ -24,9 +24,9 @@
 #include <avr/interrupt.h>
 #include "arduino++.h"
 
-volatile unsigned long Arduino::timer0_overflow_count = 0;
-volatile unsigned long Arduino::timer0_clock_cycles = 0;
-volatile unsigned long Arduino::timer0_millis = 0;
+volatile unsigned long AVRBase::timer0_overflow_count = 0;
+volatile unsigned long AVRBase::timer0_clock_cycles = 0;
+volatile unsigned long AVRBase::timer0_millis = 0;
 
 void (*volatile timer0_overflow)(void);
 
@@ -37,19 +37,19 @@ void (*volatile timer0_overflow)(void);
 
 ISR(TIMER0_OVF_vect)
     {
-    Arduino::timer0_overflow_count++;
+    AVRBase::timer0_overflow_count++;
     // timer 0 prescale factor is 64 and the timer overflows at 256
-    Arduino::timer0_clock_cycles += 64UL * 256UL;
-    while (Arduino::timer0_clock_cycles >
-       clockCyclesPerMicrosecond() * 1000UL) {
-    Arduino::timer0_clock_cycles -= clockCyclesPerMicrosecond() * 1000UL;
-    Arduino::timer0_millis++;
-    }
+    AVRBase::timer0_clock_cycles += 64UL * 256UL;
+    while (AVRBase::timer0_clock_cycles > clockCyclesPerMicrosecond() * 1000UL)
+	{
+	AVRBase::timer0_clock_cycles -= clockCyclesPerMicrosecond() * 1000UL;
+	AVRBase::timer0_millis++;
+	}
     if (timer0_overflow)
-    timer0_overflow();
+	timer0_overflow();
     }
 
-unsigned long Arduino::millis()
+unsigned long AVRBase::millis()
     {
     unsigned long m;
     uint8_t oldSREG = SREG;
@@ -63,7 +63,7 @@ unsigned long Arduino::millis()
     return m;
     }
 
-unsigned long Arduino::micros()
+unsigned long AVRBase::micros()
     {
     unsigned long m, t;
     uint8_t oldSREG = SREG;
@@ -88,7 +88,7 @@ unsigned long Arduino::micros()
 /* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. 
  * Disables interrupts, which will disrupt the millis() function if used
  * too frequently. */
-void Arduino::delayMicroseconds(unsigned int us)
+void AVRBase::delayMicroseconds(unsigned int us)
     {
     uint8_t oldSREG;
 

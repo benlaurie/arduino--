@@ -110,11 +110,9 @@ public:
     typedef Pin::B5 SPI_SCK;
     };
 
-class Arduino
+class AVRBase
     {
 public:
-    static void init();
-    
     static unsigned long millis();
     static unsigned long micros();
 
@@ -150,6 +148,16 @@ public:
     
     static void interrupts() { sei(); }
     static void noInterrupts() { cli(); }
+
+    volatile static unsigned long timer0_overflow_count;
+    volatile static unsigned long timer0_clock_cycles;
+    volatile static unsigned long timer0_millis;
+    };
+
+class Arduino : public AVRBase
+    {
+public:
+    static void init();
     
     // The analog pins in Arduino numbering
     typedef Pin::C0 A0;
@@ -173,10 +181,6 @@ public:
     typedef Pin::B3 D11;
     typedef Pin::B4 D12;
     typedef Pin::B5 D13;
-    
-    volatile static unsigned long timer0_overflow_count;
-    volatile static unsigned long timer0_clock_cycles;
-    volatile static unsigned long timer0_millis;
     };
 
 template <class Sck, class Miso, class Mosi, class Ss> class _SPI
