@@ -102,8 +102,8 @@ class NanodeMAC
 	{
 	_sendByte(data);
 	// SAK?
-	//bool sak = unio_readBit();
-	readBit();
+	if (readBit() != 1)
+	    ok_ = false;
 	}
     void sendByteNoSAK(byte data)
 	{
@@ -123,8 +123,9 @@ class NanodeMAC
 		bit0(); // NoMAK
 	    else
 		bit1(); // MAK
-	    //bool sak = unio_readBit();
-	    readBit();
+	    // SAK?
+	    if (readBit() != 1)
+		ok_ = false;
 	    addr[i] = data;
 	    }
 	}
@@ -135,7 +136,7 @@ class NanodeMAC
 	bool value1 = Pin::read();
 	waitHalfBit(1);
 	bool value2 = Pin::read();
-	waitQuarterBit(18);
+	waitQuarterBit(21);
 	if (value1 == value2)
 	    ok_ = false;
 	return value2 && !value1;
