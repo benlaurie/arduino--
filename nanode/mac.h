@@ -1,8 +1,7 @@
 // from https://github.com/thiseldo/NanodeMAC.git
 
-// Define NANODEMAC_SLOW to get original timings. In theory can do bit
-// times of 10 us, but I can't be bothered to get the timings tight
-// enough right now.
+// Define NANODEMAC_SLOW to get (almost) original timings. Current
+// timings are the fastest allowed.
 
 // Note that this device has at least 1.5kB of usable EEPROM if we want...
 
@@ -65,7 +64,7 @@ class NanodeMAC
 	{
 	Pin::clear();
 	AVRBase::constantDelayMicroseconds(THDR_US);
-	sendByte(0x55);
+	sendByteNoSAK(0x55);
 	}
     void waitQuarterBit(byte offset)
 	{ AVRBase::constantDelayMicroseconds(QUARTER_BIT - .0625*offset); }
@@ -85,7 +84,7 @@ class NanodeMAC
 	Pin::set();
 	waitHalfBit(1);
 	}
-    void sendByte(byte data)
+    void _sendByte(byte data)
 	{
 	Pin::modeOutput();
 	for (byte i = 0; i < 8; i++)
@@ -98,9 +97,19 @@ class NanodeMAC
 	    }
 	// MAK
 	bit1();
+	}
+    void sendByte(byte data)
+	{
+	_sendByte(data);
 	// SAK?
 	//bool sak = unio_readBit();
 	readBit();
+	}
+    void sendByteNoSAK(byte data)
+	{
+	_sendByte(data);
+	// don't even bother to read it (FIXME: should we check for constant 1?)
+	AVRBase::constantDelayMicroseconds(2 * HALF_BIT);
 	}
     void readBytes(byte *addr, int length)
 	{
