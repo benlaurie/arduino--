@@ -159,8 +159,7 @@ public:
 	// Re-enable interrupts
 	AVRBase::interrupts();
 	}
-    operator const byte *() { return macaddr_; }
+    operator const byte *() const { return macaddr_; }
     };
 
 byte NanodeMAC::macaddr_[6];
-
