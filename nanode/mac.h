@@ -40,7 +40,6 @@
 class NanodeMAC
     {
     typedef ::Pin::D7 Pin;
-    typedef ::Pin::D6 Debug;
 
     static const uint16_t UNIO_TSTBY_US = 600;
     static const byte UNIO_THDR_US = 6;
@@ -89,7 +88,7 @@ class NanodeMAC
     void sendByte(byte data)
 	{
 	Pin::modeOutput();
-	for (int i = 0; i < 8; i++)
+	for (byte i = 0; i < 8; i++)
 	    {
 	    if (data & 0x80)
 		bit1();
@@ -108,7 +107,7 @@ class NanodeMAC
 	for (int i = 0; i < length; i++)
 	    {
 	    byte data = 0;
-	    for (int b=0; b<8; b++)
+	    for (byte b = 0; b < 8; b++)
 		data = (data << 1) | (readBit() ? 1 : 0);
 	    Pin::modeOutput();
 	    if (i == length-1)
@@ -125,11 +124,9 @@ class NanodeMAC
 	Pin::modeInput();
 	waitQuarterBit(0);
 	bool value1 = Pin::read();
-	Debug::set();
-	waitHalfBit(1 + 1);
+	waitHalfBit(1);
 	bool value2 = Pin::read();
-	Debug::clear();
-	waitQuarterBit(8 + 1);
+	waitQuarterBit(8);
 	return value2 && !value1;
 	}
     static byte macaddr_[6];
@@ -143,8 +140,6 @@ public:
 	// Turn off Interrupts while we read the mac address
 	AVRBase::noInterrupts();
 
-	Debug::clear();
-	Debug::modeOutput();
 	standby();
 	startHeader();
 	// address A0
