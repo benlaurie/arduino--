@@ -275,12 +275,12 @@ public:
         }
 
     volatile static timeres_t timer0_overflow_count;
-    volatile static timeres_t timer0_clock_cycles;
+    volatile static uint16_t timer0_fract;
     volatile static timeres_t timer0_millis;
     };
 
 template<typename T> volatile T _Timer<T>::timer0_overflow_count = 0;
-template<typename T> volatile T _Timer<T>::timer0_clock_cycles = 0;
+template<typename T> volatile uint16_t _Timer<T>::timer0_fract = 0;
 template<typename T> volatile T _Timer<T>::timer0_millis = 0;
 
 void delayMicroseconds(unsigned int us)

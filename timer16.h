@@ -30,14 +30,22 @@ typedef _Timer<uint16_t> Timer16;
  */
 ISR(TIMER0_OVF_vect)
     {
+
+	// copy these to local variables so they can be stored in registers
+	// (volatile variables must be read from memory on every access)
+	typename Timer16::time_res_t m = Timer16::timer0_millis;
+	uint16_t f = Timer16::timer0_fract;
+
+	m += (64 * (256 / (F_CPU / 1000000))) / 1000;
+	f += (64 * (256 / (F_CPU / 1000000))) % 1000;
+	if (f >= 1000) {
+		f -= 1000;
+		m += 1;
+	}
+
+    Timer16::timer0_fract = f;
+    Timer16::timer0_millis = m;
     Timer16::timer0_overflow_count++;
-    // timer 0 prescale factor is 64 and the timer overflows at 256
-    Timer16::timer0_clock_cycles += 64UL * 256UL;
-    while (Timer16::timer0_clock_cycles > F_CPU / 1000L)
-        {
-        Timer16::timer0_clock_cycles -=  F_CPU / 1000L;
-        Timer16::timer0_millis++;
-        }
     }
 
 #endif

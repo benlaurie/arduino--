@@ -30,7 +30,6 @@ int main()
 #ifdef WATCHDOG
         wdt_reset();
 #endif
-        unsigned long t = Arduino::millis();
         typename Timer16::time_res_t t = Timer16::millis();
 
         if (t > last + 100 && RF12B::canSend())

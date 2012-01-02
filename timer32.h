@@ -20,21 +20,29 @@
 
     The value from Timer32::millis() will wrap around after about 49 days.
  */
-typedef _Arduino<uint32_t> Arduino32;
+typedef _Timer<uint32_t> Timer32;
 
 /* 
  * Implementation of the timer ISR for 32 bits resolution 
  */
 ISR(TIMER0_OVF_vect)
     {
-    Arduino32::timer0_overflow_count++;
-    // timer 0 prescale factor is 64 and the timer overflows at 256
-    Arduino32::timer0_clock_cycles += 64UL * 256UL;
-    while (Arduino32::timer0_clock_cycles > F_CPU / 1000L)
-        {
-        Arduino32::timer0_clock_cycles -=  F_CPU / 1000L;
-        Arduino32::timer0_millis++;
-        }
+
+	// copy these to local variables so they can be stored in registers
+	// (volatile variables must be read from memory on every access)
+	typename Timer32::time_res_t m = Timer32::timer0_millis;
+	uint16_t f = Timer32::timer0_fract;
+
+	m += (64 * (256 / (F_CPU / 1000000))) / 1000;
+	f += (64 * (256 / (F_CPU / 1000000))) % 1000;
+	if (f >= 1000) {
+		f -= 1000;
+		m += 1;
+	}
+
+    Timer32::timer0_fract = f;
+    Timer32::timer0_millis = m;
+    Timer32::timer0_overflow_count++;
     }
 
 #endif
