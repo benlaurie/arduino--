@@ -1,7 +1,8 @@
 #include "arduino++.h"
+#include "clock16.h"
 #include "pushbutton.h"
 
-PushButton<Arduino::D11, 20, uint16_t> Button;
+PushButton<Clock16, Arduino::D11, 20> Button;
 
 int main(void) 
     {
@@ -15,7 +16,7 @@ int main(void)
         if (Button.read() == Button.keyup)
             {
             Arduino::D13::set();
-            Arduino::delay(Button.duration());
+            Clock16::delay(Button.duration());
             Arduino::D13::clear();
             }
         }

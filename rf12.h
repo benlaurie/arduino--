@@ -12,6 +12,7 @@
 #include <util/crc16.h>
 
 #include "arduino++.h"
+#include "spi.h"
 
 // version 1 did not include the group code in the crc
 // version 2 does include the group code in the crc

@@ -60,18 +60,18 @@ class NanodeMAC
     void standby()
         {
         fastStandby();
-        AVRBase::constantDelayMicroseconds(TSTBY_US);
+        _delay_us(TSTBY_US);
         }
     void startHeader()
         {
         Pin::clear();
-        AVRBase::constantDelayMicroseconds(THDR_US);
+        _delay_us(THDR_US);
         sendByteNoSAK(0x55);
         }
     void waitQuarterBit(byte offset)
-        { AVRBase::constantDelayMicroseconds(QUARTER_BIT - .0625*offset); }
+        { _delay_us(QUARTER_BIT - .0625*offset); }
     void waitHalfBit(byte offset)
-        { AVRBase::constantDelayMicroseconds(HALF_BIT - .0625*offset); }
+        { _delay_us(HALF_BIT - .0625*offset); }
     void bit0()
         {
         Pin::set();
@@ -111,7 +111,7 @@ class NanodeMAC
         {
         _sendByte(data);
         // don't even bother to read it (FIXME: should we check for constant 1?)
-        AVRBase::constantDelayMicroseconds(2 * HALF_BIT);
+        _delay_us(2 * HALF_BIT);
         }
     void readBytes(byte *addr, int length)
         {
