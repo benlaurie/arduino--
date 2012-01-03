@@ -400,6 +400,10 @@ enum rf12DataRates {
             {
             uint8_t in = xferSlow(RF_RX_FIFO_READ);
 
+            // Shouldn't happen?
+            if (_rxfill >= RF_MAX)
+                return;
+
             if (_rxfill == 0 && _group != 0)
                 _buf[_rxfill++] = _group;
             

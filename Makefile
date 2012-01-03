@@ -19,6 +19,13 @@ all: avr-ports.h .depend blink.bin blink.lst blink2.bin blink2.lst \
      test_rf12.lst test_pushbutton.bin test_pushbutton.lst \
      libarduino++.a
 
+BIN = blink.bin blink2.bin test_enc28j60.bin onewire_test.bin test_ip.bin \
+      test_serial.bin test_rf12.bin test_nanode_mac.bin
+
+all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) libarduino++.a
+
+$(BIN:.bin=.elf): libarduino++.a
+
 .depend: *.cc *.h
 	$(CC) -mmcu=$(MCU_TARGET) -MM *.cc > .depend
 

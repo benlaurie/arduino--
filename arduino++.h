@@ -111,7 +111,15 @@ public:
     typedef Pin::B5 SPI_SCK;
     };
 
-class Arduino
+class AVRBase
+    {
+public:
+
+    static void interrupts() { sei(); }
+    static void noInterrupts() { cli(); }    
+    };
+
+class Arduino : public AVRBase
     {
 public:
 
@@ -137,9 +145,6 @@ public:
     typedef Pin::B3 D11;
     typedef Pin::B4 D12;
     typedef Pin::B5 D13;
-    
-    static void interrupts() { sei(); }
-    static void noInterrupts() { cli(); }
     
     static void init()
         {

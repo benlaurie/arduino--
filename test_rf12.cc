@@ -3,16 +3,28 @@
 #include "clock16.h"
 #include "serial.h"
 
-// This test hangs randomly without a watchdog timer.
+// This test hangs randomly without a watchdog timer on a Nanode.
 #define WATCHDOG
 
 #ifdef WATCHDOG
 # include <avr/wdt.h>
+
+uint8_t mcusr_mirror __attribute__ ((section (".noinit")));
+
+void get_mcusr(void) 
+  __attribute__((naked))
+  __attribute__((section(".init3")));
+void get_mcusr(void)
+    {
+    mcusr_mirror = MCUSR;
+    MCUSR = 0;
+    wdt_disable();
+    }
 #endif
 
 // You need to set these the other way round for the second test node.
-static const byte id = 1;
-static const byte dest = 2;
+static const byte id = 2;
+static const byte dest = 1;
 
 int main()
     {
