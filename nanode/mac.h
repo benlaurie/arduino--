@@ -1,3 +1,5 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
+
 // from https://github.com/thiseldo/NanodeMAC.git
 
 // Define NANODEMAC_SLOW to get (almost) original timings. Current
@@ -51,96 +53,96 @@ class NanodeMAC
 #endif
 
     void fastStandby()
-	{
-	Pin::set();
-	Pin::modeOutput();
-	}
+        {
+        Pin::set();
+        Pin::modeOutput();
+        }
     void standby()
-	{
-	fastStandby();
-	AVRBase::constantDelayMicroseconds(TSTBY_US);
-	}
+        {
+        fastStandby();
+        AVRBase::constantDelayMicroseconds(TSTBY_US);
+        }
     void startHeader()
-	{
-	Pin::clear();
-	AVRBase::constantDelayMicroseconds(THDR_US);
-	sendByteNoSAK(0x55);
-	}
+        {
+        Pin::clear();
+        AVRBase::constantDelayMicroseconds(THDR_US);
+        sendByteNoSAK(0x55);
+        }
     void waitQuarterBit(byte offset)
-	{ AVRBase::constantDelayMicroseconds(QUARTER_BIT - .0625*offset); }
+        { AVRBase::constantDelayMicroseconds(QUARTER_BIT - .0625*offset); }
     void waitHalfBit(byte offset)
-	{ AVRBase::constantDelayMicroseconds(HALF_BIT - .0625*offset); }
+        { AVRBase::constantDelayMicroseconds(HALF_BIT - .0625*offset); }
     void bit0()
-	{
-	Pin::set();
-	waitHalfBit(1);
-	Pin::clear();
-	waitHalfBit(1);
-	}
+        {
+        Pin::set();
+        waitHalfBit(1);
+        Pin::clear();
+        waitHalfBit(1);
+        }
     void bit1()
-	{
-	Pin::clear();
-	waitHalfBit(1);
-	Pin::set();
-	waitHalfBit(1);
-	}
+        {
+        Pin::clear();
+        waitHalfBit(1);
+        Pin::set();
+        waitHalfBit(1);
+        }
     void _sendByte(byte data)
-	{
-	Pin::modeOutput();
-	for (byte i = 0; i < 8; i++)
-	    {
-	    if (data & 0x80)
-		bit1();
-	    else
-		bit0();
-	    data <<= 1;
-	    }
-	// MAK
-	bit1();
-	}
+        {
+        Pin::modeOutput();
+        for (byte i = 0; i < 8; i++)
+            {
+            if (data & 0x80)
+                bit1();
+            else
+                bit0();
+            data <<= 1;
+            }
+        // MAK
+        bit1();
+        }
     void sendByte(byte data)
-	{
-	_sendByte(data);
-	// SAK?
-	if (readBit() != 1)
-	    ok_ = false;
-	}
+        {
+        _sendByte(data);
+        // SAK?
+        if (readBit() != 1)
+            ok_ = false;
+        }
     void sendByteNoSAK(byte data)
-	{
-	_sendByte(data);
-	// don't even bother to read it (FIXME: should we check for constant 1?)
-	AVRBase::constantDelayMicroseconds(2 * HALF_BIT);
-	}
+        {
+        _sendByte(data);
+        // don't even bother to read it (FIXME: should we check for constant 1?)
+        AVRBase::constantDelayMicroseconds(2 * HALF_BIT);
+        }
     void readBytes(byte *addr, int length)
-	{
-	for (int i = 0; i < length; i++)
-	    {
-	    byte data = 0;
-	    for (byte b = 0; b < 8; b++)
-		data = (data << 1) | (readBit() ? 1 : 0);
-	    Pin::modeOutput();
-	    if (i == length-1)
-		bit0(); // NoMAK
-	    else
-		bit1(); // MAK
-	    // SAK?
-	    if (readBit() != 1)
-		ok_ = false;
-	    addr[i] = data;
-	    }
-	}
+        {
+        for (int i = 0; i < length; i++)
+            {
+            byte data = 0;
+            for (byte b = 0; b < 8; b++)
+                data = (data << 1) | (readBit() ? 1 : 0);
+            Pin::modeOutput();
+            if (i == length-1)
+                bit0(); // NoMAK
+            else
+                bit1(); // MAK
+            // SAK?
+            if (readBit() != 1)
+                ok_ = false;
+            addr[i] = data;
+            }
+        }
     bool readBit()
-	{
-	Pin::modeInput();
-	waitQuarterBit(0);
-	bool value1 = Pin::read();
-	waitHalfBit(1);
-	bool value2 = Pin::read();
-	waitQuarterBit(21);
-	if (value1 == value2)
-	    ok_ = false;
-	return value2 && !value1;
-	}
+        {
+        Pin::modeInput();
+        waitQuarterBit(0);
+        bool value1 = Pin::read();
+        waitHalfBit(1);
+        bool value2 = Pin::read();
+        waitQuarterBit(21);
+        if (value1 == value2)
+            ok_ = false;
+        return value2 && !value1;
+        }
     static byte macaddr_[6];
     static bool ok_;
 
@@ -149,31 +151,31 @@ public:
     // static constructor should be fine (and gets run nice and
     // early).
     NanodeMAC()
-	{
-	// Turn off Interrupts while we read the mac address
-	AVRBase::noInterrupts();
+        {
+        // Turn off Interrupts while we read the mac address
+        AVRBase::noInterrupts();
 
-	ok_ = true;
-	standby();
-	startHeader();
-	// address A0
-	sendByte(0xA0);
-	// 0x3 READ
-	sendByte(0x03);
-	// word address MSB 0x00
-	sendByte(0x00);
-	// word address LSB 0xFA
-	sendByte(0xFA);
+        ok_ = true;
+        standby();
+        startHeader();
+        // address A0
+        sendByte(0xA0);
+        // 0x3 READ
+        sendByte(0x03);
+        // word address MSB 0x00
+        sendByte(0x00);
+        // word address LSB 0xFA
+        sendByte(0xFA);
   
-	// read 6 bytes into array
-	readBytes(macaddr_, 6);
+        // read 6 bytes into array
+        readBytes(macaddr_, 6);
 
-	// No need to wait here, since we standby() before doing anything.
-	fastStandby();
+        // No need to wait here, since we standby() before doing anything.
+        fastStandby();
   
-	// Re-enable interrupts
-	AVRBase::interrupts();
-	}
+        // Re-enable interrupts
+        AVRBase::interrupts();
+        }
     operator const byte *() const { return macaddr_; }
     bool ok() const { return ok_; }
     };
