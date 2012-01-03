@@ -1,6 +1,6 @@
 // -*- mode: c++; indent-tabs-mode: nil; -*-
 #include "rf12.h"
-#include "timer16.h"
+#include "clock16.h"
 #include "serial.h"
 
 // This test hangs randomly without a watchdog timer.
@@ -16,7 +16,7 @@ static const byte dest = 2;
 
 int main()
     {
-    typename Timer16::time_res_t last = 0;
+    typename Clock16::time_res_t last = 0;
     byte seq = 0;
 
     Arduino::init();
@@ -30,7 +30,7 @@ int main()
 #ifdef WATCHDOG
         wdt_reset();
 #endif
-        typename Timer16::time_res_t t = Timer16::millis();
+        typename Clock16::time_res_t t = Clock16::millis();
 
         if (t > last + 100 && RF12B::canSend())
             {

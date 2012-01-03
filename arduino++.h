@@ -221,10 +221,10 @@ public:
         }
     };
 
-/** Don't use this directly, use Timer16 or Timer32 instead
+/** Don't use this directly, use Clock16 or Clock32 instead
  */
 template<typename timeres_t>
-class _Timer
+class _Clock
     {
 public:
     typedef timeres_t time_res_t;
@@ -279,9 +279,9 @@ public:
     volatile static timeres_t timer0_millis;
     };
 
-template<typename T> volatile T _Timer<T>::timer0_overflow_count = 0;
-template<typename T> volatile uint16_t _Timer<T>::timer0_fract = 0;
-template<typename T> volatile T _Timer<T>::timer0_millis = 0;
+template<typename T> volatile T _Clock<T>::timer0_overflow_count = 0;
+template<typename T> volatile uint16_t _Clock<T>::timer0_fract = 0;
+template<typename T> volatile T _Clock<T>::timer0_millis = 0;
 
 void delayMicroseconds(unsigned int us)
     {
