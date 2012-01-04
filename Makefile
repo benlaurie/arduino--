@@ -18,8 +18,6 @@ BIN = blink.bin blink2.bin test_enc28j60.bin onewire_test.bin test_ip.bin \
 
 all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst)
 
-$(BIN:.bin=.elf): libarduino++.a
-
 .depend: *.cc *.h
 	$(CC) -mmcu=$(MCU_TARGET) -MM *.cc > .depend
 
