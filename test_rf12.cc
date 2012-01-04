@@ -23,8 +23,8 @@ void get_mcusr(void)
 #endif
 
 // You need to set these the other way round for the second test node.
-static const byte id = 2;
-static const byte dest = 1;
+static const byte id = 1;
+static const byte dest = 2;
 
 int main()
     {
@@ -32,6 +32,16 @@ int main()
     byte seq = 0;
 
     Arduino::init();
+
+    // Disable other SPI devices on the Nanode
+    // FIXME: framework should take care of this
+    // ENC28J60
+    Pin::B0::set();
+    Pin::B0::modeOutput();
+    // 23K256
+    Pin::B1::set();
+    Pin::B1::modeOutput();
+
     Serial.begin(57600);
     RF12B::init(id, RF12B::MHZ868);
 #ifdef WATCHDOG
