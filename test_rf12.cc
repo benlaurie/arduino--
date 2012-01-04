@@ -28,7 +28,7 @@ static const byte dest = 2;
 
 int main()
     {
-    typename Clock16::time_res_t last = 0;
+    Clock16::time_res_t last = 0;
     byte seq = 0;
 
     Arduino::init();
