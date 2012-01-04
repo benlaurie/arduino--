@@ -44,7 +44,7 @@ int main()
 #endif
         typename Clock16::time_res_t t = Clock16::millis();
 
-        if (t > last + 100 && RF12B::canSend())
+        if (t - last > 100 && RF12B::canSend())
             {
             last = t;
             char buf[2];
