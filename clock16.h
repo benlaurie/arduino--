@@ -1,3 +1,5 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
+
 #ifndef ARDUINO_MINUS_MINUS_CLOCK16_H
 #define ARDUINO_MINUS_MINUS_CLOCK16_H
 
@@ -30,17 +32,17 @@ typedef _Clock<uint16_t> Clock16;
  */
 ISR(TIMER0_OVF_vect)
     {
+    // copy these to local variables so they can be stored in registers
+    // (volatile variables must be read from memory on every access)
+    typename Clock16::time_res_t m = Clock16::timer0_millis;
+    uint16_t f = Clock16::timer0_fract;
 
-	// copy these to local variables so they can be stored in registers
-	// (volatile variables must be read from memory on every access)
-	typename Clock16::time_res_t m = Clock16::timer0_millis;
-	uint16_t f = Clock16::timer0_fract;
-
-	m += (64 * (256 / (F_CPU / 1000000))) / 1000;
-	f += (64 * (256 / (F_CPU / 1000000))) % 1000;
-	if (f >= 1000) {
-		f -= 1000;
-		m += 1;
+    m += (64 * (256 / (F_CPU / 1000000))) / 1000;
+    f += (64 * (256 / (F_CPU / 1000000))) % 1000;
+    if (f >= 1000)
+	{
+	f -= 1000;
+	m += 1;
 	}
 
     Clock16::timer0_fract = f;
