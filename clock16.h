@@ -27,6 +27,8 @@
  */
 typedef _Clock<uint16_t> Clock16;
 
+Clock16 clock;
+
 /* 
  * Implementation of the clock ISR for 16 bits resolution 
  */

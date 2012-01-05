@@ -165,12 +165,9 @@ public:
 #else
         _SFR_BYTE(TCCR0B) |= (_BV(CS01) | _BV(CS00));
 #endif
-        // enable timer 0 overflow interrupt
-#if defined(__AVR_ATmega8__)
-        _SFR_BYTE(TIMSK) |= _BV(TOIE0);
-#else
-        _SFR_BYTE(TIMSK0) |= _BV(TOIE0);
-#endif
+
+        // Note: timer 0 interrupt is _NOT_ enabled. To enable it,
+        // include one of the clock headers.
 
         // timers 1 and 2 are used for phase-correct hardware pwm
         // this is better for motors as it ensures an even waveform
@@ -228,12 +225,20 @@ public:
 
 /** Don't use this directly, use Clock16 or Clock32 instead
  */
-template<typename timeres_t>
-class _Clock
+template<typename timeres_t> class _Clock
     {
 public:
     typedef timeres_t time_res_t;
 
+    _Clock()
+        {
+        // enable timer 0 overflow interrupt
+#if defined(__AVR_ATmega8__)
+        _SFR_BYTE(TIMSK) |= _BV(TOIE0);
+#else
+        _SFR_BYTE(TIMSK0) |= _BV(TOIE0);
+#endif
+        }
     static timeres_t millis()
         {
         const uint8_t oldSREG = SREG;

@@ -2,8 +2,6 @@
 
 #include "nanode/mac.h"
 #include "serial.h"
-// FIXME: leave this out and we get a hang after 7 characters ... why?
-#include "clock32.h"
 
 static NanodeMAC mac;
 

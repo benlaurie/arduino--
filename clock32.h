@@ -24,6 +24,8 @@
  */
 typedef _Clock<uint32_t> Clock32;
 
+Clock32 clock;
+
 /* 
  * Implementation of the clock ISR for 32 bits resolution 
  */
