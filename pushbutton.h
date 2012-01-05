@@ -1,3 +1,5 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
+
 #ifndef PUSHBUTTON_H_
 #define PUSHBUTTON_H_
 
