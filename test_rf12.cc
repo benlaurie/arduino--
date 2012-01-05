@@ -52,7 +52,7 @@ int main()
 #ifdef WATCHDOG
         wdt_reset();
 #endif
-        typename Clock16::time_res_t t = Clock16::millis();
+        Clock16::time_res_t t = Clock16::millis();
 
         if (t - last > 100 && RF12B::canSend())
             {
