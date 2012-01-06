@@ -4,7 +4,7 @@
 #include "serial.h"
 
 // This test hangs randomly without a watchdog timer on a Nanode.
-#define WATCHDOG
+//#define WATCHDOG
 
 #ifdef WATCHDOG
 # include <avr/wdt.h>
@@ -23,8 +23,8 @@ void get_mcusr(void)
 #endif
 
 // You need to set these the other way round for the second test node.
-static const byte id = 1;
-static const byte dest = 2;
+static const byte id = 2;
+static const byte dest = 1;
 
 int main()
     {

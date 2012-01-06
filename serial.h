@@ -163,6 +163,8 @@ class HardwareSerial : public RingBuffer<128>
 	*_udr = c;
 	}
     void writeHex(byte b) { HexWriter<HardwareSerial>::write(this, b); }
+    void write(const char *str)
+	{ StringWriter<HardwareSerial>::write(this, str); }
 };
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
