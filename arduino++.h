@@ -367,4 +367,14 @@ public:
         }
     };
 
+template <class Out> class StringWriter
+    {
+public:
+    static void write(Out *out, const char *str)
+        {
+        while (*str++)
+            out->write(*str);
+        }
+    };
+
 #endif // ARDUINO_MINUS_MINUS
