@@ -22,7 +22,7 @@ all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst)
 .depend: *.cc *.h
 	$(CC) -mmcu=$(MCU_TARGET) -MM *.cc > .depend
 
-.SUFFIXES: .lst .elf .bin
+.SUFFIXES: .lst .elf .bin _upload
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c -o $(<:.cpp=.o) $<
@@ -45,13 +45,7 @@ avr-ports.h: get-ports.lst extract-ports.pl
 clean:
 	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend
 
-blink: all
-	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:blink.bin
-
-pcint: all
-	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:pcint.bin
-
-test_pushbutton: all
-	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:test_pushbutton.bin
+.bin_upload:
+	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:$<
 
 .sinclude ".depend"
