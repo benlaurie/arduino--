@@ -5,6 +5,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/sleep.h>
 #include <util/delay.h>
 #include "avr-ports.h"
 
@@ -393,6 +394,25 @@ public:
         
         while (millis() - start <= ms)
             ;
+        }
+
+    static void sleep(timeres_t ms)
+        {
+        const timeres_t start = millis();
+        
+        set_sleep_mode(SLEEP_MODE_IDLE);
+        sleep_enable();
+#ifdef sleep_bod_disable
+        sleep_bod_disable();
+#endif
+        while (millis() - start <= ms)
+            {
+            sei();
+            sleep_cpu();
+            }
+        
+        sei();
+        sleep_disable();
         }
 
     volatile static timeres_t timer0_overflow_count;
