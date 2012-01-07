@@ -26,8 +26,33 @@ int main(int argc, char **argv)
     D(PCMSK2);
 
     D(SPCR);
+
     D(EICRA);
     D(EIMSK);
+
+    D(TCNT0);
+    D(TCNT1);
+    D(TCNT2);
+
+    D(OCR0A);
+    D(OCR0B);
+    D(OCR1A);
+    D(OCR1B);
+    D(OCR2A);
+    D(OCR2B);
+
+    D(TIMSK0);
+    D(TIMSK1);
+    D(TIMSK2);
+    D(TIFR0);
+    D(TIFR1);
+    D(TIFR2);
+    D(TCCR0A);
+    D(TCCR0B);
+    D(TCCR1A);
+    D(TCCR1B);
+    D(TCCR2A);
+    D(TCCR2B);
 
     return 0;
     }

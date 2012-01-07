@@ -19,6 +19,20 @@ template <byte reg> class _Register
     operator byte() const { return _SFR_IO8(reg); }
     };
 
+template <byte reg> class _Register16
+    {
+ public:
+    static void setHigh(byte bit) { _SFR_IO8(reg + 1) |= _BV(bit); }
+    static void setLow(byte bit) { _SFR_IO8(reg) |= _BV(bit); }
+    static void clearHigh(byte bit) { _SFR_IO8(reg + 1) &= ~_BV(bit); }
+    static void clearLow(byte bit) { _SFR_IO8(reg) &= ~_BV(bit); }
+    void operator=(byte bits) { _SFR_IO8(reg) = bits; }
+    operator byte() const { return _SFR_IO8(reg); }
+
+    void operator=(uint16_t bits) { _SFR_IO16(reg) = bits; }
+    operator uint16_t() const { return _SFR_IO16(reg); }
+    };
+
 // FIXME: should Pins also be static members instead of typedefs?
 // These can't be typedefs because then we can't define operator= on them.
 class Register
@@ -31,6 +45,113 @@ class Register
 #undef SPCR
     static _Register<NSPCR> SPCR;
     };
+
+template <class TCNT_, class OCRA_, class OCRB_, byte ta, byte tb, byte tif, 
+  byte ti, byte ien> class _Timer
+    {
+public:
+
+    typedef TCNT_ TCNT;
+    typedef OCRA_ OCRA;
+    typedef OCRB_ OCRB;
+
+    static void enableOverflowInterrupt()
+        {
+        _SFR_IO8(ti) |= _BV(ien);
+        }
+
+    static void noPrescaler() { _SFR_IO8(tb) &= ((1 << 5) - 1) << 3; }
+    static void prescaler8() { prescaler(_BV(CS01)); }
+    static void prescaler64() { prescaler(_BV(CS01) | _BV(CS00)); }
+    static void prescaler256() { prescaler(_BV(CS02)); }
+    static void prescaler1024() { prescaler(_BV(CS02) | _BV(CS00)); }
+
+    static void externalFalling() { prescaler(_BV(CS02) | _BV(CS01)); }
+    static void externalRising() 
+        { prescaler(_BV(CS02) | _BV(CS01) | _BV(CS00)); }
+
+
+    //** Mode 0 */
+    static void normal() 
+        { 
+        _SFR_IO8(tb) &= ~_BV(WGM02); 
+        wgm01(0);
+        }
+
+    //* Mode 1 */
+    static void phaseCorrectPWM()
+        {
+        // clear WGM02
+        _SFR_IO8(tb) &= ~_BV(WGM02);
+        wgm01(_BV(WGM00));
+        }
+
+    /** Mode 2 */
+    static void clearTimeOnCompare()
+        { 
+        // clear WGM02
+        _SFR_IO8(tb) &= ~_BV(WGM02);
+        wgm01(_BV(WGM01));
+        }
+
+    /** Mode 3 */
+    static void fastPWM()
+        { 
+        // clear WGM02
+        _SFR_IO8(tb) &= ~_BV(WGM02);
+        wgm01(_BV(WGM01) | _BV(WGM00));
+        }
+
+    /** Mode 5 */
+    static void phaseCorrectPWMOCRA()
+        { 
+        // set WGM02
+        _SFR_IO8(tb) |= _BV(WGM02);
+        wgm01(_BV(WGM00));
+        }
+    
+    /** Mode 7 */
+    static void fastPWMOCRA() 
+        { 
+        // set WGM02
+        _SFR_IO8(tb) |= _BV(WGM02);
+        wgm01(_BV(WGM01) | _BV(WGM00));
+        }
+
+private:
+    static void prescaler(byte pre)
+        { 
+        byte tmp = _SFR_IO8(tb) & (((1 << 2) - 1) << 3);
+        tmp |= pre;
+        _SFR_IO8(tb) = tmp;
+        }
+
+    static void wgm01(byte waveform)
+        { 
+        byte tmp = _SFR_IO8(ta) & 3;
+        tmp |= waveform;
+        _SFR_IO8(ta) = tmp;
+        }
+    };
+
+// make sure that the CS bit value definitions are the same for every timer 
+// register we are interested in
+#if ((CS00 != CS10) || (CS01 != CS11) || (CS02 != CS12))
+#error "Timer CSxx register constants violate assumptions in _Timer"
+#endif 
+
+// make sure that the WGM bit value definitions are the same for every timer 
+// register we are interested in
+#if ((WGM00 != WGM10) || (WGM01 != WGM11) || (WGM02 != WGM12))
+#error "Timer WGMxx register constants violate assumptions in _Timer"
+#endif 
+
+typedef _Timer<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
+  NTCCR0A, NTCCR0B, NTIFR0, NTIMSK0, TOIE0> Timer0;
+typedef _Timer<_Register16<NTCNT1>, _Register16<NOCR1A>, _Register16<NOCR1B>,
+  NTCCR1A, NTCCR1B, NTIFR1, NTIMSK1, TOIE1> Timer1;
+typedef _Timer<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
+  NTCCR2A, NTCCR2B, NTIFR2, NTIMSK2, TOIE2> Timer2;
 
 template <byte lsb, byte maskbit> class _Interrupt
     {
@@ -116,7 +237,7 @@ class AVRBase
 public:
 
     static void interrupts() { sei(); }
-    static void noInterrupts() { cli(); }    
+    static void noInterrupts() { cli(); }
     };
 
 class Arduino : public AVRBase
@@ -155,16 +276,13 @@ public:
         // on the ATmega168, timer 0 is also used for fast hardware pwm
         // (using phase-correct PWM would mean that timer 0 overflowed half as 
         // often, resulting in different millis() behavior on the ATmega8 and 
-        //ATmega168)
+        // ATmega168)
 #if !defined(__AVR_ATmega8__)
-        _SFR_BYTE(TCCR0A) |= (_BV(WGM01) | _BV(WGM00));
+        Timer0::fastPWM();
 #endif  
         // set timer 0 prescale factor to 64
-#if defined(__AVR_ATmega8__)
-        _SFR_BYTE(TCCR0) |= (_BV(CS01) | _BV(CS00));
-#else
-        _SFR_BYTE(TCCR0B) |= (_BV(CS01) | _BV(CS00));
-#endif
+
+        Timer0::prescaler64();
 
         // Note: timer 0 interrupt is _NOT_ enabled. To enable it,
         // include one of the clock headers.
@@ -175,21 +293,18 @@ public:
         // 8 MHz (with a 16 MHz clock) at 50% duty cycle
 
         // set timer 1 prescale factor to 64
-        _SFR_BYTE(TCCR1B) |= (_BV(CS11) | _BV(CS10));
+        Timer1::prescaler64();
         // put timer 1 in 8-bit phase correct pwm mode
-        _SFR_BYTE(TCCR1A) |= _BV(WGM10);
+        Timer1::phaseCorrectPWM();
 
-    // set timer 2 prescale factor to 64
-#if defined(__AVR_ATmega8__)
-        _SFR_BYTE(TCCR2) |= _BV(CS22);
-#else
-        _SFR_BYTE(TCCR2B) |= _BV(CS22);
-#endif
+        // set timer 2 prescale factor to 64
+        Timer2::prescaler64();
+
     // configure timer 2 for phase correct pwm (8-bit)
 #if defined(__AVR_ATmega8__)
         _SFR_BYTE(TCCR2) |= _BV(WGM20);
 #else
-        _SFR_BYTE(TCCR2A) |= _BV(WGM20);
+        Timer2::phaseCorrectPWM();
 #endif
 
 #if defined(__AVR_ATmega1280__)
@@ -233,11 +348,7 @@ public:
     _Clock()
         {
         // enable timer 0 overflow interrupt
-#if defined(__AVR_ATmega8__)
-        _SFR_BYTE(TIMSK) |= _BV(TOIE0);
-#else
-        _SFR_BYTE(TIMSK0) |= _BV(TOIE0);
-#endif
+        Timer0::enableOverflowInterrupt();
         }
     static timeres_t millis()
         {

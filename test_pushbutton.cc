@@ -2,7 +2,7 @@
 #include "clock16.h"
 #include "pushbutton.h"
 
-PushButton<Clock16, Arduino::D11, 20> Button;
+PushButton<Clock16, Arduino::D4, 20> Button;
 
 int main(void) 
     {

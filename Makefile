@@ -14,8 +14,11 @@ CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 
 BIN = blink.bin blink2.bin test_enc28j60.bin onewire_test.bin test_ip.bin \
+<<<<<<< Updated upstream
       test_serial.bin test_rf12.bin test_nanode_mac.bin test_pushbutton.bin \
-      test_watchdog.bin
+      test_watchdog.bin test_serial.bin test_rf12.bin test_nanode_mac.bin \
+	  test_pushbutton.bin test_serial.bin test_rf12.bin test_nanode_mac.bin \
+	  test_pushbutton.bin
 
 all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst)
 
