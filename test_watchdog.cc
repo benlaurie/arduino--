@@ -21,7 +21,14 @@ int main()
     Arduino::init();
     Serial.write("Boing!\r\n");
     wdt_enable(WDTO_2S);
-    wdt_reset();
+    for (byte n = 0; n < 30; ++n)
+	{
+	_delay_ms(500);
+	Serial.write("gnioB");
+	Serial.writeHex(n);
+	Serial.write("\r\n");
+	wdt_reset();
+	}
     for ( ; ; )
 	;
     }
