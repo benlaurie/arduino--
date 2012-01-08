@@ -17,8 +17,7 @@ int main(void)
     Arduino16::D13::modeOutput();
     
     // make D11 input and activate internal pullups
-    Arduino16::D11::modeInput();
-    Arduino16::D11::set();
+    Arduino16::D11::modeInputPullup();
 
     // Initialise the LED on D13
     Arduino16::D11::read() ? Arduino16::D13::clear() : Arduino16::D13::set();

@@ -11,11 +11,38 @@
 
 typedef uint8_t byte;
 
+class ILock
+    {
+public:
+    ILock() : sreg_(SREG) { cli(); }
+    ~ILock() { SREG = sreg_; }
+
+private:
+    byte sreg_;
+    };
+
 template <byte reg> class _Register
     {
- public:
+ public:    
+    typedef byte value_t;
+
     static void set(byte bit) { _SFR_IO8(reg) |= _BV(bit); }
     static void clear(byte bit) { _SFR_IO8(reg) &= ~_BV(bit); }
+    static byte atomicRead()
+        {
+        const byte sreg = SREG;
+        cli();
+        const byte rv = _SFR_IO8(reg);
+        SREG = sreg;
+        return rv;
+        }
+    static void atomicWrite(byte val)
+        {
+        const byte sreg = SREG;
+        cli();
+        _SFR_IO8(reg) = val;
+        SREG = sreg;
+        }
     void operator=(byte bits) { _SFR_IO8(reg) = bits; }
     operator byte() const { return _SFR_IO8(reg); }
     };
@@ -23,12 +50,30 @@ template <byte reg> class _Register
 template <byte reg> class _Register16
     {
  public:
+    typedef uint16_t value_t;
+
     static void setHigh(byte bit) { _SFR_IO8(reg + 1) |= _BV(bit); }
     static void setLow(byte bit) { _SFR_IO8(reg) |= _BV(bit); }
     static void clearHigh(byte bit) { _SFR_IO8(reg + 1) &= ~_BV(bit); }
     static void clearLow(byte bit) { _SFR_IO8(reg) &= ~_BV(bit); }
-    void operator=(byte bits) { _SFR_IO8(reg) = bits; }
-    operator byte() const { return _SFR_IO8(reg); }
+    static uint16_t atomicRead()
+        {
+        const byte sreg = SREG;
+        cli();
+        const uint16_t rv = _SFR_IO16(reg);
+        SREG = sreg;
+        return rv;
+        }
+    static void atomicWrite(uint16_t val)
+        {
+        const byte sreg = SREG;
+        cli();
+        _SFR_IO16(reg) = val;
+        SREG = sreg;
+        }
+
+    byte readLow() { return _SFR_IO8(reg); };
+    byte readHigh() { return _SFR_IO8(reg + 1); };
 
     void operator=(uint16_t bits) { _SFR_IO16(reg) = bits; }
     operator uint16_t() const { return _SFR_IO16(reg); }
@@ -47,21 +92,44 @@ class Register
     static _Register<NSPCR> SPCR;
     };
 
-template <class TCNT_, class OCRA_, class OCRB_, byte ta, byte tb, byte tif, 
-  byte ti, byte ien> class _Timer
+template <class TCNT_, class OCRA_, class OCRB_, byte tccrxa, byte tccrxb,
+          byte tifrx, byte timskx, byte toiex, byte ociexa, byte ocfxa, 
+          byte ociexb, byte ocfxb> 
+class _Timer
     {
 public:
 
-    typedef TCNT_ TCNT;
-    typedef OCRA_ OCRA;
-    typedef OCRB_ OCRB;
+    static TCNT_ TCNT;
+    static OCRA_ OCRA;
+    static OCRB_ OCRB;
 
-    static void enableOverflowInterrupt()
+    static void reset() { TCNT = 0; }
+
+    static void enableOverflowInterrupt() { _SFR_IO8(timskx) |= _BV(toiex); }
+    static void disableOverflowInterrupt() { _SFR_IO8(timskx) &= ~_BV(toiex); }
+
+    static void enableCompareInterruptA(typename OCRA_::value_t count) 
         {
-        _SFR_IO8(ti) |= _BV(ien);
+        // clear compare interrupt flag
+        _SFR_IO8(tifrx) &= _BV(ocfxa);
+        OCRA = count;
+        _SFR_IO8(timskx) |= _BV(ociexa); 
         }
+    static void enableCompareInterruptA() {  _SFR_IO8(timskx) |= _BV(ociexa); }
+    static void disableCompareInterruptA() { _SFR_IO8(timskx) &= ~_BV(ociexa); }
 
-    static void noPrescaler() { _SFR_IO8(tb) &= ((1 << 5) - 1) << 3; }
+    static void enableCompareInterruptB(typename OCRB_::value_t count) 
+        { 
+        // clear compare interrupt flag
+        _SFR_IO8(tifrx) &= _BV(ocfxb);
+        OCRB = count;
+        _SFR_IO8(timskx) |= _BV(ociexb);
+        }
+    static void enableCompareInterruptB() {  _SFR_IO8(timskx) |= _BV(ociexb); }
+    static void disableCompareInterruptB() { _SFR_IO8(timskx) &= ~_BV(ociexb); }
+
+    static void stop() { _SFR_IO8(tccrxb) &= ((1 << 5) - 1) << 3; }
+    static void prescaler1() { prescaler(_BV(CS00)); }
     static void prescaler8() { prescaler(_BV(CS01)); }
     static void prescaler64() { prescaler(_BV(CS01) | _BV(CS00)); }
     static void prescaler256() { prescaler(_BV(CS02)); }
@@ -75,7 +143,7 @@ public:
     //** Mode 0 */
     static void normal() 
         { 
-        _SFR_IO8(tb) &= ~_BV(WGM02); 
+        _SFR_IO8(tccrxb) &= ~_BV(WGM02); 
         wgm01(0);
         }
 
@@ -83,15 +151,15 @@ public:
     static void phaseCorrectPWM()
         {
         // clear WGM02
-        _SFR_IO8(tb) &= ~_BV(WGM02);
+        _SFR_IO8(tccrxb) &= ~_BV(WGM02);
         wgm01(_BV(WGM00));
         }
 
     /** Mode 2 */
-    static void clearTimeOnCompare()
+    static void clearTimerOnCompare()
         { 
         // clear WGM02
-        _SFR_IO8(tb) &= ~_BV(WGM02);
+        _SFR_IO8(tccrxb) &= ~_BV(WGM02);
         wgm01(_BV(WGM01));
         }
 
@@ -99,7 +167,7 @@ public:
     static void fastPWM()
         { 
         // clear WGM02
-        _SFR_IO8(tb) &= ~_BV(WGM02);
+        _SFR_IO8(tccrxb) &= ~_BV(WGM02);
         wgm01(_BV(WGM01) | _BV(WGM00));
         }
 
@@ -107,7 +175,7 @@ public:
     static void phaseCorrectPWMOCRA()
         { 
         // set WGM02
-        _SFR_IO8(tb) |= _BV(WGM02);
+        _SFR_IO8(tccrxb) |= _BV(WGM02);
         wgm01(_BV(WGM00));
         }
     
@@ -115,23 +183,23 @@ public:
     static void fastPWMOCRA() 
         { 
         // set WGM02
-        _SFR_IO8(tb) |= _BV(WGM02);
+        _SFR_IO8(tccrxb) |= _BV(WGM02);
         wgm01(_BV(WGM01) | _BV(WGM00));
         }
 
 private:
     static void prescaler(byte pre)
         { 
-        byte tmp = _SFR_IO8(tb) & (((1 << 2) - 1) << 3);
+        byte tmp = _SFR_IO8(tccrxb) & (((1 << 2) - 1) << 3);
         tmp |= pre;
-        _SFR_IO8(tb) = tmp;
+        _SFR_IO8(tccrxb) = tmp;
         }
 
     static void wgm01(byte waveform)
         { 
-        byte tmp = _SFR_IO8(ta) & 3;
+        byte tmp = _SFR_IO8(tccrxa) & 3;
         tmp |= waveform;
-        _SFR_IO8(ta) = tmp;
+        _SFR_IO8(tccrxa) = tmp;
         }
     };
 
@@ -148,11 +216,16 @@ private:
 #endif 
 
 typedef _Timer<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
-  NTCCR0A, NTCCR0B, NTIFR0, NTIMSK0, TOIE0> Timer0;
+               NTCCR0A, NTCCR0B, NTIFR0, NTIMSK0, TOIE0, OCIE0A, OCF0A,
+               OCIE0B, OCF0B> Timer0;
+
 typedef _Timer<_Register16<NTCNT1>, _Register16<NOCR1A>, _Register16<NOCR1B>,
-  NTCCR1A, NTCCR1B, NTIFR1, NTIMSK1, TOIE1> Timer1;
+               NTCCR1A, NTCCR1B, NTIFR1, NTIMSK1, TOIE1, OCIE1A, OCF1A, 
+               OCIE1B, OCF1B> Timer1;
+
 typedef _Timer<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
-  NTCCR2A, NTCCR2B, NTIFR2, NTIMSK2, TOIE2> Timer2;
+               NTCCR2A, NTCCR2B, NTIFR2, NTIMSK2, TOIE2, OCIE2A, OCF2A, 
+               OCIE2B, OCF2B> Timer2;
 
 template <byte lsb, byte maskbit> class _Interrupt
     {
@@ -194,6 +267,7 @@ public:
 
     static void modeOutput() { _SFR_IO8(ddr) |= _BV(bit); }
     static void modeInput() { _SFR_IO8(ddr) &= ~_BV(bit); }
+    static void modeInputPullup() { modeInput(); set(); }
     static void set() { _SFR_IO8(port) |= _BV(bit); }
     static void clear() { _SFR_IO8(port) &= ~_BV(bit); }
 
@@ -353,26 +427,19 @@ public:
         }
     static timeres_t millis()
         {
-        const uint8_t oldSREG = SREG;
-    
         // disable interrupts while we read timer0_millis or we might get an
         // inconsistent value (e.g. in the middle of the timer0_millis++)
-        cli();
-        const timeres_t m = timer0_millis;
-        SREG = oldSREG;
-        
-        return m;
+        ILock il;
+        return timer0_millis;
         }
 
     static uint16_t micros()
         {
         uint8_t m;
         uint8_t t;
-        const uint8_t oldSREG = SREG;
-    
-        cli();
-        t = TCNT0;
+        ILock il;
 
+        t = TCNT0;
         m = timer0_overflow_count % (1 << TIMER16_MICRO_SCALE);
   
 #ifdef TIFR0
@@ -383,8 +450,6 @@ public:
             m++;
 #endif
 
-        SREG = oldSREG;
-    
         return ((m << 8) + t) * (64 / (F_CPU / 1000000L));
         }
 
@@ -466,10 +531,10 @@ void delayMicroseconds(unsigned int us)
     us--;
 #endif
 
+    {
     // disable interrupts, otherwise the timer 0 overflow interrupt that
     // tracks milliseconds will make us delay longer than we want.
-    const uint8_t oldSREG = SREG;
-    cli();
+    ILock il;
 
     // busy wait
     __asm__ __volatile__ (
@@ -477,8 +542,7 @@ void delayMicroseconds(unsigned int us)
               "brne 1b" : "=w" (us) : "0" (us) // 2 cycles
               );
 
-    // reenable interrupts.
-    SREG = oldSREG;
+    }
     }
 
 template <class Out> class HexWriter
@@ -488,6 +552,11 @@ public:
         {
         writeNibble(out, b >> 4);
         writeNibble(out, b & 0x0f);
+        }
+    static void write(Out *out, uint16_t i)
+        {
+        write(out, static_cast<byte>(i >> 8));
+        write(out, static_cast<byte>(i & 0xff));
         }
     static void writeNibble(Out *out, byte b)
         {
