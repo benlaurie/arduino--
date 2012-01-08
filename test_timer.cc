@@ -35,9 +35,9 @@ int main(void)
         Timer0::disableCompareInterruptA();
         Arduino::D13::clear();
         
-        Serial.write("0x");
+        Serial.write_P(PSTR("0x"));
         Serial.writeHex(delta);
-        Serial.write("\r\n");
+        Serial.write_P(PSTR("\r\n"));
         _delay_ms(2000);
         }
     }

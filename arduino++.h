@@ -7,6 +7,7 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 #include <util/delay.h>
+#include <avr/pgmspace.h>
 #include "avr-ports.h"
 
 typedef uint8_t byte;
@@ -564,6 +565,13 @@ public:
         {
         while (*str)
             out->write(*str++);
+        }
+    // PROGMEM variant
+    static void write_P(Out *out, const char *str)
+        {
+        byte v;
+		while ((v = pgm_read_byte(str++)))
+            out->write(v);
         }
     };
 
