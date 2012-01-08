@@ -40,7 +40,7 @@
 #define RF12_SLEEP 0
 #define RF12_WAKEUP -1
 
-#define OPTIMIZE_SPI 1   // uncomment this to write to the RFM12B @ 8 Mhz
+//#define OPTIMIZE_SPI 1   // uncomment this to write to the RFM12B @ 8 Mhz
 
 // maximum transmit / receive buffer: 3 header + data + 2 crc bytes
 #define RF_MAX   (RF12_MAXDATA + 5)
