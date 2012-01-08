@@ -5,7 +5,7 @@ volatile uint16_t delta = 0;
 
 ISR(TIMER0_COMPA_vect)
     {
-    ILock il;
+    ScopedInterruptDisable sid;
     delta = Timer1::TCNT;
     Arduino::D13::set();
     }
@@ -22,7 +22,7 @@ int main(void)
     for(;;)
         {
         {
-        ILock il;
+        ScopedInterruptDisable sid;
         delta = 0;
         Timer1::reset();
         Timer0::reset();

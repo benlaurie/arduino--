@@ -11,11 +11,11 @@
 
 typedef uint8_t byte;
 
-class ILock
+class ScopedInterruptDisable
     {
 public:
-    ILock() : sreg_(SREG) { cli(); }
-    ~ILock() { SREG = sreg_; }
+    ScopedInterruptDisable() : sreg_(SREG) { cli(); }
+    ~ScopedInterruptDisable() { SREG = sreg_; }
 
 private:
     byte sreg_;
@@ -30,18 +30,13 @@ template <byte reg> class _Register
     static void clear(byte bit) { _SFR_IO8(reg) &= ~_BV(bit); }
     static byte atomicRead()
         {
-        const byte sreg = SREG;
-        cli();
-        const byte rv = _SFR_IO8(reg);
-        SREG = sreg;
-        return rv;
+        ScopedInterruptDisable sid;
+        return _SFR_IO8(reg);
         }
     static void atomicWrite(byte val)
         {
-        const byte sreg = SREG;
-        cli();
+        ScopedInterruptDisable sid;
         _SFR_IO8(reg) = val;
-        SREG = sreg;
         }
     void operator=(byte bits) { _SFR_IO8(reg) = bits; }
     operator byte() const { return _SFR_IO8(reg); }
@@ -58,18 +53,13 @@ template <byte reg> class _Register16
     static void clearLow(byte bit) { _SFR_IO8(reg) &= ~_BV(bit); }
     static uint16_t atomicRead()
         {
-        const byte sreg = SREG;
-        cli();
-        const uint16_t rv = _SFR_IO16(reg);
-        SREG = sreg;
-        return rv;
+        ScopedInterruptDisable sid;
+        return _SFR_IO16(reg);
         }
     static void atomicWrite(uint16_t val)
         {
-        const byte sreg = SREG;
-        cli();
+        ScopedInterruptDisable sid;
         _SFR_IO16(reg) = val;
-        SREG = sreg;
         }
 
     byte readLow() { return _SFR_IO8(reg); };
@@ -429,7 +419,7 @@ public:
         {
         // disable interrupts while we read timer0_millis or we might get an
         // inconsistent value (e.g. in the middle of the timer0_millis++)
-        ILock il;
+        ScopedInterruptDisable sid;
         return timer0_millis;
         }
 
@@ -437,7 +427,7 @@ public:
         {
         uint8_t m;
         uint8_t t;
-        ILock il;
+        ScopedInterruptDisable sid;
 
         t = TCNT0;
         m = timer0_overflow_count % (1 << TIMER16_MICRO_SCALE);
@@ -534,7 +524,7 @@ void delayMicroseconds(unsigned int us)
     {
     // disable interrupts, otherwise the timer 0 overflow interrupt that
     // tracks milliseconds will make us delay longer than we want.
-    ILock il;
+    ScopedInterruptDisable sid;
 
     // busy wait
     __asm__ __volatile__ (
