@@ -69,7 +69,7 @@ public:
       : len_(0)
 	{}
 
-    void add_p(const prog_char *pmem)
+    void add_p(const char *pmem)
 	{ len_ = ip.fill_tcp_data_p(buf, len_, pmem); }
     void add(const char *str)
 	{ len_ = ip.fill_tcp_data(buf, len_, str); }
