@@ -267,6 +267,59 @@ public:
     static byte toggle() { return (_SFR_IO8(port) ^= _BV(bit)); }
     };
 
+template <byte ddr, byte port, byte in, byte bit, byte pcport, 
+  byte pcbit, byte pcen> class _AnalogPin : 
+    public _Pin<ddr, port, in, bit, pcport, pcbit, pcen>
+    {
+    // AREF, Internal Vref turned off 
+    static const uint8_t REF_AREF = 0;
+    // AVCC with external capacitor at AREF pin
+    static const uint8_t REF_AVCC_EXT = 1;
+    // Internal 1.1V Voltage Reference with external capacitor at AREF pin
+    static const uint8_t REF_INT_1_1_REF = 3;
+    
+    static void analogStart(uint8_t reference = REF_AREF)
+        {
+        // set the analog reference (high two bits of ADMUX) and select the
+        // channel (low 4 bits).  this also sets ADLAR (left-adjust result)
+        // to 0 (the default).
+#if defined(ADMUX)
+        ADMUX = (reference << 6) | (in & 0x07);
+#endif
+        // start the conversion
+        ADCSRA |= (1 << (ADSC));
+        }
+
+    static int analogRead(uint8_t reference = REF_AREF)
+        {
+        analogStart(reference);
+        
+        // ADSC is cleared when the conversion finishes
+        while (ADCSRA & (1 << ADSC))
+            ;
+
+        // we have to read ADCL first; doing so locks both ADCL
+        // and ADCH until ADCH is read.  reading ADCL second would
+        // cause the results of each conversion to be discarded,
+        // as ADCL and ADCH would be locked when it completed.
+        uint8_t low  = ADCL;
+        uint8_t high = ADCH;
+
+        // combine the two bytes
+        return (high << 8) | low;
+        }
+
+    static void analogWrite(int val)
+        {
+        // We need to make sure the PWM output is enabled for those pins
+        // that support it, as we turn it off when digitally reading or
+        // writing with them.  Also, make sure the pin is in output mode
+        // for consistenty with Wiring, which doesn't require a pinMode
+        // call for the analog output pins.
+        _Pin<ddr, port, in, bit, pcport, pcbit, pcen>::modeOutput();
+        }
+    };
+
 class Pin
     {
 public:
@@ -277,11 +330,17 @@ public:
     typedef _Pin<NDDRB, NPORTB, NPINB, PB4, NPCMSK0, PCINT4, PCIE0> B4;
     typedef _Pin<NDDRB, NPORTB, NPINB, PB5, NPCMSK0, PCINT5, PCIE0> B5;
         
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC0, NPCMSK1, PCINT8, PCIE1> C0;
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC1, NPCMSK1, PCINT9, PCIE1> C1;
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC2, NPCMSK1, PCINT10, PCIE1> C2;
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC3, NPCMSK1, PCINT11, PCIE1> C3;
-    typedef _Pin<NDDRC, NPORTC, NPINC, PC4, NPCMSK1, PCINT12, PCIE1> C4;
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC0, NPCMSK1, PCINT8, PCIE1> C0;
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC1, NPCMSK1, PCINT9, PCIE1> C1;
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC2, NPCMSK1, PCINT10, PCIE1> C2;
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC3, NPCMSK1, PCINT11, PCIE1> C3;
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC4, NPCMSK1, PCINT12, PCIE1> C4;
+
+    typedef C0 ADC0;
+    typedef C1 ADC1;
+    typedef C2 ADC2;
+    typedef C3 ADC3;
+    typedef C4 ADC4;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD0, NPCMSK2, PCINT16, PCIE2> D0;
     typedef _Pin<NDDRD, NPORTD, NPIND, PD1, NPCMSK2, PCINT17, PCIE2> D1;

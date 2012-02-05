@@ -54,5 +54,13 @@ int main(int argc, char **argv)
     D(TCCR2A);
     D(TCCR2B);
 
+    D(UBRR0H);
+    D(UBRR0L);
+    D(UCSR0A);
+    D(UCSR0B);
+    D(UDR0);
+    D(RXEN0); 
+    D(TXEN0); 
+
     return 0;
     }

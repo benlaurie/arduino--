@@ -17,7 +17,7 @@ int main(void)
     Timer0::prescaler256();
     Timer1::prescaler1();
 
-    Serial.begin(9600);
+    Serial.begin(57600);
 
     for(;;)
         {

@@ -193,7 +193,7 @@ def update(version):
     except IOError:
         recent_sizes = {}
 
-    counter = recent_sizes.get('counter', 0)
+    counter = recent_sizes.get('counter', 0) + 1
 
     increment = False
     binlist = glob.glob('*.bin')

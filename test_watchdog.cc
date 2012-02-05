@@ -19,7 +19,7 @@ void get_mcusr(void)
 int main()
     {
     Arduino::init();
-    Serial.begin(9600);
+    Serial.begin(57600);
     Serial.write("Boing!\r\n");
     wdt_enable(WDTO_2S);
     for (byte n = 0; n < 30; ++n)

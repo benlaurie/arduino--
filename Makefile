@@ -18,7 +18,7 @@ BIN = blink.bin test_clock.bin test_enc28j60.bin onewire_test.bin test_ip.bin \
       test_watchdog.bin test_serial.bin test_rf12.bin test_nanode_mac.bin \
 	  test_timer.bin
 
-all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst)
+all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
 .depend: *.cc *.h
 	$(CC) -mmcu=$(MCU_TARGET) -MM *.cc > .depend
