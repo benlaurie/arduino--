@@ -17,6 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   
   Modified 23 November 2006 by David A. Mellis
+  Modified 28 September 2010 by Mark Sproul
   Modified 27 December 2011 by Ben Laurie (RingBuffer)
   Modified 5 February 2012 by Lars Immisch (template remix)  
 */
@@ -94,7 +95,7 @@ template <byte ubrrh, byte ubrrl, byte ucsra, byte ucsrb, byte udr,
     void begin(long baud)
         {
         uint16_t baud_setting;
-        bool use_u2x;
+        bool use_u2x = true;
 
 #if F_CPU == 16000000UL
         // hardcoded exception for compatibility with the bootloader shipped
@@ -103,29 +104,9 @@ template <byte ubrrh, byte ubrrl, byte ucsra, byte ucsrb, byte udr,
         if (baud == 57600)
             use_u2x = false;
 #endif
-        // U2X mode is needed for baud rates higher than (CPU Hz / 16)
-        if (baud > F_CPU / 16)
-            {
-            use_u2x = true;
-            }
-        else
-            {
-            // figure out if U2X mode would allow for a better
-            // connection calculate the percent difference between the
-            // baud-rate specified and the real baud rate for both U2X
-            // and non-U2X mode (0-255 error percent)
-            uint8_t nonu2x_baud_error
-                = abs((int)(255 - ((F_CPU / (16 * (((F_CPU / 8 / baud - 1) / 2)
-                                                   + 1)) * 255) / baud)));
-            uint8_t u2x_baud_error
-                = abs((int)(255 - ((F_CPU / (8 * (((F_CPU / 4 / baud - 1) / 2)
-                                                  + 1)) * 255) / baud)));
-    
-            // prefer non-U2X mode because it handles clock skew better
-            use_u2x = (nonu2x_baud_error > u2x_baud_error);
-            }
-  
-        if (use_u2x)
+
+try_again:
+       if (use_u2x)
             {
             _SFR_IO8(ucsra) = 1 << u2x;
             baud_setting = (F_CPU / 4 / baud - 1) / 2;
@@ -136,20 +117,22 @@ template <byte ubrrh, byte ubrrl, byte ucsra, byte ucsrb, byte udr,
             baud_setting = (F_CPU / 8 / baud - 1) / 2;
             }
 
+       if ((baud_setting > 4095) && use_u2x)
+           {
+           use_u2x = false;
+           goto try_again;
+           }
+
         // assign the baud_setting, a.k.a. ubbr (USART Baud Rate Register)
         _SFR_IO8(ubrrh) = baud_setting >> 8;
         _SFR_IO8(ubrrl) = baud_setting;
 
         _SFR_IO8(ucsrb) |= ucsrbmask;
-        _SFR_IO8(ucsrb) &= ~udre;
+        _SFR_IO8(ucsrb) &= ~udre;        
         }
 
     void end()
         { 
-        // wait for transmission of outgoing data
-        while (RingBuffer<size>::read() >= 0)
-            ;
-        
         _SFR_IO8(ucsrb) &= ~(ucsrbmask | (1 << udre));
         RingBuffer<size>::flush();
         }
