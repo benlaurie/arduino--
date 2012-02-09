@@ -119,6 +119,7 @@ function git_plot_data(version, fn, data, offset) {
 
     var acc = 0
     var index = offset || data.data.length
+    var count = 0
 
     for (var i = 0; i < git_sizes.length; i++) {
         var gi = git_sizes[i][version]
@@ -128,15 +129,16 @@ function git_plot_data(version, fn, data, offset) {
         var sz = gi[fn]
         if (sz !== undefined) {
             data.data.push([index, sz])
+            data.meta.push(git_sizes[i].git)
             data.min = Math.min(data.min, sz)
             data.max = Math.max(data.max, sz)
             acc = acc + sz
+            count++
         }
         index = index + 1
-        data.meta.push(git_sizes[i].git)
     }
 
-    return update_mean(data, acc, i)
+    return update_mean(data, acc, count)
 }
 
 function recent_plot_data(version, fn, data, offset) {
@@ -278,7 +280,7 @@ function add_plots_grouped(version, fnlist) {
 
     for (var bf in all_data) {
         var data = all_data[bf]
-        var bucket = Math.ceil(data.mean / partition_size) * partition_size
+        var bucket = Math.ceil(data.max / partition_size) * partition_size
 
         if (!buckets.hasOwnProperty(bucket)) {
             buckets[bucket] = []
