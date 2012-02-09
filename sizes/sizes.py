@@ -264,7 +264,7 @@ def history():
 
                 if os.path.exists('.depend'):
                     os.unlink('.depend')
-                rc = silent('bsdmake', 'clean', 'all')
+                rc = silent('make', 'clean', 'all')
                 append_git_size(sizes)
                 if not rc:
                     print '%s ok' % r
@@ -276,7 +276,7 @@ def history():
         subprocess.call(['git', 'checkout', '-q', options.branch])
         if os.path.exists('.depend'):
             os.unlink('.depend')
-        silent('bsdmake', 'clean')
+        silent('make', 'clean')
 
     return sizes
 
