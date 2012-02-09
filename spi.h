@@ -1,7 +1,7 @@
 #ifndef SPI_H_
 #define SPI_H
 
-#include "arduino++.h"
+#include "arduino--.h"
 
 template <class Sck, class Miso, class Mosi, class Ss> 
     class _SPI

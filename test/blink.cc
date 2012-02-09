@@ -5,7 +5,7 @@
    on all Arduino variants that we know of).
 */
 
-#include "arduino++.h"
+#include "arduino--.h"
 #include <avr/sleep.h>
 
 int main(void)

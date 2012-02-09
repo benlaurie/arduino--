@@ -131,6 +131,12 @@ def json_indented(data, initial_indent = 4, indent = 4):
 
     return '\n'.join(lines)
 
+def binfiles():
+    return glob.glob('test/*.bin')
+
+def bname(b):
+    return os.path.split(b)[1]
+
 def generate(version, git_sizes, recent_sizes):
     remote_url = github_url(git_remote_url(options.remote))
 
@@ -196,17 +202,17 @@ def update(version):
     counter = recent_sizes.get('counter', 0) + 1
 
     increment = False
-    binlist = glob.glob('*.bin')
-    for b in binlist:
+    for b in binfiles():
         size = os.path.getsize(b)
         if not recent_sizes.has_key(version):
             recent_sizes[version] = {}
 
-        binfiles = recent_sizes[version]
-        if not binfiles.has_key(b):
-            binfiles[b] = []
+        blist = recent_sizes[version]
+        bn = bname(b)
+        if not blist.has_key(bn):
+            blist[bn] = []
 
-        bfile = binfiles[b]
+        bfile = blist[bn]
         # Only add files with changed sizes
         if not len(bfile) or bfile[-1].get('size', None) != size:
             mt = os.path.getmtime(b)
@@ -232,9 +238,8 @@ def append_git_size(sizes):
     git_info = git_log(1)[0]
     info = {}
 
-    binlist = glob.glob('*.bin')
-    for b in binlist:
-        info[b] = os.path.getsize(b)
+    for b in binfiles():
+        info[bname(b)] = os.path.getsize(b)
 
     if not git_info['hash'] in hashes:
         sizes.append({version: info, 'git': git_info})
