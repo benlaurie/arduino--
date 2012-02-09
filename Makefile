@@ -1,6 +1,6 @@
 include Makefile.local
 
-OPTIMIZE = -O3
+OPTIMIZE = -O3 -Os
 DEFS = -I /usr/local/avr/avr/include -DF_CPU=$(CPU_FREQUENCY)
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
@@ -40,8 +40,8 @@ all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 .o.elf:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
-sizes/sizes.json sizes/sizes.html: $(BIN)
-	python sizes/sizes.py -s sizes/sizes.json generate
+sizes/recent_sizes.json sizes/sizes.html: $(BIN)
+	python sizes/sizes.py generate
 
 avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl -f $(CPU_FREQUENCY) < get-ports.lst > avr-ports.h
