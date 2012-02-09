@@ -105,6 +105,13 @@ function update_mean(data, acc, count) {
     return data
 }
 
+function next_index(data) {
+    if (!data.data.length)
+        return 0
+
+    return data.data[data.data.length-1][0] + 1
+}
+
 function git_plot_data(version, fn, data, offset) {
 
     data = data || { 'data': [], 'meta': [], 'label': fn,
@@ -118,7 +125,7 @@ function git_plot_data(version, fn, data, offset) {
     }
 
     var acc = 0
-    var index = offset || data.data.length
+    var index = offset || next_index(data)
     var count = 0
 
     for (var i = 0; i < git_sizes.length; i++) {
@@ -156,7 +163,7 @@ function recent_plot_data(version, fn, data, offset) {
     }
 
     var acc = 0
-    var index = offset || data.data.length
+    var index = offset || next_index(data)
     var sz
 
     for (var i = 0; i < bdata.length; i++) {
@@ -237,11 +244,12 @@ function plot(id, data) {
                             lines: { show: true },
                             points: { show: true }
                         },
+                        xaxis: { min: 0 },
                         grid: { hoverable: true, clickable: true },
                     })
 
     $("#" + id).bind("plothover", plothover);
-    // $("#" + id).bind("plotclick", curryclick(id, pl));
+    $("#" + id).bind("plotclick", curryclick(id, pl));
 
     return pl
 }
@@ -344,32 +352,36 @@ function show_tooltip(x, y, contents) {
 }
 
 function clickdata(md) {
-    if (md.comment) {
-        return 'commit <a href="' + remote_url + '/commit/' + md.hash + '">'
-            + md.short + '</a>'
+    if (md.hash) {
+        return '<tt>' + md.hash + '</tt>'
     }
     return ""
+}
+
+function utc_now() {
+    return new Date
+    return new Date((new Date).toUTCString())
 }
 
 function hoverdata(item, y) {
     var s = item.series.label + ": " + Math.floor(y) + " bytes, "
     var md = item.series.meta[item.dataIndex]
     if (md.mtime) {
-        return s + humaneDate(md.mtime)
+        return s + humaneDate(new Date(md.mtime * 1000))
     }
     else {
         return s + md.comment
     }
 }
-    
-var previousPoint = null;
+
+var previous_point = null;
 function plothover(event, pos, item) {
     $("#x").text(pos.x.toFixed(2));
     $("#y").text(pos.y.toFixed(2));
 
     if (item) {
-        if (previousPoint != item.dataIndex) {
-            previousPoint = item.dataIndex;
+        if (previous_point != item.dataIndex) {
+            previous_point = item.dataIndex;
                     
             $("#tooltip").remove();
             var x = item.datapoint[0].toFixed(2),
@@ -380,17 +392,24 @@ function plothover(event, pos, item) {
     }
     else {
         $("#tooltip").remove();
-        previousPoint = null;
+        previous_point = null;
     }
 }
 
+var last_highlight = null
 function curryclick(id, plot) {
     
     function click(event, pos, item) {
         if (item) {
             var s = clickdata(item.series.meta[item.dataIndex])
             $("#" + id + "_clickdata").html(s)
-            plot.highlight(item.series, item.datapoint);
+            if (last_highlight) {
+                plot.unhighlight(last_highlight.series,
+                                 last_highlight.datapoint)
+            }
+            plot.highlight(item.series, item.datapoint)
+            last_highlight = { series: item.series,
+                               datapoint: item.datapoint }
         }
     }
     

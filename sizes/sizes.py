@@ -209,10 +209,10 @@ def update(version):
         bfile = binfiles[b]
         # Only add files with changed sizes
         if not len(bfile) or bfile[-1].get('size', None) != size:
-            dt = datetime.datetime.fromtimestamp(os.path.getmtime(b))
+            mt = os.path.getmtime(b)
             increment = True
             bfile.append({'index': counter, 'size': size,
-                           'mtime': dt.isoformat(' ')})
+                           'mtime': int(mt)})
 
     if increment:
         counter = counter + 1
