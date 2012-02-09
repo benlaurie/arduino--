@@ -1,0 +1,449 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>arduino-- size tracking</title>
+    <style type="text/css">
+      body {
+          font-family: sans-serif;
+          font-size: 16px;
+          margin: 50px;
+          max-width: 800px;
+      }
+      select#compiler_version {
+          float: right;
+      }
+    </style>
+    <script language="javascript" type="text/javascript" 
+            src="flot/jquery.js"></script>
+    <script language="javascript" type="text/javascript" 
+            src="flot/jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" 
+            src="humane.js"></script>
+    <script type="text/javascript">
+
+var git_sizes = %(git_sizes)s
+var recent_sizes = %(recent_sizes)s
+var compiler_version = "%(compiler_version)s"
+var remote_url = "%(remote_url)s"
+var plot_id = 0
+var bin_to_id = {}
+
+var partition_size = 1024
+
+function keys(d) {
+    var kl = []
+    for (k in d) {
+        if (d.hasOwnProperty(k)) {
+            kl.push(k)
+        }
+    }
+
+    return kl
+}
+
+function generate_id(fnlist) {
+    plot_id = plot_id + 1
+    for (var i = 0; i < fnlist.length; i++) {
+        bin_to_id[fnlist[i]] = plot_id
+    }
+
+    return plot_id
+}
+
+/** collect all compiler versions
+*/
+function compiler_versions() {
+    var versions = {}
+    for (var i = 0; i < git_sizes.length; i++) {
+        for (var v in git_sizes[i]) {
+            if (v != 'git') {
+                versions[v] = null
+            }
+        }
+    }
+    for (var v in recent_sizes) {
+        if (v != 'counter') {
+            versions[v] = null
+        }
+    }
+
+    return keys(versions)
+}
+
+// collect all binfiles as an object
+function binfiles() {
+    var bf = {}
+    for (var i = 0; i < git_sizes.length; i++) {
+        for (var v in git_sizes[i]) {
+            if (v != 'git') {
+                for (var b in git_sizes[i][v]) {
+                    bf[b] = null
+                }
+            }
+        }
+    }
+    for (var v in recent_sizes) {
+        if (v != 'counter') {
+            for (var b in recent_sizes[v]) {
+                bf[b] = null
+            }
+        }
+    }
+
+    return keys(bf)
+}
+
+function update_mean(data, acc, count) {
+    if (data.mean === null) {
+        data.mean = acc / count
+    }
+    else {
+        data.mean = (acc / count + data.mean) / 2
+    }
+
+    return data
+}
+
+function git_plot_data(version, fn, data, offset) {
+
+    data = data || { 'data': [], 'meta': [], 'label': fn,
+                     'min': Infinity, 'max': 0, 'mean': null,
+                     'version': version }
+
+    version = version || compiler_version
+
+    if (git_sizes === undefined) {
+        return data
+    }
+
+    var acc = 0
+    var index = offset || data.data.length
+
+    for (var i = 0; i < git_sizes.length; i++) {
+        var gi = git_sizes[i][version]
+        if (gi === undefined) 
+            continue
+
+        var sz = gi[fn]
+        if (sz !== undefined) {
+            data.data.push([index, sz])
+            data.min = Math.min(data.min, sz)
+            data.max = Math.max(data.max, sz)
+            acc = acc + sz
+        }
+        index = index + 1
+        data.meta.push(git_sizes[i].git)
+    }
+
+    return update_mean(data, acc, i)
+}
+
+function recent_plot_data(version, fn, data, offset) {
+
+    data = data || { 'data': [], 'meta': [], 'label': fn,
+                     'min': Infinity, 'max': 0, 'mean': null }
+    version = version || compiler_version
+    if (recent_sizes[version] === undefined) {
+        return data
+    }
+
+    var bdata = recent_sizes[version][fn]
+    if (bdata === undefined) {
+        return data
+    }
+
+    var acc = 0
+    var index = offset || data.data.length
+    var sz
+
+    for (var i = 0; i < bdata.length; i++) {
+        sz = bdata[i].size
+        data.data.push([index + bdata[i].index, sz])
+        data.min = Math.min(data.min, sz)
+        data.max = Math.max(data.max, sz)
+        acc = acc + sz
+        data.meta.push({'mtime': bdata[i].mtime})
+    }
+
+    return update_mean(data, acc, i)
+}
+
+function all_plot_data(version, fn) {
+    version = version || compiler_version
+
+    return recent_plot_data(version, fn, git_plot_data(version, fn))
+}
+
+function split_plot_data(version, fn) {
+    version = version || compiler_version
+    var sl = []
+    var gd = git_plot_data(version, fn)
+
+    sl.push(gd)
+    
+    var rd = recent_plot_data(version, fn, undefined, gd.data.length)
+    delete rd.label
+    sl.push(rd)
+
+    return sl
+}
+
+/** Generate the html for the plot(s)
+ */
+function plot_html(title, fnlist, id) {
+    id = id || generate_id(fnlist)
+    s = '<div id="' + id + '"><h3>' + title + '</h3>\n'
+    
+    for (var i = 0; i < fnlist.length; i++) {
+        s = s + '<a name="' + fnlist[i] + '"></a>\n'
+    }
+
+    if (fnlist.length > 0 && fnlist[0] != title) {
+        var names = fnlist[0]
+        // starts at 1
+        for (var i = 1; i < fnlist.length; i++) {
+            names = names + ', ' + fnlist[i]
+        }
+
+        s = s + '<p>' + names + '</p>'
+    }
+
+    s = s + '<div id="' + id + '_plot" style="width:800px;height:300px">' +
+        '</div>\n' +
+        '<p><span id="' + id + '_clickdata"></span></p>\n' +
+        '</div>\n'
+
+    return s
+}
+
+function cmp_mean(a, b) {
+    if (a.mean == b.mean) {
+        return 0
+    }
+    return a.mean < b.mean ? -1 : 1
+}
+
+function plot(id, data) {
+
+    data.sort(cmp_mean)
+
+    var pl = $.plot($("#" + id + '_plot'),
+                    data,
+                    {
+                        series: {
+                            lines: { show: true },
+                            points: { show: true }
+                        },
+                        grid: { hoverable: true, clickable: true },
+                    })
+
+    $("#" + id).bind("plothover", plothover);
+    // $("#" + id).bind("plotclick", curryclick(id, pl));
+
+    return pl
+}
+
+function kb(s) {
+    return (s / 1024) + 'kb'
+}
+
+/** Add all plots, grouped by sizes
+ *
+ * @param version Compiler version (default is the installed compiler)
+ * @param fnlist List of binfiles to display
+ */
+function add_plots_grouped(version, fnlist) {
+    version = version || compiler_version
+    fnlist = fnlist || binfiles()
+
+    var all_data = {}
+    var max = 0
+    var min = Infinity;
+
+    // Get all the data 
+    for (var i = 0; i < fnlist.length; i++) {
+        var data = all_plot_data(version, fnlist[i])
+        min = Math.min(data.min, min)
+        max = Math.max(data.max, max)
+        data.color = i
+        all_data[fnlist[i]] = data
+    }
+
+    var lower = Math.floor(min/partition_size) * partition_size
+    var upper = Math.ceil(max/partition_size) * partition_size
+
+    var buckets = {}
+    var buckets_fn = {}
+
+    for (var bf in all_data) {
+        var data = all_data[bf]
+        var bucket = Math.ceil(data.mean / partition_size) * partition_size
+
+        if (!buckets.hasOwnProperty(bucket)) {
+            buckets[bucket] = []
+            buckets_fn[bucket] = []
+        }
+        buckets[bucket].push(data)
+        buckets_fn[bucket].push(bf)
+    }
+
+    for (var i = lower; i <= upper; i = i + partition_size) {
+        if (buckets.hasOwnProperty(i)) {
+            var title = kb(i)
+            var id = generate_id(buckets_fn[i])
+            $('#plots').append(plot_html(title, buckets_fn[i], id))
+
+            plot(id, buckets[i])
+        }
+    }
+}
+
+/** Add a single plot for each binfile
+ *
+ * @param version Compiler version (default is the installed compiler)
+ * @param fnlist List of binfiles to display
+ */
+function add_plots_single(version, fnlist) {
+    version = version || compiler_version
+    fnlist = fnlist || binfiles()
+
+    var data = []
+    for (var i = 0; i < fnlist.length; i++) {
+        data.push(all_plot_data(version, fnlist[i]))
+    }
+
+    data.sort(cmp_mean)
+
+    for (var i = 0; i < data.length; i++) {
+        var di = data[i]
+        var id = generate_id([di.label])
+        $('#plots').append(plot_html(di.label, [di.label], id))
+        di.color = i
+        plot(id, [di])
+    }
+}
+
+function remove_plots() {
+    $('#plots').children().remove()
+}
+
+function show_tooltip(x, y, contents) {
+    $('<div id="tooltip">' + contents + "</div>").css( {
+        position: "absolute",
+        display: "none",
+        top: y + 5,
+        left: x + 5,
+        border: "1px solid #fdd",
+        padding: "2px",
+        "background-color": "#fee",
+        opacity: 0.80
+    }).appendTo("body").fadeIn(200);
+}
+
+function clickdata(md) {
+    if (md.comment) {
+        return 'commit <a href="' + remote_url + '/commit/' + md.hash + '">'
+            + md.short + '</a>'
+    }
+    return ""
+}
+
+function hoverdata(item, y) {
+    var s = item.series.label + ": " + Math.floor(y) + " bytes, "
+    var md = item.series.meta[item.dataIndex]
+    if (md.mtime) {
+        return s + humaneDate(md.mtime)
+    }
+    else {
+        return s + md.comment
+    }
+}
+    
+var previousPoint = null;
+function plothover(event, pos, item) {
+    $("#x").text(pos.x.toFixed(2));
+    $("#y").text(pos.y.toFixed(2));
+
+    if (item) {
+        if (previousPoint != item.dataIndex) {
+            previousPoint = item.dataIndex;
+                    
+            $("#tooltip").remove();
+            var x = item.datapoint[0].toFixed(2),
+            y = item.datapoint[1].toFixed(2);
+            
+            show_tooltip(item.pageX, item.pageY, hoverdata(item, y))
+        }
+    }
+    else {
+        $("#tooltip").remove();
+        previousPoint = null;
+    }
+}
+
+function curryclick(id, plot) {
+    
+    function click(event, pos, item) {
+        if (item) {
+            var s = clickdata(item.series.meta[item.dataIndex])
+            $("#" + id + "_clickdata").html(s)
+            plot.highlight(item.series, item.datapoint);
+        }
+    }
+    
+    return click;
+}
+
+function update() {
+    var version = $("#compiler_version option:selected").text()
+    var group = $('input:radio[name=group]:checked').val()
+
+    remove_plots()
+
+    if (group == 'grouped') {
+        add_plots_grouped()
+    }
+    else {
+        add_plots_single()
+    }
+}
+
+function add_version_select(versions) {
+    versions = versions || compiler_versions()
+    var s = ''
+
+    for (var i = 0; i < versions.length; i++) {
+        var v = versions[i]
+        s = s + '<option value="' + v + '"> gcc ' + v + '</option>'
+    }
+
+    var select = $('#select_ui').append(
+        '<select id="compiler_version">' + s + '</select>')
+
+    $(select).change(update)
+}
+
+$(function () {
+    var versions = compiler_versions()
+    if (versions.length > 1) {
+        add_version_select(versions)
+    }
+    var group = $('input:radio[name=group]')
+    $(group).change(function() {
+        update()
+    })
+    group[0].checked = true;
+    update()
+});
+    </script>
+  </head>
+    <body>
+      <h1>arduino-- size tracking</h1>
+      <div id="select_ui">
+        <input type="radio" name="group" value="grouped">grouped plots</input>
+        <input type="radio" name="group" value="single">single plots</input>
+      </div>
+      <div id="plots"></div>
+    </body>
+</html>
