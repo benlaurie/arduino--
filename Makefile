@@ -9,6 +9,8 @@ AR = avr-ar
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 
+VPATH=test
+
 CFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
@@ -21,10 +23,10 @@ BIN = test/blink.bin test/test_clock.bin test/test_enc28j60.bin \
 
 all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
-.depend: *.cc *.h test/*.cc
-	$(CC) -I. -mmcu=$(MCU_TARGET) -MM *.cc test/*.cc > .depend
+.depend: test/*.cc *.h
+	$(CC) $(DEFS) -mmcu=$(MCU_TARGET) -MM test/*.cc | sed 's;^\(.*\):;test/\1:;'> .depend
 
-.SUFFIXES: .lst .elf .bin _upload
+.SUFFIXES: .elf .lst .bin _upload
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c -o $(<:.cc=.o) $<
@@ -34,6 +36,9 @@ all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
 .elf.bin:
 	$(OBJCOPY) -j .text -j .data -O binary $< $@
+
+.elf.lst:
+	$(OBJDUMP) -h -S $< > $@
 
 .elf.lst:
 	$(OBJDUMP) -h -S $< > $@
@@ -48,8 +53,8 @@ avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl -f $(CPU_FREQUENCY) < get-ports.lst > avr-ports.h
 
 clean:
-	rm -f *.o *.elf *.lst *.map test/*.o test/*.map test/*.lst test/*.elf test/*.bin \
-	avr-ports.h .depend
+	rm -f *.o *.map *.lst *.elf *.bin test/*.o test/*.map test/*.lst \
+	test/*.elf test/*.bin avr-ports.h .depend
 
 .bin_upload:
 	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:$<
