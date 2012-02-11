@@ -85,22 +85,10 @@ class Register
     static _Register<NSPCR> SPCR;
     };
 
-
-// make sure that the CS bit value definitions are the same for every timer 
-// register we are interested in
-#if ((CS00 != CS10) || (CS01 != CS11) || (CS02 != CS12))
-#error "Timer CSxx register constants violate assumptions in _Timer"
-#endif 
-
-// make sure that the WGM bit value definitions are the same for every timer 
-// register we are interested in
-#if ((WGM00 != WGM10) || (WGM01 != WGM11) || (WGM02 != WGM12))
-#error "Timer WGMxx register constants violate assumptions in _Timer"
-#endif 
-
 template <class TCNT_, class OCRA_, class OCRB_, class TCCRA_, class TCCRB_,
           class TIFR_, class TIMSK_, byte toiex, byte ociexa, byte ocfxa, 
-          byte ociexb, byte ocfxb> 
+          byte ociexb, byte ocfxb, byte csx0, byte csx1, byte csx2,
+          byte wgmx0, byte wgmx1, byte wgmx2> 
 class _Timer
     {
 public:
@@ -139,62 +127,63 @@ public:
     static void disableCompareInterruptB() { TIMSK &= ~_BV(ociexb); }
 
     static void stop() { TCCRB &= ((1 << 5) - 1) << 3; }
-    static void prescaler1() { prescaler(_BV(CS00)); }
-    static void prescaler8() { prescaler(_BV(CS01)); }
-    static void prescaler64() { prescaler(_BV(CS01) | _BV(CS00)); }
-    static void prescaler256() { prescaler(_BV(CS02)); }
-    static void prescaler1024() { prescaler(_BV(CS02) | _BV(CS00)); }
+    static void prescaler1() { prescaler(_BV(csx0)); }
+    static void prescaler8() { prescaler(_BV(csx1)); }
+    static void prescaler64() { prescaler(_BV(csx1) | _BV(csx0)); }
+    static void prescaler256() { prescaler(_BV(csx2)); }
+    static void prescaler1024() { prescaler(_BV(csx2) | _BV(csx0)); }
 
-    static void externalFalling() { prescaler(_BV(CS02) | _BV(CS01)); }
+    static void externalFalling() { prescaler(_BV(csx2) | _BV(csx1)); }
     static void externalRising() 
-        { prescaler(_BV(CS02) | _BV(CS01) | _BV(CS00)); }
+        { prescaler(_BV(csx2) | _BV(csx1) | _BV(csx0)); }
 
 
     //** Mode 0 */
     static void normal() 
         { 
-        TCCRB &= ~_BV(WGM02); 
+        // clear WGMx2
+        TCCRB &= ~_BV(wgmx2); 
         wgm01(0);
         }
 
     //* Mode 1 */
     static void phaseCorrectPWM()
         {
-        // clear WGM02
-        TCCRB &= ~_BV(WGM02);
-        wgm01(_BV(WGM00));
+        // clear WGMx2
+        TCCRB &= ~_BV(wgmx2);
+        wgm01(_BV(wgmx0));
         }
 
     /** Mode 2 */
     static void clearTimerOnCompare()
         { 
-        // clear WGM02
-        TCCRB &= ~_BV(WGM02);
-        wgm01(_BV(WGM01));
+        // clear WGMx2
+        TCCRB &= ~_BV(wgmx2);
+        wgm01(_BV(wgmx1));
         }
 
     /** Mode 3 */
     static void fastPWM()
         { 
-        // clear WGM02
-        TCCRB &= ~_BV(WGM02);
-        wgm01(_BV(WGM01) | _BV(WGM00));
+        // clear WGMx2
+        TCCRB &= ~_BV(wgmx2);
+        wgm01(_BV(wgmx1) | _BV(wgmx0));
         }
 
     /** Mode 5 */
     static void phaseCorrectPWMOCRA()
         { 
-        // set WGM02
-        TCCRB |= _BV(WGM02);
-        wgm01(_BV(WGM00));
+        // set WGMx2
+        TCCRB |= _BV(wgmx2);
+        wgm01(_BV(wgmx0));
         }
     
     /** Mode 7 */
     static void fastPWMOCRA() 
         { 
-        // set WGM02
-        TCCRB |= _BV(WGM02);
-        wgm01(_BV(WGM01) | _BV(WGM00));
+        // set WGMx2
+        TCCRB |= _BV(wgmx2);
+        wgm01(_BV(wgmx1) | _BV(wgmx0));
         }
 
 private:
@@ -212,15 +201,6 @@ private:
         TCCRA = tmp;
         }
     };
-
-template<typename T, class Timer> 
-volatile T _Clock<T, Timer>::timer_overflow_count = 0;
-
-template<typename T, class Timer> 
-volatile uint16_t _Clock<T, Timer>::timer_fract = 0;
-
-template<typename T, class Timer> 
-volatile T _Clock<T, Timer>::timer_millis = 0;
 
 template <byte lsb, byte maskbit> class _Interrupt
     {
@@ -394,6 +374,15 @@ public:
     volatile static uint16_t timer_fract;
     volatile static timeres_t timer_millis;
     };
+
+template<typename timeres_t, class Timer> 
+volatile timeres_t _Clock<timeres_t, Timer>::timer_overflow_count = 0;
+
+template<typename timeres_t, class Timer> 
+volatile uint16_t _Clock<timeres_t, Timer>::timer_fract = 0;
+
+template<typename timeres_t, class Timer> 
+volatile timeres_t _Clock<timeres_t, Timer>::timer_millis = 0;
 
 void delayMicroseconds(unsigned int us)
     {

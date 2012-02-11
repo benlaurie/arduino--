@@ -40,17 +40,20 @@ public:
 
 typedef _Timer<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
                _Register<NTCCR0A>, _Register<NTCCR0B>, _Register<NTIFR0>, 
-               _Register<NTIMSK0>, TOIE0, OCIE0A, OCF0A, OCIE0B, OCF0B> 
+               _Register<NTIMSK0>, TOIE0, OCIE0A, OCF0A, OCIE0B, OCF0B,
+               CS00, CS01, CS02, WGM00, WGM01, WGM02> 
 Timer0;
 
 typedef _Timer<_Register16<NTCNT1>, _Register16<NOCR1A>, _Register16<NOCR1B>,
                _Register<NTCCR1A>, _Register<NTCCR1B>, _Register<NTIFR1>, 
-               _Register<NTIMSK1>, TOIE1, OCIE1A, OCF1A, OCIE1B, OCF1B> 
+               _Register<NTIMSK1>, TOIE1, OCIE1A, OCF1A, OCIE1B, OCF1B,
+               CS10, CS11, CS12, WGM10, WGM11, WGM12> 
 Timer1;
 
 typedef _Timer<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
                _Register<NTCCR2A>, _Register<NTCCR2B>, _Register<NTIFR2>, 
-               _Register<NTIMSK2>, TOIE2, OCIE2A, OCF2A, OCIE2B, OCF2B> 
+               _Register<NTIMSK2>, TOIE2, OCIE2A, OCF2A, OCIE2B, OCF2B, 
+               CS20, CS21, CS22, WGM20, WGM21, WGM22> 
 Timer2;
 
 typedef class _Interrupt<ISC00, INT0> Interrupt0;
