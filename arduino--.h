@@ -289,16 +289,6 @@ template <byte ddr, byte port, byte in, byte bit, byte pcport,
         // combine the two bytes
         return (high << 8) | low;
         }
-
-    static void analogWrite(int val)
-        {
-        // We need to make sure the PWM output is enabled for those pins
-        // that support it, as we turn it off when digitally reading or
-        // writing with them.  Also, make sure the pin is in output mode
-        // for consistenty with Wiring, which doesn't require a pinMode
-        // call for the analog output pins.
-        _Pin<ddr, port, in, bit, pcport, pcbit, pcen>::modeOutput();
-        }
     };
 
 class AVRBase
@@ -481,6 +471,9 @@ public:
 
 #if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
 #include "defs/m328.h"
+#elif defined (__AVR_ATmega168__) || defined (__AVR_ATmega168A__) || \
+  defined (__AVR_ATmega168P__)
+#include "defs/m168.h"
 #endif
 
 #endif // ARDUINO_MINUS_MINUS

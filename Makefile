@@ -40,9 +40,6 @@ all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 .elf.lst:
 	$(OBJDUMP) -h -S $< > $@
 
-.elf.lst:
-	$(OBJDUMP) -h -S $< > $@
-
 .o.elf:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 

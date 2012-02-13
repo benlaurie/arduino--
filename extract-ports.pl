@@ -19,7 +19,7 @@ print "#define TIMER16_MICRO_SCALE $scale16\n\n";
 while (my $line = <>) {
     chomp $line;
 
-    next if $line !~ /^    D\((.*?)\);$/;
+    next if $line !~ /^\s*D\((.*?)\);$/;
     my $port = $1;
 
     my $val;
