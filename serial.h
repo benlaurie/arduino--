@@ -148,6 +148,8 @@ try_again:
         { HexWriter<HardwareSerial>::write(this, b); }
     void writeHex(uint16_t i) 
         { HexWriter<HardwareSerial>::write(this, i); }
+    void writeHex(const byte *b, byte n)
+        { HexWriter<HardwareSerial>::write(this, b, n); }
     void write(const char *str)
         { StringWriter<HardwareSerial>::write(this, str); }
     void write_P(const char *str)

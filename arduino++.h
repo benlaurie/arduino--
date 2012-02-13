@@ -608,6 +608,11 @@ public:
         write(out, static_cast<byte>(i >> 8));
         write(out, static_cast<byte>(i & 0xff));
         }
+    static void write(Out *out, const byte *b, byte n)
+        {
+        for (int k = 0; k < n; ++k)
+            write(out, b[k]);
+        }
     static void writeNibble(Out *out, byte b)
         {
         if (b < 10)
