@@ -26,8 +26,8 @@ def run(*args):
 
         fout.seek(0)
         ferr.seek(0)
-        out = fout.readlines()
-        err = ferr.readlines()
+        out = [line.rstrip() for line in fout]
+        err = [line.rstrip() for line in ferr]
     finally:
         fout.close()
         os.unlink(fnout)
@@ -72,6 +72,16 @@ def github_url(url):
         return 'https://%s%s' % (m.netloc, m.path)
 
     raise ValueError('Cannot parse remote URL')
+
+def git_branch():
+    p_branch = re.compile('^\*\s+(.+)')
+    data, _ = run('git', 'branch')
+    for l in data:
+        m = p_branch.search(l)
+        if m:
+            return m.group(1)
+
+    raise ValueError('Cannot find git branch')
 
 def git_remote_url(remote):
     p_remote = re.compile(remote + '\s+([\w@.:/_-]+)\s+\(fetch\)')
@@ -252,16 +262,26 @@ def write_git_sizes(sizes):
     json.dump(sizes, f, indent=4)
     f.close()
 
-def history():
+def history(branch):
     sizes = git_sizes()
-    revlist, _ = run('git', 'rev-list', options.branch, '--')
+    revlist, _ = run('git', 'rev-list', branch, '--')
     hashes = set()
-    for s in sizes:
-        hashes.add(s['git']['hash'])
+    stale = []
+    for i, s in enumerate(sizes):
+        h = s['git']['hash']
+        hashes.add(h)
+        if not h in revlist:
+            print '%s removed (stale)' % h
+            stale.append(i)
+
+    # remove stale entries, i.e. unrelated entries from other branches or
+    # commits that were deleted through an interactive rebase or whatever else
+    # git throws our way 
+    for u in reversed(stale):
+        del sizes[u]
 
     try:
         for r in revlist:
-            r = r.rstrip()
             if not r in hashes:
                 rc = subprocess.call(['git', 'checkout', '-q', r])
                 if rc:
@@ -276,9 +296,10 @@ def history():
                 else:
                     print '%s make failed' % r
             else:
-                print '%s already recorded' % r
+                if not options.quiet:
+                    print '%s already recorded' % r
     finally:
-        subprocess.call(['git', 'checkout', '-q', options.branch])
+        subprocess.call(['git', 'checkout', '-q', branch])
         if os.path.exists('.depend'):
             os.unlink('.depend')
         silent('bsdmake', 'clean')
@@ -295,10 +316,10 @@ if __name__ == '__main__':
                       help="write HTML output to FILE")
     parser.add_option("-t", "--template", default='sizes/sizes.template',
                       help="read HTML from TEMPLATE")
-    parser.add_option("-b", "--branch", default='master',
-                      help="the git branch (default is master)")
     parser.add_option("-r", "--remote", default='origin',
                       help="the git REMOTE name (default is origin)")
+    parser.add_option("-q", "--quiet", action='store_true',
+                      help="be more quiet")
     options, args = parser.parse_args()
 
     version = avr_gcc_version()
@@ -310,7 +331,8 @@ if __name__ == '__main__':
             append_git_size(sizes)
             write_git_sizes(sizes)
         elif a == 'history':
-            sizes = history()
+            branch = git_branch()
+            sizes = history(branch)
             write_git_sizes(sizes)
             generate(version, sizes, update(version))
     else:

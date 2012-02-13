@@ -9,3 +9,7 @@ test_enc28j60
 avr-ports.h
 libarduino++.a
 Makefile.local
+sizes/recent_sizes.json
+sizes/git_sizes.json
+sizes/sizes.html
+*.pyc
