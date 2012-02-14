@@ -7,10 +7,12 @@ int main(int argc, char **argv)
     {
     volatile uint8_t *x = 0;
 
-#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
-#include "defs/ports_m328.i"
-#elif defined (__AVR_ATmega168__) || defined (__AVR_ATmega168A__) || defined (__AVR_ATmega168P__)
-#include "defs/ports_m168.i"
+#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__) \
+    || defined (__AVR_ATmega168__) || defined (__AVR_ATmega168A__) \
+    || defined (__AVR_ATmega168P__)
+#include "defs/ports_mx8.i"
+#else
+#error "No port definition found"
 #endif
 
     return 0;

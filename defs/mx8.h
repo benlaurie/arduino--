@@ -1,5 +1,5 @@
-#ifndef ARDUINO_MINUS_MINUS_M328
-#define ARDUINO_MINUS_MINUS_M328
+#ifndef ARDUINO_MINUS_MINUS_MX8
+#define ARDUINO_MINUS_MINUS_MX8
 
 class Pin
     {
@@ -130,4 +130,4 @@ public:
         }
     };
 
-#endif // ARDUINO_MINUS_MINUS_M328
+#endif // ARDUINO_MINUS_MINUS_MX8

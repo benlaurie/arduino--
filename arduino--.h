@@ -469,11 +469,12 @@ public:
         }
     };
 
-#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
-#include "defs/m328.h"
-#elif defined (__AVR_ATmega168__) || defined (__AVR_ATmega168A__) || \
-  defined (__AVR_ATmega168P__)
-#include "defs/m168.h"
+#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__) \
+    || defined (__AVR_ATmega168__) || defined (__AVR_ATmega168A__) \
+    || defined (__AVR_ATmega168P__)
+#include "defs/mx8.h"
+#else
+#error "No MCU specific definitions found"
 #endif
 
 #endif // ARDUINO_MINUS_MINUS
