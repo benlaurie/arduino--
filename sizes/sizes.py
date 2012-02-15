@@ -21,8 +21,9 @@ def run(*args):
     out, err = None, None
     try:
         p = subprocess.Popen(args, stderr=ferr, stdout=fout)
-        if p.wait() != 0:
-            raise RuntimeError('error executing ' + ' '.join(args))
+        rc = p.wait()
+        if rc != 0:
+            raise subprocess.CalledProcessError(rc, ' '.join(args))
 
         fout.seek(0)
         ferr.seek(0)
@@ -50,6 +51,22 @@ def silent(*args):
     os.unlink(fnerr)
 
     return rc
+
+def get_make_cmd(flavour):
+    # flavour is one of 'gnu' or 'bsd'
+    p_gnu_version = re.compile('GNU Make [0-9.]+')
+    cmds = ('make', 'bsdmake', 'gmake')
+    for c in cmds:
+        try:
+            out, _ = run(c, '--version')
+            if flavour == 'gnu' and p_gnu_version.search(out[0]) is not None:
+                return c
+        except subprocess.CalledProcessError:
+            # bsd make doesn't understand '--version' and throws an error
+            if flavour == 'bsd':
+                return c
+
+    raise RuntimeError('Cannot find %s make' % flavour.upper())
 
 def avr_gcc_version():
     p_version = re.compile('gcc version ([0-9.]+)')
@@ -263,6 +280,7 @@ def write_git_sizes(sizes):
     f.close()
 
 def history(branch):
+    make = get_make_cmd('bsd')
     sizes = git_sizes()
     revlist, _ = run('git', 'rev-list', branch, '--')
     hashes = set()
@@ -274,9 +292,9 @@ def history(branch):
             print '%s removed (stale)' % h
             stale.append(i)
 
-    # remove stale entries, i.e. unrelated entries from other branches or
-    # commits that were deleted through an interactive rebase or whatever else
-    # git throws our way 
+    # remove stale entries, i.e. unrelated commits from other branches or
+    # commits that were deleted through an interactive rebase (or whatever else
+    # git throws our way) 
     for u in reversed(stale):
         del sizes[u]
 
@@ -289,7 +307,7 @@ def history(branch):
 
                 if os.path.exists('.depend'):
                     os.unlink('.depend')
-                rc = silent('bsdmake', 'clean', 'all')
+                rc = silent(make, 'clean', 'all')
                 append_git_size(sizes)
                 if not rc:
                     print '%s ok' % r
@@ -302,7 +320,7 @@ def history(branch):
         subprocess.call(['git', 'checkout', '-q', branch])
         if os.path.exists('.depend'):
             os.unlink('.depend')
-        silent('bsdmake', 'clean')
+        silent(make, 'clean', 'all')
 
     return sizes
 
