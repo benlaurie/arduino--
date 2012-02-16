@@ -44,7 +44,7 @@ all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 sizes/recent_sizes.json sizes/sizes.html: $(BIN)
-	python sizes/sizes.py generate
+	python sizes/sizes.py recent generate
 
 avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl -f $(CPU_FREQUENCY) < get-ports.lst > avr-ports.h
