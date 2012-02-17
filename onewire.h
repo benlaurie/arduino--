@@ -204,8 +204,8 @@ template <class Pin> void Button<Pin>::Select() const
     {
     Reset();
     OutByte(MATCH_ROM);
-    for (byte n = 7; n >= 0; --n)
-	OutByte(id_[n]);
+    for (byte n = 0; n < 8; ++n)
+	OutByte(id_[7 - n]);
     }
 
 template <class Pin> void Buttons<Pin>::GetTemperatures()
