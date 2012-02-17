@@ -35,7 +35,7 @@ template <byte rx_buffer_size> class RingBuffer
  public:
     void store(byte c)
         {
-        int i = (_head + 1) % rx_buffer_size;
+        byte i = (_head + 1) % rx_buffer_size;
 
         // if we should be storing the received character into the location
         // just before the tail (meaning that the head would advance to the
