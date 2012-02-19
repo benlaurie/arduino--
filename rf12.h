@@ -28,8 +28,9 @@
  *
  * A packet with ACK=1 and CTL=0 wants an ack.
  * An ack depends on DST in the received packet
- *           DST=1 -> CTL=1 DST=0 ACK=0 ID=0
- *           DST=0 -> CTL=1 DST=1 ACK=0 ID=source ID
+ *           DST=1 -> CTL=1 DST=0 ACK=0 ID=sender ID (== destination
+ *                                                    ID of original packet)
+ *           DST=0 -> CTL=1 DST=1 ACK=0 ID=source ID of original packet
  *
  * It is not clear how the recipient, in the first case, knows the ack
  * is theirs?
