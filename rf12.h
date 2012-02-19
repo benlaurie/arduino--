@@ -15,7 +15,9 @@
  *          bit 6 DST
  *          bit 5 ACK
  *          bit 4-0 ID
- * LEN  is the length of the data
+ * LEN   is the length of the data
+ * ...   is the data
+ * CRC   is a CRC over SYNC2 onwards
  *
  * Nodes can only send to other nodes in the same group (nominally you
  * can send outside the group, but the chip recognises the group code,
