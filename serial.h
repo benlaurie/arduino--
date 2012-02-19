@@ -154,6 +154,8 @@ try_again:
         { StringWriter<HardwareSerial>::write(this, str); }
     void write_P(const char *str)
         { StringWriter<HardwareSerial>::write_P(this, str); }
+    void writeDecimal(uint32_t d, byte digits = 1)
+	{ DecimalWriter<HardwareSerial>::write(this, d, digits); }
 };
 
 // typedefs for serial classes

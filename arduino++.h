@@ -639,4 +639,16 @@ public:
         }
     };
 
+template <class Out> class DecimalWriter
+    {
+public:
+    static void write(Out *out, uint32_t d, char digits)
+        {
+        if (d == 0 && digits <= 0)
+            return;
+        write(out, d/10, digits - 1);
+        out->write('0' + d % 10);
+        }
+    };
+
 #endif // ARDUINO_MINUS_MINUS

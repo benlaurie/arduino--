@@ -8,6 +8,20 @@ void Button<Pin>::Dump(_Serial *serial) const
     serial->writeHex(id_, 8);
     serial->write(':');
     serial->writeHex(temperature_);
+
+    short temp = temperature_;
+    bool sign = !!(temp & 0x8000);
+    if (sign)
+	temp = -temp;
+    uint32_t t100 = temp * 6 + (temp + 2) / 4;  // * 100 * 1/16 = * 6.25
+    serial->write(':');
+    if (sign)
+	serial->write('-');
+    serial->writeDecimal(t100 / 100);
+    serial->write('.');
+    t100 %= 100;
+    serial->writeDecimal(t100, 2);
+
     serial->write('\r');
     serial->write('\n');
     }
