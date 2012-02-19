@@ -3,6 +3,40 @@
 // 2009-02-09 <jc@wippler.nl> http://opensource.org/licenses/mit-license.php
 // 2011-12-28 Ben Laurie <ben@links.org>
 
+/*
+ * Packets look like:
+ *
+ * SYNC1 SYNC2 HDR LEN ... CRC1 CRC2
+ *
+ * SYNC1 is 2d
+ * SYNC2 is the group, which is d4 by default
+ * HDR   is
+ *          bit 7 CTL
+ *          bit 6 DST
+ *          bit 5 ACK
+ *          bit 4-0 ID
+ * LEN  is the length of the data
+ *
+ * Nodes can only send to other nodes in the same group (nominally you
+ * can send outside the group, but the chip recognises the group code,
+ * so you can only receive messages with your group number on them).
+ *
+ * If DST=1, then ID is the id of the destination, otherwise it is the
+ * ID of the source.
+ *
+ * A packet with ACK=1 and CTL=0 wants an ack.
+ * An ack depends on DST in the received packet
+ *           DST=1 -> CTL=1 DST=0 ACK=0 ID=0
+ *           DST=0 -> CTL=1 DST=1 ACK=0 ID=source ID
+ *
+ * It is not clear how the recipient, in the first case, knows the ack
+ * is theirs?
+ *
+ * A packet with CTL=1 is an ack. If DST=1, then ID is the id of the
+ * node the ack is aimed at.
+ *        
+ */
+
 #ifndef RF12_h
 #define RF12_h
 
