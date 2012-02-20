@@ -250,6 +250,9 @@ def clean():
     if os.path.exists('.depend'):
         os.unlink('.depend')
 
+    if os.path.exists('libarduino++.a'):
+        os.unlink('libarduino++.a')
+
 def bname(b):
     return os.path.split(b)[1]
 
