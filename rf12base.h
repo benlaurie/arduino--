@@ -2,6 +2,7 @@
 // RFM12B driver definitions
 // 2009-02-09 <jc@wippler.nl> http://opensource.org/licenses/mit-license.php
 // 2011-12-28 Ben Laurie <ben@links.org>
+// 2012-02-19 Ben Laurie - split into layers.
 
 /*
  * Packets look like:
@@ -10,11 +11,7 @@
  *
  * SYNC1 is 2d
  * SYNC2 is the group, which is d4 by default
- * HDR   is
- *          bit 7 CTL
- *          bit 6 DST
- *          bit 5 ACK
- *          bit 4-0 ID
+ * HDR   is used by higher layers
  * LEN   is the length of the data
  * ...   is the data
  * CRC   is a CRC over SYNC2 onwards
@@ -23,21 +20,6 @@
  * can send outside the group, but the chip recognises the group code,
  * so you can only receive messages with your group number on them).
  *
- * If DST=1, then ID is the id of the destination, otherwise it is the
- * ID of the source.
- *
- * A packet with ACK=1 and CTL=0 wants an ack.
- * An ack depends on DST in the received packet
- *           DST=1 -> CTL=1 DST=0 ACK=0 ID=sender ID (== destination
- *                                                    ID of original packet)
- *           DST=0 -> CTL=1 DST=1 ACK=0 ID=source ID of original packet
- *
- * It is not clear how the recipient, in the first case, knows the ack
- * is theirs?
- *
- * A packet with CTL=1 is an ack. If DST=1, then ID is the id of the
- * node the ack is aimed at.
- *        
  */
 
 #ifndef RF12_h
@@ -51,15 +33,6 @@
 #include "arduino++.h"
 #include "spi.h"
 
-// version 1 did not include the group code in the crc
-// version 2 does include the group code in the crc
-#define RF12_VERSION    2
-
-#define RF12_HDR_CTL    0x80
-#define RF12_HDR_DST    0x40
-#define RF12_HDR_ACK    0x20
-#define RF12_HDR_MASK   0x1F
-
 #define RF12_MAXDATA    66
 
 // EEPROM address range used by the rf12_config() code
@@ -68,11 +41,6 @@
 #define RF12_EEPROM_EKEY (RF12_EEPROM_ADDR + RF12_EEPROM_SIZE)
 #define RF12_EEPROM_ELEN 16
 
-// shorthand to simplify sending out the proper ACK when requested
-#define RF12_WANTS_ACK ((rf12_hdr & RF12_HDR_ACK) && !(rf12_hdr & RF12_HDR_CTL))
-#define RF12_ACK_REPLY (rf12_hdr & RF12_HDR_DST ? RF12_HDR_CTL : \
-            RF12_HDR_CTL | RF12_HDR_DST | (rf12_hdr & RF12_HDR_MASK))
-            
 // options for RF12_sleep()
 #define RF12_SLEEP 0
 #define RF12_WAKEUP -1
@@ -161,7 +129,7 @@
 #define NODE_ACKANY     0x20        // ack on broadcast packets if set
 #define NODE_ID         0x1F        // id of this node, as A..Z or 1..31
 
-template <class RFM_IRQ> class _RF12
+template <class RFM_IRQ> class _RF12Base
     {
     static volatile uint16_t _crc;  // running crc value, should be
                                     // zero at end
@@ -172,9 +140,8 @@ template <class RFM_IRQ> class _RF12
         LENGTH = 2,
         DATA = 3
         };
-    static volatile byte _buf[]; // recv/xmit buf including hdr &
-                                    // crc bytes
-    static long _seq;               // seq number of encrypted packet (or -1)
+    static volatile byte _buf[];  // recv/xmit buf including hdr &
+                                  // crc bytes
 
     // transceiver states, these determine what to do with each interrupt
     enum TransceiverState
@@ -192,7 +159,6 @@ template <class RFM_IRQ> class _RF12
         TXSYN2,
         };
 
-    static uint8_t _nodeid;              // address of this node
     static uint8_t _group;               // network group
     static volatile byte _rxfill;     // number of data bytes in rf12_buf
     static volatile int8_t _rxstate;     // current transceiver state
@@ -233,10 +199,9 @@ public:
         MHZ915 = 3,
         };
 
-    // call this once with the node ID, frequency band, and optional group
-    static void init(uint8_t id, uint8_t band, uint8_t group = 0xD4)
+    // call this once with the frequency band, and optional group
+    static void init(uint8_t band, bool enableInterrupt, uint8_t group = 0xD4)
         {
-        _nodeid = id;
         _group = group;
     
         spiInit();
@@ -274,13 +239,15 @@ public:
         xfer(0xC049); // 1.66MHz,3.1V 
 
         _rxstate = TXIDLE;
-        if ((_nodeid & NODE_ID) != 0)
+        if (enableInterrupt)
             Interrupt0::enable(Interrupt0::LOW);
         else
             Interrupt0::disable();
         }
 
-    // call this frequently, returns true if a packet has been received
+    // Call this frequently, returns true if a packet has been
+    // received. You should process the packet before calling this
+    // again, it may get overwritten once you have.
     static bool recvDone(void)
         {
         if (_rxstate == TXRECV && (_rxfill >= _buf[LENGTH] + 5
@@ -289,16 +256,7 @@ public:
             _rxstate = TXIDLE;
             if (_buf[LENGTH] > RF12_MAXDATA)
                 _crc = 1; // force bad crc if packet length is invalid
-            if (!(_buf[HEADER] & RF12_HDR_DST) || (_nodeid & NODE_ID) == 31 ||
-                (_buf[HEADER] & RF12_HDR_MASK) == (_nodeid & NODE_ID))
-                {
-                if (_crc == 0 && _crypter != 0)
-                    _crypter(0);
-                else
-                    _seq = -1;
-                return true; // it's a broadcast packet or it's addressed
-                          // to this node
-                }
+	    return true;
             }
         if (_rxstate == TXIDLE)
             recvStart();
@@ -307,6 +265,7 @@ public:
 
     static bool goodCRC() { return _crc == 0; }
     static byte header() { return _buf[HEADER]; }
+    static void setHeader(byte hdr) { _buf[HEADER] = hdr; }
     static byte length() { return _buf[LENGTH]; }
     static const volatile byte *data() { return &_buf[DATA]; }
 
@@ -332,47 +291,20 @@ public:
         return false;
         }
 
-    // returns true if the buffer currently contains a packet that
-    // needs ACKing.
-    static bool wantsAck()
-        {
-        return (_buf[HEADER] & RF12_HDR_ACK) && !(_buf[HEADER] & RF12_HDR_CTL);
-        }
-
-    // Send an ack reply to the packet in the buffer (wantsAck() must be true)
-    static void sendAckReply()
-        {
-        byte hdr;
-
-        if (_buf[HEADER] & RF12_HDR_DST)
-            hdr = RF12_HDR_CTL;
-        else
-            hdr = RF12_HDR_CTL | RF12_HDR_DST | (_buf[HEADER] & RF12_HDR_MASK);
-        sendStart(hdr, 0, 0);
-        }
-    static bool isAckReply() { return (header() & RF12_HDR_CTL) != 0; }
-
     // call this only when rf12_recvDone() or rf12_canSend() return true
-    static void sendStart(uint8_t hdr)
+    static void sendStart()
         {
-        _buf[HEADER] = hdr & RF12_HDR_DST ? hdr :
-            (hdr & ~RF12_HDR_MASK) + (_nodeid & NODE_ID);
-        if (_crypter != 0)
-            _crypter(1);
-    
         _crc = ~0;
-#if RF12_VERSION >= 2
         _crc = _crc16_update(_crc, _buf[GROUP]);
-#endif
         _rxstate = TXPRE1;
         xfer(RF_XMITTER_ON); // bytes will be fed via interrupts
         }
 
-    static void sendStart(uint8_t hdr, const void* ptr, uint8_t len)
+    static void sendStart(const void *ptr, uint8_t len)
         {
         _buf[LENGTH] = len;
         memcpy((void *)&_buf[DATA], ptr, len);
-        sendStart(hdr);
+        sendStart();
         }
 
 // wait for send to finish, sleep mode: 0=none, 1=idle, 2=standby, 3=powerdown
@@ -555,31 +487,20 @@ private:
         {
         _rxfill = _buf[LENGTH] = 0;
         _crc = ~0;
-#if RF12_VERSION >= 2
+	// FIXME: _group == 0 is not excepted on the send side...
         if (_group != 0)
             _crc = _crc16_update(~0, _group);
-#endif
         _rxstate = TXRECV;
         xfer(RF_RECEIVER_ON);
         }
   
     };
 
-template <class RFM_IRQ> volatile byte _RF12<RFM_IRQ>::_buf[RF_MAX];
-template <class RFM_IRQ> volatile byte _RF12<RFM_IRQ>::_rxfill;
-template <class RFM_IRQ> volatile uint16_t _RF12<RFM_IRQ>::_crc;
-template <class RFM_IRQ> byte _RF12<RFM_IRQ>::_group;
-template <class RFM_IRQ> volatile int8_t _RF12<RFM_IRQ>::_rxstate;
-template <class RFM_IRQ> byte _RF12<RFM_IRQ>::_nodeid;
-template <class RFM_IRQ> void (*_RF12<RFM_IRQ>::_crypter)(byte);
-template <class RFM_IRQ> long _RF12<RFM_IRQ>::_seq;
-
-// Setup for Jeenodes and Wi/Nanodes.
-typedef _RF12<Pin::D2> RF12B;
-
-SIGNAL(INT0_vect)
-    {
-    RF12B::interrupt();
-    }
+template <class RFM_IRQ> volatile byte _RF12Base<RFM_IRQ>::_buf[RF_MAX];
+template <class RFM_IRQ> volatile byte _RF12Base<RFM_IRQ>::_rxfill;
+template <class RFM_IRQ> volatile uint16_t _RF12Base<RFM_IRQ>::_crc;
+template <class RFM_IRQ> byte _RF12Base<RFM_IRQ>::_group;
+template <class RFM_IRQ> volatile int8_t _RF12Base<RFM_IRQ>::_rxstate;
+template <class RFM_IRQ> void (*_RF12Base<RFM_IRQ>::_crypter)(byte);
 
 #endif
