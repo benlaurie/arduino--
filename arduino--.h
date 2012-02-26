@@ -72,19 +72,6 @@ template <byte reg> class _Register16
     operator uint16_t() const { return _SFR_IO16(reg); }
     };
 
-// FIXME: should Pins also be static members instead of typedefs?
-// These can't be typedefs because then we can't define operator= on them.
-class Register
-    {
- public:
-#undef EICRA
-    static _Register<NEICRA> EICRA;
-#undef EIMSK
-    static _Register<NEIMSK> EIMSK;
-#undef SPCR
-    static _Register<NSPCR> SPCR;
-    };
-
 template <class TCNT_, class OCRA_, class OCRB_, class TCCRA_, class TCCRB_,
           class TIFR_, class TIMSK_, byte toiex, byte ociexa, byte ocfxa, 
           byte ociexb, byte ocfxb, byte csx0, byte csx1, byte csx2,
@@ -92,6 +79,14 @@ template <class TCNT_, class OCRA_, class OCRB_, class TCCRA_, class TCCRB_,
 class _Timer
     {
 public:
+
+#undef TCNT
+#undef OCRA
+#undef OCRB
+#undef TCCRA
+#undef TCCRFB
+#undef TIFR
+#undef TIMSK
 
     static TCNT_ TCNT;
     static OCRA_ OCRA;
@@ -202,40 +197,10 @@ private:
         }
     };
 
-template <byte lsb, byte maskbit> class _Interrupt
-    {
- public:
-    enum Mode
-        {
-        LOW = 0,
-        CHANGE = 1,
-        FALLING_EDGE = 2,
-        RISING_EDGE = 3
-        };
-    static void enable(Mode mode)
-        {
-        Register::EICRA = (Register::EICRA & ~(3 << lsb)) | (mode << lsb);
-        Register::EIMSK.set(maskbit);
-        }
-    static void disable()
-        { Register::EIMSK.clear(maskbit); }
-    };
-
-template <byte ddr, byte port, byte in, byte bit, byte pcport, 
-  byte pcbit, byte pcen> class _Pin
+template <byte ddr, byte port, byte in, byte bit> 
+class _Pin
     {
 public:
-
-    static void enablePCInterrupt() 
-        {
-        PCICR |= _BV(pcen);
-        _SFR_IO8(pcport) |= _BV(pcbit); 
-        }
-    static void disablePCInterrupt() 
-        { 
-        if (_SFR_IO8(pcport) &= ~_BV(pcbit))
-            PCICR &= ~_BV(pcen);
-        }
 
     static void modeOutput() { _SFR_IO8(ddr) |= _BV(bit); }
     static void modeInput() { _SFR_IO8(ddr) &= ~_BV(bit); }
@@ -248,30 +213,41 @@ public:
     static byte toggle() { return (_SFR_IO8(port) ^= _BV(bit)); }
     };
 
-template <byte ddr, byte port, byte in, byte bit, byte pcport, 
-  byte pcbit, byte pcen> class _AnalogPin : 
-    public _Pin<ddr, port, in, bit, pcport, pcbit, pcen>
+template <class Pin_, byte pcicr, byte pcport, byte pcen, byte pcbit> 
+class _ChangeInterruptPin : public Pin_
     {
-    // AREF, Internal Vref turned off 
-    static const uint8_t REF_AREF = 0;
-    // AVCC with external capacitor at AREF pin
-    static const uint8_t REF_AVCC_EXT = 1;
-    // Internal 1.1V Voltage Reference with external capacitor at AREF pin
-    static const uint8_t REF_INT_1_1_REF = 3;
-    
-    static void analogStart(uint8_t reference = REF_AREF)
+public:
+
+    static void enableChangeInterrupt() 
+        {
+        _SFR_IO8(pcicr) |= _BV(pcen);
+        _SFR_IO8(pcport) |= _BV(pcbit); 
+        }
+    static void disableChangeInterrupt() 
+        { 
+        if (_SFR_IO8(pcport) &= ~_BV(pcbit))
+            _SFR_IO8(pcicr) &= ~_BV(pcen);
+        }
+    };
+
+#if defined (ADMUX) && defined (ADCSRA) && defined (ADSC) && defined (ADCH) \
+  && defined (ADCL)
+
+template <byte in> 
+class _Analog
+    {
+
+    static void analogStart(uint8_t reference)
         {
         // set the analog reference (high two bits of ADMUX) and select the
         // channel (low 4 bits).  this also sets ADLAR (left-adjust result)
         // to 0 (the default).
-#if defined(ADMUX)
         ADMUX = (reference << 6) | (in & 0x07);
-#endif
         // start the conversion
         ADCSRA |= (1 << (ADSC));
         }
 
-    static int analogRead(uint8_t reference = REF_AREF)
+    static int analogRead(uint8_t reference)
         {
         analogStart(reference);
         
@@ -290,6 +266,13 @@ template <byte ddr, byte port, byte in, byte bit, byte pcport,
         return (high << 8) | low;
         }
     };
+#endif
+
+template <byte ddr, byte port, byte in, byte bit, byte ain>
+class _AnalogPin : public _Pin<ddr, port, in, bit>, public _Analog<ain> 
+    {
+    };
+
 
 class AVRBase
     {
@@ -470,9 +453,12 @@ public:
     };
 
 #if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__) \
-    || defined (__AVR_ATmega168__) || defined (__AVR_ATmega168A__) \
-    || defined (__AVR_ATmega168P__)
+  || defined (__AVR_ATmega168__) || defined (__AVR_ATmega168A__)    \
+  || defined (__AVR_ATmega168P__)
 #include "defs/mx8.h"
+#elif defined (__AVR_ATtiny85__) || defined (__AVR_ATtiny45__) \
+  || defined (__AVR_ATTiny25__)
+#include "defs/tnx5.h"
 #else
 #error "No MCU specific definitions found"
 #endif

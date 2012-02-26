@@ -1,36 +1,112 @@
 #ifndef ARDUINO_MINUS_MINUS_MX8
 #define ARDUINO_MINUS_MINUS_MX8
 
+// Analog input voltage references
+
+// AREF, Internal Vref turned off 
+const uint8_t REF_AREF = 0;
+// AVCC with external capacitor at AREF pin
+const uint8_t REF_AVCC_EXT_CAP = 1;
+// Internal 1.1V Voltage Reference with external capacitor at AREF pin
+const uint8_t REF_INT_1_1_EXT_CAP = 3;
+
+// FIXME: should Pins also be static members instead of typedefs?
+// These can't be typedefs because then we can't define operator= on them.
+class Register
+    {
+ public:
+#undef EICRA
+    static _Register<NEICRA> EICRA;
+#undef EIMSK
+    static _Register<NEIMSK> EIMSK;
+#undef SPCR
+    static _Register<NSPCR> SPCR;
+    };
+
+template <byte lsb, byte maskbit> class _Interrupt
+    {
+ public:
+    enum Mode
+        {
+        LOW = 0,
+        CHANGE = 1,
+        FALLING_EDGE = 2,
+        RISING_EDGE = 3
+        };
+    static void enable(Mode mode)
+        {
+        Register::EICRA = (Register::EICRA & ~(3 << lsb)) | (mode << lsb);
+        Register::EIMSK.set(maskbit);
+        }
+    static void disable()
+        { Register::EIMSK.clear(maskbit); }
+    };
+
+typedef class _Interrupt<ISC00, INT0> Interrupt0;
+typedef class _Interrupt<ISC10, INT1> Interrupt1;
+
 class Pin
     {
 public:
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB0, NPCMSK0, PCINT0, PCIE0> B0;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB1, NPCMSK0, PCINT1, PCIE0> B1;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB2, NPCMSK0, PCINT2, PCIE0> B2;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB3, NPCMSK0, PCINT3, PCIE0> B3;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB4, NPCMSK0, PCINT4, PCIE0> B4;
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB5, NPCMSK0, PCINT5, PCIE0> B5;
-        
-    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC0, NPCMSK1, PCINT8, PCIE1> C0;
-    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC1, NPCMSK1, PCINT9, PCIE1> C1;
-    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC2, NPCMSK1, PCINT10, PCIE1> C2;
-    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC3, NPCMSK1, PCINT11, PCIE1> C3;
-    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC4, NPCMSK1, PCINT12, PCIE1> C4;
+    // Port B
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB0> D_B0;
+    typedef _ChangeInterruptPin<D_B0, NPCMSK0, NPCICR, PCIE0, PCINT0> B0; 
 
-    typedef C0 ADC0;
-    typedef C1 ADC1;
-    typedef C2 ADC2;
-    typedef C3 ADC3;
-    typedef C4 ADC4;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB1> D_B1;
+    typedef _ChangeInterruptPin<D_B1, NPCMSK0, NPCICR, PCIE0, PCINT1> B1;
 
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD0, NPCMSK2, PCINT16, PCIE2> D0;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD1, NPCMSK2, PCINT17, PCIE2> D1;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD2, NPCMSK2, PCINT18, PCIE2> D2;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD3, NPCMSK2, PCINT19, PCIE2> D3;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD4, NPCMSK2, PCINT20, PCIE2> D4;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD5, NPCMSK2, PCINT21, PCIE2> D5;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD6, NPCMSK2, PCINT22, PCIE2> D6;
-    typedef _Pin<NDDRD, NPORTD, NPIND, PD7, NPCMSK2, PCINT23, PCIE2> D7;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB2> D_B2;
+    typedef _ChangeInterruptPin<D_B2, NPCMSK0, NPCICR, PCIE0, PCINT2> B2;
+
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB3> D_B3;
+    typedef _ChangeInterruptPin<D_B3, NPCMSK0, NPCICR, PCIE0, PCINT3> B3;
+
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB4> D_B4;
+    typedef _ChangeInterruptPin<D_B4, NPCMSK0, NPCICR, PCIE0, PCINT4> B4;
+
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB3> D_B5;
+    typedef _ChangeInterruptPin<D_B5, NPCMSK0, NPCICR, PCIE0, PCINT5> B5;
+
+    // Port C
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC0, 0> ADC0;
+    typedef _ChangeInterruptPin<ADC0, NPCMSK1, NPCICR, PCIE1, PCINT8> C0;
+
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC1, 1> ADC1;
+    typedef _ChangeInterruptPin<ADC1, NPCMSK1, NPCICR, PCIE1, PCINT9> C1;
+
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC2, 2> ADC2;
+    typedef _ChangeInterruptPin<ADC2, NPCMSK1, NPCICR, PCIE1, PCINT10> C2;
+
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC3, 3> ADC3;
+    typedef _ChangeInterruptPin<ADC3, NPCMSK1, NPCICR, PCIE1, PCINT11> C3;
+
+    typedef _AnalogPin<NDDRC, NPORTC, NPINC, PC4, 4> ADC4;
+    typedef _ChangeInterruptPin<ADC4, NPCMSK1, NPCICR, PCIE1, PCINT12> C4;
+
+    // Port D
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD0> D_D0;
+    typedef _ChangeInterruptPin<D_D0, NPCMSK2, NPCICR, PCIE2, PCINT16> D0;
+
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD1> D_D1;
+    typedef _ChangeInterruptPin<D_D1, NPCMSK2, NPCICR, PCIE2, PCINT17> D1;
+
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD2> D_D2;
+    typedef _ChangeInterruptPin<D_D2, NPCMSK2, NPCICR, PCIE2, PCINT18> D2;
+
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD3> D_D3;
+    typedef _ChangeInterruptPin<D_D3, NPCMSK2, NPCICR, PCIE2, PCINT19> D3;
+
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD4> D_D4;
+    typedef _ChangeInterruptPin<D_D4, NPCMSK2, NPCICR, PCIE2, PCINT20> D4;
+
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD5> D_D5;
+    typedef _ChangeInterruptPin<D_D5, NPCMSK2, NPCICR, PCIE2, PCINT21> D5;
+
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD6> D_D6;
+    typedef _ChangeInterruptPin<D_D6, NPCMSK2, NPCICR, PCIE2, PCINT22> D6;
+
+    typedef _Pin<NDDRD, NPORTD, NPIND, PD7> D_D7;
+    typedef _ChangeInterruptPin<D_D7, NPCMSK2, NPCICR, PCIE2, PCINT23> D7;
 
     typedef Pin::B2 SPI_SS;
     typedef Pin::B3 SPI_MOSI;
@@ -55,9 +131,6 @@ typedef _Timer<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
                _Register<NTIMSK2>, TOIE2, OCIE2A, OCF2A, OCIE2B, OCF2B, 
                CS20, CS21, CS22, WGM20, WGM21, WGM22> 
 Timer2;
-
-typedef class _Interrupt<ISC00, INT0> Interrupt0;
-typedef class _Interrupt<ISC10, INT1> Interrupt1;
 
 class Arduino : public AVRBase
     {
@@ -88,9 +161,7 @@ public:
 
     static void init()
         {
-        // this needs to be called before setup() or some functions won't
-        // work there
-        sei();
+        interrupts();
     
         Timer0::fastPWM();
 

@@ -46,12 +46,17 @@ all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 sizes/recent_sizes.json sizes/sizes.html: $(BIN)
 	python sizes/sizes.py recent generate
 
+get-ports.cc: Makefile.local
+
 avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl -f $(CPU_FREQUENCY) < get-ports.lst > avr-ports.h
 
-clean:
+sizeclean:
+	rm -f sizes/recent_sizes.json
+
+clean: sizeclean
 	rm -f *.o *.map *.lst *.elf *.bin test/*.o test/*.map test/*.lst \
-	test/*.elf test/*.bin avr-ports.h .depend
+	test/*.elf test/*.bin avr-ports.h .depend 
 
 .bin_upload:
 	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:$<

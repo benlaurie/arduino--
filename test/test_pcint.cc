@@ -23,7 +23,7 @@ int main(void)
     Arduino::D11::read() ? Arduino::D13::clear() : Arduino::D13::set();
 
 	// enable the pin change interrupt
-    Arduino::D11::enablePCInterrupt();
+    Arduino::D11::enableChangeInterrupt();
 
     set_sleep_mode(SLEEP_MODE_IDLE);
     while(true)
