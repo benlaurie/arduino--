@@ -28,7 +28,7 @@ all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
 .SUFFIXES: .elf .lst .bin _upload
 
-.cc.o:
+.cc.o: 
 	$(CXX) $(CXXFLAGS) -c -o $(<:.cc=.o) $<
 
 .c.o:

@@ -80,48 +80,43 @@ class _Timer
     {
 public:
 
-#undef TCNT
-#undef OCRA
-#undef OCRB
-#undef TCCRA
-#undef TCCRFB
-#undef TIFR
-#undef TIMSK
+    typedef OCRA_ T_OCRA;
+    typedef OCRB_ T_OCRB;
 
-    static TCNT_ TCNT;
-    static OCRA_ OCRA;
-    static OCRB_ OCRB;
-    static TCCRA_ TCCRA;
-    static TCCRB_ TCCRB;
-    static TIFR_ TIFR;
-    static TIMSK_ TIMSK;
+    static TCNT_ R_TCNT;
+    static OCRA_ R_OCRA;
+    static OCRB_ R_OCRB;
+    static TCCRA_ R_TCCRA;
+    static TCCRB_ R_TCCRB;
+    static TIFR_ R_TIFR;
+    static TIMSK_ R_TIMSK;
 
-    static void reset() { TCNT = 0; }
+    static void reset() { R_TCNT = 0; }
 
-    static void enableOverflowInterrupt() { TIMSK |= _BV(toiex); }
-    static void disableOverflowInterrupt() { TIMSK &= ~_BV(toiex); }
+    static void enableOverflowInterrupt() { R_TIMSK |= _BV(toiex); }
+    static void disableOverflowInterrupt() { R_TIMSK &= ~_BV(toiex); }
 
     static void enableCompareInterruptA(typename OCRA_::value_t count) 
         {
         // clear compare interrupt flag
-        TIFR &= _BV(ocfxa);
-        OCRA = count;
-        TIMSK |= _BV(ociexa); 
+        R_TIFR &= _BV(ocfxa);
+        R_OCRA = count;
+        R_TIMSK |= _BV(ociexa); 
         }
-    static void enableCompareInterruptA() {  TIMSK |= _BV(ociexa); }
-    static void disableCompareInterruptA() { TIMSK &= ~_BV(ociexa); }
+    static void enableCompareInterruptA() {  R_TIMSK |= _BV(ociexa); }
+    static void disableCompareInterruptA() { R_TIMSK &= ~_BV(ociexa); }
 
     static void enableCompareInterruptB(typename OCRB_::value_t count) 
         { 
         // clear compare interrupt flag
-        TIFR &= _BV(ocfxb);
-        OCRB = count;
-        TIMSK |= _BV(ociexb);
+        R_TIFR &= _BV(ocfxb);
+        R_OCRB = count;
+        R_TIMSK |= _BV(ociexb);
         }
-    static void enableCompareInterruptB() {  TIMSK |= _BV(ociexb); }
-    static void disableCompareInterruptB() { TIMSK &= ~_BV(ociexb); }
+    static void enableCompareInterruptB() {  R_TIMSK |= _BV(ociexb); }
+    static void disableCompareInterruptB() { R_TIMSK &= ~_BV(ociexb); }
 
-    static void stop() { TCCRB &= ((1 << 5) - 1) << 3; }
+    static void stop() { R_TCCRB &= ((1 << 5) - 1) << 3; }
     static void prescaler1() { prescaler(_BV(csx0)); }
     static void prescaler8() { prescaler(_BV(csx1)); }
     static void prescaler64() { prescaler(_BV(csx1) | _BV(csx0)); }
@@ -137,7 +132,7 @@ public:
     static void normal() 
         { 
         // clear WGMx2
-        TCCRB &= ~_BV(wgmx2); 
+        R_TCCRB &= ~_BV(wgmx2);
         wgm01(0);
         }
 
@@ -145,7 +140,7 @@ public:
     static void phaseCorrectPWM()
         {
         // clear WGMx2
-        TCCRB &= ~_BV(wgmx2);
+        R_TCCRB &= ~_BV(wgmx2);
         wgm01(_BV(wgmx0));
         }
 
@@ -153,7 +148,7 @@ public:
     static void clearTimerOnCompare()
         { 
         // clear WGMx2
-        TCCRB &= ~_BV(wgmx2);
+        R_TCCRB &= ~_BV(wgmx2);
         wgm01(_BV(wgmx1));
         }
 
@@ -161,7 +156,7 @@ public:
     static void fastPWM()
         { 
         // clear WGMx2
-        TCCRB &= ~_BV(wgmx2);
+        R_TCCRB &= ~_BV(wgmx2);
         wgm01(_BV(wgmx1) | _BV(wgmx0));
         }
 
@@ -169,7 +164,7 @@ public:
     static void phaseCorrectPWMOCRA()
         { 
         // set WGMx2
-        TCCRB |= _BV(wgmx2);
+        R_TCCRB |= _BV(wgmx2);
         wgm01(_BV(wgmx0));
         }
     
@@ -177,55 +172,97 @@ public:
     static void fastPWMOCRA() 
         { 
         // set WGMx2
-        TCCRB |= _BV(wgmx2);
+        R_TCCRB |= _BV(wgmx2);
         wgm01(_BV(wgmx1) | _BV(wgmx0));
         }
 
 private:
     static void prescaler(byte pre)
         { 
-        byte tmp = TCCRB & (((1 << 2) - 1) << 3);
+        byte tmp = R_TCCRB & (((1 << 2) - 1) << 3);
         tmp |= pre;
-        TCCRB = tmp;
+        R_TCCRB = tmp;
         }
 
     static void wgm01(byte waveform)
         { 
-        byte tmp = TCCRA & 3;
+        byte tmp = R_TCCRA & 3;
         tmp |= waveform;
-        TCCRA = tmp;
+        R_TCCRA = tmp;
         }
     };
 
+/*
+  We are forcing gcc to inline the _Pin methods. I think this shouldn't be 
+  necessary, but when the _Pin methods are used via a subclass like 
+  _ChangeInterruptPin, gcc doesn't automatically inline these methods any more.
+
+  This might be a bug in the inliner, but to be fair, we are mixing template 
+  arguments with inheritance.
+ */
 template <byte ddr, byte port, byte in, byte bit> 
 class _Pin
     {
 public:
 
-    static void modeOutput() { _SFR_IO8(ddr) |= _BV(bit); }
-    static void modeInput() { _SFR_IO8(ddr) &= ~_BV(bit); }
-    static void modeInputPullup() { modeInput(); set(); }
-    static void set() { _SFR_IO8(port) |= _BV(bit); }
-    static void clear() { _SFR_IO8(port) &= ~_BV(bit); }
+    static void modeOutput() __attribute__((always_inline))
+        { _SFR_IO8(ddr) |= _BV(bit); }
+    static void modeInput() __attribute__((always_inline))
+        { _SFR_IO8(ddr) &= ~_BV(bit); }
+    static void modeInputPullup() __attribute__((always_inline))
+        { modeInput(); set(); }
+    static void set() __attribute__((always_inline))
+        { _SFR_IO8(port) |= _BV(bit); }
+    static void clear() __attribute__((always_inline))
+        { _SFR_IO8(port) &= ~_BV(bit); }
 
     /** Return 1 if the Pin reads HIGH */
-    static byte read() { return !!(_SFR_IO8(in) & _BV(bit)); }
-    static byte toggle() { return (_SFR_IO8(port) ^= _BV(bit)); }
+    static byte read() __attribute__((always_inline))
+        { return !!(_SFR_IO8(in) & _BV(bit)); }
+    static byte toggle() __attribute__((always_inline))
+        { return (_SFR_IO8(port) ^= _BV(bit)); }
     };
 
-template <class Pin_, byte pcicr, byte pcport, byte pcen, byte pcbit> 
+template <class Pin_, class Timer_, class OCR_, byte tccrc, byte foc>
+class _PWMPin : public Pin_
+    {
+    static Timer_ Timer;
+    static OCR_ R_OCR;
+
+    /** Force the comparison of the output compare register.
+
+        Advanced functionality: This avoids a glitch in PWM generation
+        when the clock associated with this PWM Pin is not yet in a
+        PWM mode. 
+
+        This method should not be called if the clock is already in PWM mode.
+     */
+    static void forceCompare() __attribute__((always_inline))
+        {
+        _SFR_IO8(tccrc) |= foc;
+        }
+
+    static void pwmWrite(byte value) __attribute__((always_inline))
+        {
+        R_OCR = value;
+        }
+    };
+
+// pcicr is the interrupy control register address, pcen is the enable bit, 
+// pcmsk is pin change mask register and pcbit the value bit
+template <class Pin_, byte pcicr, byte pcen, byte pcmsk, byte pcbit> 
 class _ChangeInterruptPin : public Pin_
     {
 public:
 
-    static void enableChangeInterrupt() 
+    static void enableChangeInterrupt() __attribute__((always_inline))
         {
         _SFR_IO8(pcicr) |= _BV(pcen);
-        _SFR_IO8(pcport) |= _BV(pcbit); 
+        _SFR_IO8(pcmsk) |= _BV(pcbit); 
         }
-    static void disableChangeInterrupt() 
+    static void disableChangeInterrupt() __attribute__((always_inline))
         { 
-        if (_SFR_IO8(pcport) &= ~_BV(pcbit))
+        if (_SFR_IO8(pcmsk) &= ~_BV(pcbit))
             _SFR_IO8(pcicr) &= ~_BV(pcen);
         }
     };
@@ -233,16 +270,15 @@ public:
 #if defined (ADMUX) && defined (ADCSRA) && defined (ADSC) && defined (ADCH) \
   && defined (ADCL)
 
-template <byte in> 
-class _Analog
+template <class Pin_, byte ain>
+class _AnalogPin : public Pin_
     {
-
-    static void analogStart(uint8_t reference)
+    static void analogStart(uint8_t reference) __attribute__((always_inline))
         {
         // set the analog reference (high two bits of ADMUX) and select the
         // channel (low 4 bits).  this also sets ADLAR (left-adjust result)
         // to 0 (the default).
-        ADMUX = (reference << 6) | (in & 0x07);
+        ADMUX = (reference << 6) | (ain & 0x07);
         // start the conversion
         ADCSRA |= (1 << (ADSC));
         }
@@ -266,13 +302,8 @@ class _Analog
         return (high << 8) | low;
         }
     };
+
 #endif
-
-template <byte ddr, byte port, byte in, byte bit, byte ain>
-class _AnalogPin : public _Pin<ddr, port, in, bit>, public _Analog<ain> 
-    {
-    };
-
 
 class AVRBase
     {
@@ -295,8 +326,8 @@ public:
         }
     static timeres_t millis()
         {
-        // disable interrupts while we read timer0_millis or we might get an
-        // inconsistent value (e.g. in the middle of the timer0_millis++)
+        // disable interrupts while we read timer0millis or we might get an
+        // inconsistent value (e.g. in the middle of the timer_millis++)
         ScopedInterruptDisable sid;
         return timer_millis;
         }
@@ -307,10 +338,10 @@ public:
         uint8_t t;
         ScopedInterruptDisable sid;
 
-        t = Timer::TCNT;
+        t = Timer::R_TCNT;
         m = timer_overflow_count % (1 << TIMER16_MICRO_SCALE);
 
-        if ((Timer::TIFR & _BV(TOV0)) && (t == 0))
+        if ((Timer::R_TIFR & _BV(TOV0)) && (t == 0))
             m++;
 
         return ((m << 8) + t) * (64 / (F_CPU / 1000000L));
@@ -357,6 +388,7 @@ volatile uint16_t _Clock<timeres_t, Timer>::timer_fract = 0;
 template<typename timeres_t, class Timer> 
 volatile timeres_t _Clock<timeres_t, Timer>::timer_millis = 0;
 
+/** busy wait */
 void delayMicroseconds(unsigned int us)
     {
     // calling avrlib's delay_us() function with low values (e.g. 1 or
