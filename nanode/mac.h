@@ -178,6 +178,7 @@ public:
         }
     operator const byte *() const { return macaddr_; }
     bool ok() const { return ok_; }
+    byte length() const { return 6; }
     };
 
 byte NanodeMAC::macaddr_[6];

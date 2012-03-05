@@ -1,3 +1,4 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
 /*
   HardwareSerial.cpp - Hardware serial library for Wiring
   Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
@@ -21,6 +22,9 @@
   Modified 27 December 2011 by Ben Laurie (RingBuffer)
   Modified 5 February 2012 by Lars Immisch (template remix)  
 */
+
+#ifndef SERIAL_H
+#define SERIAL_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -224,3 +228,5 @@ SIGNAL(USART_RX_vect)
     }
 
 #endif
+
+#endif  // ndef SERIAL_H
