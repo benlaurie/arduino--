@@ -31,6 +31,7 @@
 #include <util/crc16.h>
 
 #include "arduino++.h"
+#include "clock16.h"
 #include "spi.h"
 
 #define RF12_MAXDATA    66
@@ -99,9 +100,9 @@
 
 // ATmega168, ATmega328, etc.
 //#define RFM_IRQ     2
-#define SS_DDR      DDRB
-#define SS_PORT     PORTB
-#define SS_BIT      2     // for PORTB: 2 = d.10, 1 = d.9, 0 = d.8
+//#define SS_DDR      DDRB
+//#define SS_PORT     PORTB
+//#define SS_BIT      2     // for PORTB: 2 = d.10, 1 = d.9, 0 = d.8
 
 //#define SPI_SS      10    // PB2, pin 16
 #define SPI_MOSI    11    // PB3, pin 17
@@ -129,10 +130,14 @@
 #define NODE_ACKANY     0x20        // ack on broadcast packets if set
 #define NODE_ID         0x1F        // id of this node, as A..Z or 1..31
 
-template <class RFM_IRQ> class _RF12Base
+template <class RFM_IRQ, class SelectPin> class _RF12Base
     {
+    static const uint16_t MIN_SEND_INTERVAL = 500;  // in ms.
     static volatile uint16_t _crc;  // running crc value, should be
                                     // zero at end
+
+    static uint16_t _lastSend;
+
     enum BufferOffset
         {
         GROUP = 0,
@@ -183,6 +188,9 @@ public:
     // rf12_initialize does it
     static void spiInit(void)
         {
+	SelectPin::set();
+	SelectPin::modeOutput();
+
         // maybe use clk/2 (2x 1/4th) for sending (and clk/8 for recv,
         // see rf12_xferSlow)
         SPISS::init(0, F_CPU > 10000000);
@@ -267,13 +275,27 @@ public:
     static byte header() { return _buf[HEADER]; }
     static void setHeader(byte hdr) { _buf[HEADER] = hdr; }
     static byte length() { return _buf[LENGTH]; }
-    static const volatile byte *data() { return &_buf[DATA]; }
+    // This was originally declared volatile, but it is only volatile
+    // if you have a bug, so that has been removed.
+    static const byte *data() { return (byte *)&_buf[DATA]; }
 
     // call this to check whether a new transmission can be started
     // returns true when a new transmission may be started with
     // rf12_sendStart()
     static bool canSend(void)
         {
+        // This allows canSend() to be called, even if recvDone() has
+        // already returned true, which previously caused canSend() to
+        // return false.
+        //
+	// FIXME: should the time limit be enforced? According to the
+	// original logic, no, because either it already was, or we're
+	// in TXIDLE because a packet was received, after which it was
+	// allowed to send immediately.
+	if (_rxstate == TXIDLE)
+	    return true;
+	if (Clock16::millis() - _lastSend < MIN_SEND_INTERVAL)
+	    return false;
         // no need to test with interrupts disabled: state TXRECV is
         // only reached outside of ISR and we don't care if rxfill
         // jumps from 0 to 1 here
@@ -291,13 +313,14 @@ public:
         return false;
         }
 
-    // call this only when rf12_recvDone() or rf12_canSend() return true
+    // call this only when recvDone() or canSend() return true
     static void sendStart()
         {
         _crc = ~0;
         _crc = _crc16_update(_crc, _buf[GROUP]);
         _rxstate = TXPRE1;
         xfer(RF_XMITTER_ON); // bytes will be fed via interrupts
+	_lastSend = Clock16::millis();
         }
 
     static void sendStart(const void *ptr, uint8_t len)
@@ -306,6 +329,15 @@ public:
         memcpy((void *)&_buf[DATA], ptr, len);
         sendStart();
         }
+
+    static void clearData()
+	{ _buf[LENGTH] = 0; }
+
+    static void writeData(const byte *data, byte length)
+	{
+	memcpy((void *)&_buf[DATA + _buf[LENGTH]], data, length);
+	_buf[LENGTH] += length;
+	}
 
 // wait for send to finish, sleep mode: 0=none, 1=idle, 2=standby, 3=powerdown
 void rf12_sendWait(uint8_t mode);
@@ -455,11 +487,11 @@ private:
         Register::SPCR.set(SPR0);
 #endif
         //bitClear(SS_PORT, SS_BIT);
-        Pin::SPI_SS::clear();
+        SelectPin::clear();
         uint16_t reply = xferByte(cmd >> 8) << 8;
         reply |= xferByte(cmd);
         //bitSet(SS_PORT, SS_BIT);
-        Pin::SPI_SS::set();
+        SelectPin::set();
 #if F_CPU > 10000000
         //bitClear(SPCR, SPR0);
         //SPCR &= ~(1 << SPR0);
@@ -473,11 +505,11 @@ private:
 #if OPTIMIZE_SPI
         // writing can take place at full speed, even 8 MHz works
         //bitClear(SS_PORT, SS_BIT);
-        Pin::SPI_SS::clear();
+        SelectPin::clear();
         xferByte(cmd >> 8);
         xferByte(cmd);
         //bitSet(SS_PORT, SS_BIT);
-        Pin::SPI_SS::set();
+        SelectPin::set();
 #else
         xferSlow(cmd);
 #endif
@@ -496,11 +528,19 @@ private:
   
     };
 
-template <class RFM_IRQ> volatile byte _RF12Base<RFM_IRQ>::_buf[RF_MAX];
-template <class RFM_IRQ> volatile byte _RF12Base<RFM_IRQ>::_rxfill;
-template <class RFM_IRQ> volatile uint16_t _RF12Base<RFM_IRQ>::_crc;
-template <class RFM_IRQ> byte _RF12Base<RFM_IRQ>::_group;
-template <class RFM_IRQ> volatile int8_t _RF12Base<RFM_IRQ>::_rxstate;
-template <class RFM_IRQ> void (*_RF12Base<RFM_IRQ>::_crypter)(byte);
+template <class RFM_IRQ, class SelectPin>
+  uint16_t _RF12Base<RFM_IRQ, SelectPin>::_lastSend;
+template <class RFM_IRQ, class SelectPin>
+  volatile byte _RF12Base<RFM_IRQ, SelectPin>::_buf[RF_MAX];
+template <class RFM_IRQ, class SelectPin>
+  volatile byte _RF12Base<RFM_IRQ, SelectPin>::_rxfill;
+template <class RFM_IRQ, class SelectPin>
+  volatile uint16_t _RF12Base<RFM_IRQ, SelectPin>::_crc;
+template <class RFM_IRQ, class SelectPin>
+  byte _RF12Base<RFM_IRQ, SelectPin>::_group;
+template <class RFM_IRQ, class SelectPin>
+  volatile int8_t _RF12Base<RFM_IRQ, SelectPin>::_rxstate;
+template <class RFM_IRQ, class SelectPin>
+  void (*_RF12Base<RFM_IRQ, SelectPin>::_crypter)(byte);
 
 #endif
