@@ -48,7 +48,8 @@
 #define RF12_HDR_ACK    0x20
 #define RF12_HDR_MASK   0x1F
 
-template <class RFM_IRQ> class RF12BJeelabs : public _RF12Base<RFM_IRQ>
+template <class RFM_IRQ, class SelectPin> class RF12BJeelabs
+  : public _RF12Base<RFM_IRQ, SelectPin>
     {
     static uint8_t _nodeid;              // address of this node
     static long _seq;             // seq number of encrypted packet (or -1)
@@ -63,17 +64,19 @@ public:
     static void init(uint8_t id, uint8_t band, uint8_t group = 0xD4)
         {
         _nodeid = id;
-	_RF12Base<RFM_IRQ>::init(band, (_nodeid & NODE_ID) != 0, group);
+	_RF12Base<RFM_IRQ, SelectPin>::init(band, (_nodeid & NODE_ID) != 0,
+					    group);
 	}
 
-    static byte header() { return _RF12Base<RFM_IRQ>::header(); }
-    static void setHeader(byte hdr) { _RF12Base<RFM_IRQ>::setHeader(hdr); }
-    static bool goodCRC() { return _RF12Base<RFM_IRQ>::goodCRC(); }
+    static byte header() { return _RF12Base<RFM_IRQ, SelectPin>::header(); }
+    static void setHeader(byte hdr)
+	{ _RF12Base<RFM_IRQ, SelectPin>::setHeader(hdr); }
+    static bool goodCRC() { return _RF12Base<RFM_IRQ, SelectPin>::goodCRC(); }
 
     // call this frequently, returns true if a packet has been received
     static bool recvDone(void)
         {
-	if (!_RF12Base<RFM_IRQ>::recvDone())
+	if (!_RF12Base<RFM_IRQ, SelectPin>::recvDone())
 	    return false;
 	if (!(header() & RF12_HDR_DST) || (_nodeid & NODE_ID) == 31 ||
 	    (header() & RF12_HDR_MASK) == (_nodeid & NODE_ID))
@@ -120,17 +123,21 @@ public:
 		  (hdr & ~RF12_HDR_MASK) + (_nodeid & NODE_ID));
         if (_crypter != 0)
             _crypter(1);
-        _RF12Base<RFM_IRQ>::sendStart(ptr, len);
+        _RF12Base<RFM_IRQ, SelectPin>::sendStart(ptr, len);
         }
     };
 
-template <class RFM_IRQ> byte RF12BJeelabs<RFM_IRQ>::_nodeid;
-template <class RFM_IRQ> long RF12BJeelabs<RFM_IRQ>::_seq;
-template <class RFM_IRQ> void (*RF12BJeelabs<RFM_IRQ>::_crypter)(byte);
+template <class RFM_IRQ, class SelectPin>
+  byte RF12BJeelabs<RFM_IRQ, SelectPin>::_nodeid;
+template <class RFM_IRQ, class SelectPin>
+  long RF12BJeelabs<RFM_IRQ, SelectPin>::_seq;
+template <class RFM_IRQ, class SelectPin>
+  void (*RF12BJeelabs<RFM_IRQ, SelectPin>::_crypter)(byte);
 
 // Setup for Jeenodes and Wi/Nanodes.
-typedef RF12BJeelabs<Pin::D2> RF12B;
+typedef RF12BJeelabs<Pin::D2, Pin::B2> RF12B;
 
+// FIXME: this should be in rf12base.
 SIGNAL(INT0_vect)
     {
     RF12B::interrupt();
