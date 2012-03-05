@@ -23,8 +23,8 @@ void get_mcusr(void)
 #endif
 
 // You need to set these the other way round for the second test node.
-static const byte id = 1;
-static const byte dest = 2;
+static const byte id = 2;
+static const byte dest = 1;
 
 int main()
     {
@@ -47,6 +47,8 @@ int main()
 #ifdef WATCHDOG
     wdt_enable(WDTO_2S);
 #endif
+    uint32_t count = 0;
+    bool wantsAck = false;
     for ( ; ; )
         {
 #ifdef WATCHDOG
@@ -57,6 +59,15 @@ int main()
         if (t - last > 100 && RF12B::canSend())
             {
             last = t;
+            if (wantsAck)
+                {
+                RF12B::sendAckReply();
+                Serial.write('a');
+                wantsAck = false;
+                continue;
+                }
+            if (count % 3 != 0)
+                continue;
             char buf[2];
             buf[0] = id;
             buf[1] = ++seq;
@@ -64,6 +75,14 @@ int main()
                              sizeof buf);
             Serial.write('s');
             Serial.writeHex(RF12B::header());
+            }
+        else if (++count == 100000)
+            {
+            count = 0;
+            Serial.write('X');
+            Serial.writeDecimal(t);
+            Serial.write(':');
+            Serial.writeDecimal(last);
             }
 
         if (RF12B::recvDone())
@@ -82,10 +101,7 @@ int main()
                     Serial.write(RF12B::data()[0] + '0');
                     Serial.writeHex(RF12B::data()[1]);
                     if (RF12B::wantsAck())
-                        {
-                        RF12B::sendAckReply();
-                        Serial.write('a');
-                        }
+                        wantsAck = true;
                     }
                 }
             }
