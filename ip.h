@@ -25,11 +25,6 @@
 #include "net.h"
 #include "enc28j60.h"
 
-static uint8_t macaddr[6];
-static uint8_t ipaddr[4];
-static int16_t info_hdr_len=0;
-static int16_t info_data_len=0;
-static uint8_t seqnum=0xa; // my initial tcp sequence number
 
 template <class Ethernet, byte port> class IP
     {
@@ -106,13 +101,13 @@ public:
 
         while(i < 4)
             {
-            ipaddr[i] = myip[i];
+            ipaddr_[i] = myip[i];
             i++;
             }
         i = 0;
         while(i<6)
             {
-            macaddr[i] = mymac[i];
+            macaddr_[i] = mymac[i];
             i++;
             }
         }
@@ -128,7 +123,7 @@ public:
             return 0;
         while (i < 4)
             {
-            if(buf[ETH_ARP_DST_IP_P+i] != ipaddr[i])
+            if(buf[ETH_ARP_DST_IP_P+i] != ipaddr_[i])
                 return 0;
             i++;
             }
@@ -150,7 +145,7 @@ public:
             return 0;
         while (i < 4)
             {
-            if (buf[IP_DST_P+i] !=  ipaddr[i])
+            if (buf[IP_DST_P+i] !=  ipaddr_[i])
                 return 0;
             i++;
             }
@@ -166,7 +161,7 @@ public:
         while (i < 6)
             {
             buf[ETH_DST_MAC + i] = buf[ETH_SRC_MAC + i];
-            buf[ETH_SRC_MAC + i] = macaddr[i];
+            buf[ETH_SRC_MAC + i] = macaddr_[i];
             i++;
             }
         }
@@ -180,7 +175,7 @@ public:
         while (i < 6)
             {
             buf[ETH_DST_MAC +i]=dst_mac[i];
-            buf[ETH_SRC_MAC +i]=macaddr[i];
+            buf[ETH_SRC_MAC +i]=macaddr_[i];
             i++;
             }
                 
@@ -221,9 +216,9 @@ public:
         buf[ IP_TOTLEN_L_P ] = len & 0xff;
         
         // set packet identification
-        buf[ IP_ID_H_P ] = (ip_identifier >>8) & 0xff;
-        buf[ IP_ID_L_P ] = ip_identifier & 0xff;
-        ip_identifier++;
+        buf[ IP_ID_H_P ] = (ip_identifier_ >>8) & 0xff;
+        buf[ IP_ID_L_P ] = ip_identifier_ & 0xff;
+        ip_identifier_++;
         
         // set fragment flags   
         buf[ IP_FLAGS_H_P ] = 0x00;
@@ -239,7 +234,7 @@ public:
         while(i<4)
             {
             buf[IP_DST_P+i]=dst_ip[i];
-            buf[IP_SRC_P+i]=ipaddr[i];
+            buf[IP_SRC_P+i]=ipaddr_[i];
             i++;
             }
         fill_ip_hdr_checksum(buf);
@@ -252,7 +247,7 @@ public:
         while(i<4)
             {
             buf[IP_DST_P+i]=buf[IP_SRC_P+i];
-            buf[IP_SRC_P+i]=ipaddr[i];
+            buf[IP_SRC_P+i]=ipaddr_[i];
             i++;
             }
         fill_ip_hdr_checksum(buf);
@@ -307,11 +302,11 @@ public:
             buf[TCP_SEQ_H_P+1]= 0;
             // we step only the second byte, this allows us to send packts 
             // with 255 bytes or 512 (if we step the initial seqnum by 2)
-            buf[TCP_SEQ_H_P+2]= seqnum; 
+            buf[TCP_SEQ_H_P+2]= seqnum_;
             buf[TCP_SEQ_H_P+3]= 0;
             // step the inititial seq num by something we will not use
             // during this tcp session:
-            seqnum+=2;
+            seqnum_ += 2;
             }
         // zero the checksum
         buf[TCP_CHECKSUM_H_P]=0;
@@ -351,14 +346,14 @@ public:
         while(i<6)
             {
             buf[ETH_ARP_DST_MAC_P+i]=buf[ETH_ARP_SRC_MAC_P+i];
-            buf[ETH_ARP_SRC_MAC_P+i]=macaddr[i];
+            buf[ETH_ARP_SRC_MAC_P+i]=macaddr_[i];
             i++;
             }
         i=0;
         while(i<4)
             {
             buf[ETH_ARP_DST_IP_P+i]=buf[ETH_ARP_SRC_IP_P+i];
-            buf[ETH_ARP_SRC_IP_P+i]=ipaddr[i];
+            buf[ETH_ARP_SRC_IP_P+i]=ipaddr_[i];
             i++;
             }
         // eth+arp is 42 bytes:
@@ -438,8 +433,8 @@ public:
     // You must call init_len_info once before calling this function
     static uint16_t get_tcp_data_pointer(void)
         {
-        if (info_data_len)
-            return((uint16_t)TCP_SRC_PORT_H_P+info_hdr_len);
+        if (info_data_len_)
+            return((uint16_t)TCP_SRC_PORT_H_P+info_hdr_len_);
         else
             return(0);
         }
@@ -448,12 +443,12 @@ public:
     // static varibales
     static void init_len_info(uint8_t *buf)
         {
-        info_data_len=(buf[IP_TOTLEN_H_P]<<8)|(buf[IP_TOTLEN_L_P]&0xff);
-        info_data_len-=IP_HEADER_LEN;
-        info_hdr_len=(buf[TCP_HEADER_LEN_P]>>4)*4; // generate len in bytes;
-        info_data_len-=info_hdr_len;
-        if (info_data_len<=0)
-            info_data_len=0;
+        info_data_len_ = (buf[IP_TOTLEN_H_P]<<8)|(buf[IP_TOTLEN_L_P]&0xff);
+        info_data_len_ -= IP_HEADER_LEN;
+        info_hdr_len_ = (buf[TCP_HEADER_LEN_P]>>4)*4; // generate len in bytes;
+        info_data_len_ -= info_hdr_len_;
+        if (info_data_len_ <= 0)
+            info_data_len_ = 0;
         }
 
     // fill in tcp data at position pos. pos=0 means start of
@@ -499,11 +494,11 @@ public:
         make_eth(buf);
         // fill the header:
         buf[TCP_FLAG_P]=TCP_FLAG_ACK_V;
-        if (info_data_len==0)
+        if (info_data_len_ == 0)
             // if there is no data then we must still acknoledge one packet
             make_tcphead(buf,1,0,1); // no options
         else
-            make_tcphead(buf,info_data_len,0,1); // no options
+            make_tcphead(buf,info_data_len_,0,1); // no options
 
         // total length field in the IP header must be set:
         // 20 bytes IP + 20 bytes tcp (when no options) 
@@ -557,7 +552,7 @@ public:
         while(i<6)
             {
             buf[ETH_DST_MAC +i]=0xff;
-            buf[ETH_SRC_MAC +i]=macaddr[i];
+            buf[ETH_SRC_MAC +i]=macaddr_[i];
             i++;
             }
     
@@ -587,14 +582,14 @@ public:
         for ( i=0; i<6; i++)
             {
             buf[ ARP_DST_MAC_P + i ] = 0x00;
-            buf[ ARP_SRC_MAC_P + i ] = macaddr[i];
+            buf[ ARP_SRC_MAC_P + i ] = macaddr_[i];
             }
 
         // setup arp destination and source ip address
         for ( i=0; i<4; i++)
             {
             buf[ ARP_DST_IP_P + i ] = server_ip[i];
-            buf[ ARP_SRC_IP_P + i ] = ipaddr[i];
+            buf[ ARP_SRC_IP_P + i ] = ipaddr_[i];
             }
 
         // eth+arp is 42 bytes:
@@ -615,7 +610,7 @@ public:
             return 0;
         // if destination ip address in arp packet not match with avr ip address
         for(i=0; i<4; i++)
-            if(buf[ETH_ARP_DST_IP_P+i] != ipaddr[i])
+            if(buf[ETH_ARP_DST_IP_P+i] != ipaddr_[i])
                 return 0;
         return 1;
         }
@@ -663,11 +658,11 @@ public:
             buf[TCP_SEQ_H_P+1]= 0;
             // we step only the second byte, this allows us to send packts
             // with 255 bytes or 512 (if we step the initial seqnum by 2)
-            buf[TCP_SEQ_H_P+2]= seqnum;
+            buf[TCP_SEQ_H_P+2]= seqnum_;
             buf[TCP_SEQ_H_P+3]= 0;
             // step the inititial seq num by something we will not use
             // during this tcp session:
-            seqnum+=2;
+            seqnum_ += 2;
 
             // setup maximum segment size
             buf[TCP_OPTIONS_P]=2;
@@ -733,9 +728,20 @@ public:
         return ((uint16_t)dlength);
         }
 private:
-    static uint16_t ip_identifier;
+    static uint16_t ip_identifier_;
+    static uint8_t ipaddr_[4];
+    static uint8_t macaddr_[6];
+    static int16_t info_hdr_len_;
+    static int16_t info_data_len_;
+    static uint8_t seqnum_;
     };
 
 template <class Ethernet, byte port>
-uint16_t IP<Ethernet, port>::ip_identifier = 1;
+uint16_t IP<Ethernet, port>::ip_identifier_ = 1;
+template <class Ethernet, byte port> uint8_t IP<Ethernet, port>::ipaddr_[4];
+template <class Ethernet, byte port> uint8_t IP<Ethernet, port>::macaddr_[6];
+template <class Ethernet, byte port> int16_t IP<Ethernet, port>::info_hdr_len_;
+template <class Ethernet, byte port> int16_t IP<Ethernet, port>::info_data_len_;
+template <class Ethernet, byte port> uint8_t IP<Ethernet, port>::seqnum_ = 0xa;
+
 /* end of ip_arp_udp.c */
