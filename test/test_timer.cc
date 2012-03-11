@@ -1,4 +1,4 @@
-#include "arduino++.h"
+#include "arduino--.h"
 #include "serial.h"
 
 volatile uint16_t delta = 0;
@@ -6,7 +6,7 @@ volatile uint16_t delta = 0;
 ISR(TIMER0_COMPA_vect)
     {
     ScopedInterruptDisable sid;
-    delta = Timer1::TCNT;
+    delta = Timer1::R_TCNT;
     Arduino::D13::set();
     }
 

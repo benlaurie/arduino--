@@ -25,7 +25,7 @@
     Motivation: With Clock16 instead of Clock32, Lars has seen a code size 
     reduction of 238 bytes with avr-gcc 4.6.1.
  */
-typedef _Clock<uint16_t> Clock16;
+typedef _Clock<uint16_t,Timer0> Clock16;
 
 Clock16 clock;
 
@@ -36,8 +36,8 @@ ISR(TIMER0_OVF_vect)
     {
     // copy these to local variables so they can be stored in registers
     // (volatile variables must be read from memory on every access)
-    typename Clock16::time_res_t m = Clock16::timer0_millis;
-    uint16_t f = Clock16::timer0_fract;
+    typename Clock16::time_res_t m = Clock16::timer_millis;
+    uint16_t f = Clock16::timer_fract;
 
     m += (64 * (256 / (F_CPU / 1000000))) / 1000;
     f += (64 * (256 / (F_CPU / 1000000))) % 1000;
@@ -47,9 +47,9 @@ ISR(TIMER0_OVF_vect)
 	m += 1;
 	}
 
-    Clock16::timer0_fract = f;
-    Clock16::timer0_millis = m;
-    Clock16::timer0_overflow_count++;
+    Clock16::timer_fract = f;
+    Clock16::timer_millis = m;
+    Clock16::timer_overflow_count++;
     }
 
 #endif

@@ -14,7 +14,7 @@
  * Chip type           : ATMEGA88 with ENC28J60
  *********************************************/
 
-#include "arduino++.h"
+#include "arduino--.h"
 #include "spi.h"
 #include <util/delay.h>
 
