@@ -7,7 +7,6 @@
 typedef ENC28J60<Pin::B0> Ethernet;
 
 IP<Ethernet, 80> ip;
-Ethernet ethernet;
 
 static uint16_t mywwwport = 80; // listen port for tcp/www (max range 1-254)
 
@@ -19,8 +18,8 @@ static uint8_t myip[4] = {192,168,1,111};
 void setup()
     {
     /*initialize enc28j60*/
-    ethernet.Init(mymac);
-    ethernet.clkout(2); // change clkout from 6.25MHz to 12.5MHz
+    Ethernet::Init(mymac);
+    Ethernet::clkout(2); // change clkout from 6.25MHz to 12.5MHz
     _delay_ms(10);
         
     /* Magjack leds configuration, see enc28j60 datasheet, page 11 */
@@ -28,27 +27,27 @@ void setup()
 
     // 0x880 is PHLCON LEDB=on, LEDA=on
     // enc28j60PhyWrite(PHLCON,0b0000 1000 1000 00 00);
-    ethernet.phlcon(0x880);
+    Ethernet::phlcon(0x880);
     _delay_ms(500);
 
     // 0x990 is PHLCON LEDB=off, LEDA=off
     // enc28j60PhyWrite(PHLCON,0b0000 1001 1001 00 00);
-    ethernet.phlcon(0x990);
+    Ethernet::phlcon(0x990);
     _delay_ms(500);
 
     // 0x880 is PHLCON LEDB=on, LEDA=on
     // enc28j60PhyWrite(PHLCON,0b0000 1000 1000 00 00);
-    ethernet.phlcon(0x880);
+    Ethernet::phlcon(0x880);
     _delay_ms(500);
 
     // 0x990 is PHLCON LEDB=off, LEDA=off
     // enc28j60PhyWrite(PHLCON,0b0000 1001 1001 00 00);
-    ethernet.phlcon(0x990);
+    Ethernet::phlcon(0x990);
     _delay_ms(500);
 
     // 0x476 is PHLCON LEDA=links status, LEDB=receive/transmit
     // enc28j60PhyWrite(PHLCON,0b0000 0100 0111 01 10);
-    ethernet.phlcon(0x476);
+    Ethernet::phlcon(0x476);
     _delay_ms(100);
 
     //init the ethernet/ip layer:
@@ -118,7 +117,7 @@ void loop()
     {
     uint16_t plen, dat_p;
 
-    plen = ethernet.PacketReceive(BUFFER_SIZE, buf);
+    plen = Ethernet::PacketReceive(BUFFER_SIZE, buf);
 
     /* plen will ne unequal to zero if there is a valid packet
        (without crc error) */
