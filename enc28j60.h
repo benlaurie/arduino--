@@ -452,3 +452,6 @@ private:
     static byte Enc28j60Bank;
     static uint16_t NextPacketPtr;
     };
+
+template<class Pin> byte ENC28J60<Pin>::Enc28j60Bank;
+template<class Pin> uint16_t ENC28J60<Pin>::NextPacketPtr;

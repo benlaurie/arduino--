@@ -9,9 +9,6 @@ typedef ENC28J60<Pin::B0> Ethernet;
 IP<Ethernet, 80> ip;
 Ethernet ethernet;
 
-template<class Pin> byte ENC28J60<Pin>::Enc28j60Bank;
-template<class Pin> uint16_t ENC28J60<Pin>::NextPacketPtr;
-
 static uint16_t mywwwport = 80; // listen port for tcp/www (max range 1-254)
 
 #define BUFFER_SIZE 500
