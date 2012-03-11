@@ -1,7 +1,10 @@
 #include <string.h>
 #include "ip.h"
 
-typedef ENC28J60<Pin::B2> Ethernet;
+// EtherShield
+//typedef ENC28J60<Pin::B2> Ethernet;
+// Nanode
+typedef ENC28J60<Pin::B0> Ethernet;
 
 IP<Ethernet, 80> ip;
 Ethernet ethernet;
