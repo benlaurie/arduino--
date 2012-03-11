@@ -96,43 +96,27 @@ public:
     // other functions:
     static void init_ip_arp_udp_tcp(uint8_t *mymac, uint8_t *myip)
         {
-        uint8_t i=0;
-
-        while(i < 4)
-            {
+        for (byte i = 0; i < 4; ++i)
             ipaddr_[i] = myip[i];
-            i++;
-            }
-        i = 0;
-        while(i<6)
-            {
+        for (byte i = 0; i < 6; ++i)
             macaddr_[i] = mymac[i];
-            i++;
-            }
         }
 
     static uint8_t eth_type_is_arp_and_my_ip(uint8_t *buf, uint16_t len)
         {
-        uint8_t i=0;
-
-        if (len<41)
+        if (len < 41)
             return 0;
         if (buf[ETH_TYPE_H_P] != ETHTYPE_ARP_H_V || 
             buf[ETH_TYPE_L_P] != ETHTYPE_ARP_L_V)
             return 0;
-        while (i < 4)
-            {
+        for(byte i = 0; i < 4; ++i)
             if(buf[ETH_ARP_DST_IP_P+i] != ipaddr_[i])
                 return 0;
-            i++;
-            }
         return 1;
         }
 
     static uint8_t eth_type_is_ip_and_my_ip(uint8_t *buf, uint16_t len)
         {
-        uint8_t i = 0;
-
         //eth+ip+udp header is 42
         if (len < 42)
             return 0;
@@ -142,40 +126,31 @@ public:
         if (buf[IP_HEADER_LEN_VER_P] != 0x45)
             // must be IP V4 and 20 byte header
             return 0;
-        while (i < 4)
-            {
+        for (byte i = 0; i < 4; ++i)
             if (buf[IP_DST_P+i] !=  ipaddr_[i])
                 return 0;
-            i++;
-            }
         return 1;
         }
 
     // make a return eth header from a received eth packet
     static void make_eth(uint8_t *buf)
         {
-        uint8_t i = 0;
-
         //copy the destination mac from the source and fill my mac into src
-        while (i < 6)
+        for (byte i = 0; i < 6; ++i)
             {
             buf[ETH_DST_MAC + i] = buf[ETH_SRC_MAC + i];
             buf[ETH_SRC_MAC + i] = macaddr_[i];
-            i++;
             }
         }
 
     // make a new eth header for IP packet
     static void make_eth_ip_new(uint8_t *buf, uint8_t* dst_mac)
         {
-        uint8_t i=0;
-
-    //copy the destination mac from the source and fill my mac into src
-        while (i < 6)
+        //copy the destination mac from the source and fill my mac into src
+        for (byte i = 0; i < 6; ++i)
             {
             buf[ETH_DST_MAC +i]=dst_mac[i];
             buf[ETH_SRC_MAC +i]=macaddr_[i];
-            i++;
             }
                 
         buf[ETH_TYPE_H_P] = ETHTYPE_IP_H_V;
@@ -202,8 +177,6 @@ public:
     // make a return ip header from a received ip packet
     static void make_ip_tcp_new(uint8_t *buf, uint16_t len,uint8_t *dst_ip)
         {
-        uint8_t i=0;
-        
         // set ipv4 and header length
         buf[ IP_P ] = IP_V4_V | IP_HEADER_LENGTH_V;
     
@@ -230,11 +203,10 @@ public:
         buf[ IP_PROTO_P ] = IP_PROTO_TCP_V;
     
         // set source and destination ip address
-        while(i<4)
+        for (byte i = 0; i < 4; ++i)
             {
             buf[IP_DST_P+i]=dst_ip[i];
             buf[IP_SRC_P+i]=ipaddr_[i];
-            i++;
             }
         fill_ip_hdr_checksum(buf);
         }
@@ -242,12 +214,10 @@ public:
     // make a return ip header from a received ip packet
     static void make_ip(uint8_t *buf)
         {
-        uint8_t i=0;
-        while(i<4)
+        for (byte i = 0; i < 4; ++i)
             {
             buf[IP_DST_P+i]=buf[IP_SRC_P+i];
             buf[IP_SRC_P+i]=ipaddr_[i];
-            i++;
             }
         fill_ip_hdr_checksum(buf);
         }
@@ -264,20 +234,19 @@ public:
     static void make_tcphead(uint8_t *buf,uint16_t rel_ack_num,uint8_t mss,
 			     uint8_t cp_seq)
         {
-        uint8_t i=0;
         uint8_t tseq;
-        while(i<2)
+
+        for (byte i = 0; i < 2; ++i)
             {
             buf[TCP_DST_PORT_H_P+i]=buf[TCP_SRC_PORT_H_P+i];
             buf[TCP_SRC_PORT_H_P+i]=0; // clear source port
-            i++;
             }
         // set source port  (http):
         buf[TCP_SRC_PORT_L_P]=port;
-        i=4;
+
         // sequence numbers:
         // add the rel ack num to SEQACK
-        while(i>0)
+        for (byte i = 4; i > 0; --i)
             {
             rel_ack_num=buf[TCP_SEQ_H_P+i-1]+rel_ack_num;
             tseq=buf[TCP_SEQACK_H_P+i-1];
@@ -292,7 +261,6 @@ public:
                 buf[TCP_SEQ_H_P+i-1]= 0; // some preset vallue
                 }
             rel_ack_num=rel_ack_num>>8;
-            i--;
             }
         if (cp_seq==0)
             {
@@ -336,24 +304,19 @@ public:
 
     static void make_arp_answer_from_request(uint8_t *buf)
         {
-        uint8_t i=0;
-        
         make_eth(buf);
         buf[ETH_ARP_OPCODE_H_P]=ETH_ARP_OPCODE_REPLY_H_V;
         buf[ETH_ARP_OPCODE_L_P]=ETH_ARP_OPCODE_REPLY_L_V;
         // fill the mac addresses:
-        while(i<6)
+        for (byte i = 0; i < 6; ++i)
             {
             buf[ETH_ARP_DST_MAC_P+i]=buf[ETH_ARP_SRC_MAC_P+i];
             buf[ETH_ARP_SRC_MAC_P+i]=macaddr_[i];
-            i++;
             }
-        i=0;
-        while(i<4)
+        for (byte i=0; i < 4; ++i)
             {
             buf[ETH_ARP_DST_IP_P+i]=buf[ETH_ARP_SRC_IP_P+i];
             buf[ETH_ARP_SRC_IP_P+i]=ipaddr_[i];
-            i++;
             }
         // eth+arp is 42 bytes:
         Ethernet::PacketSend(42,buf); 
@@ -377,7 +340,6 @@ public:
     static void make_udp_reply_from_request(uint8_t *buf, char *data,
 					    uint8_t datalen, uint16_t dstport)
         {
-        uint8_t i=0;
         uint16_t ck;
         make_eth(buf);
         if (datalen>220)
@@ -396,11 +358,8 @@ public:
         buf[UDP_CHECKSUM_H_P]=0;
         buf[UDP_CHECKSUM_L_P]=0;
         // copy the data:
-        while(i<datalen)
-            {
+        for (byte i = 0; i < datalen; ++i)
             buf[UDP_DATA_P+i]=data[i];
-            i++;
-            }
         ck=checksum(&buf[IP_SRC_P], 16 + datalen,1);
         buf[UDP_CHECKSUM_H_P]=ck>>8;
         buf[UDP_CHECKSUM_L_P]=ck& 0xff;
@@ -478,9 +437,8 @@ public:
         // with no options the data starts after the checksum + 2 more bytes (urgent ptr)
         while (*s)
             {
-            buf[TCP_CHECKSUM_L_P+3+pos]=*s;
+            buf[TCP_CHECKSUM_L_P+3+pos] = *s++;
             pos++;
-            s++;
             }
         return(pos);
         }
@@ -490,14 +448,16 @@ public:
     static void make_tcp_ack_from_any(uint8_t *buf)
         {
         uint16_t j;
+
         make_eth(buf);
         // fill the header:
         buf[TCP_FLAG_P]=TCP_FLAG_ACK_V;
+
         if (info_data_len_ == 0)
             // if there is no data then we must still acknoledge one packet
-            make_tcphead(buf,1,0,1); // no options
+            make_tcphead(buf, 1, 0, 1); // no options
         else
-            make_tcphead(buf,info_data_len_,0,1); // no options
+            make_tcphead(buf, info_data_len_, 0, 1); // no options
 
         // total length field in the IP header must be set:
         // 20 bytes IP + 20 bytes tcp (when no options) 
@@ -546,13 +506,10 @@ public:
     /* new functions for web client interface */
     static void make_arp_request(uint8_t *buf, uint8_t *server_ip)
         {
-        uint8_t i=0;
-    
-        while(i<6)
+        for (byte i = 0; i < 6; ++i)
             {
             buf[ETH_DST_MAC +i]=0xff;
             buf[ETH_SRC_MAC +i]=macaddr_[i];
-            i++;
             }
     
         buf[ ETH_TYPE_H_P ] = ETHTYPE_ARP_H_V;
@@ -578,14 +535,14 @@ public:
         buf[ ARP_PROTOCOL_SIZE_P ] = ARP_PROTOCOL_SIZE_V;
 
         // setup arp destination and source mac address
-        for ( i=0; i<6; i++)
+        for (byte i = 0; i < 6; ++i)
             {
             buf[ ARP_DST_MAC_P + i ] = 0x00;
             buf[ ARP_SRC_MAC_P + i ] = macaddr_[i];
             }
 
         // setup arp destination and source ip address
-        for ( i=0; i<4; i++)
+        for (byte i = 0; i < 4; ++i)
             {
             buf[ ARP_DST_IP_P + i ] = server_ip[i];
             buf[ ARP_SRC_IP_P + i ] = ipaddr_[i];
@@ -597,8 +554,6 @@ public:
 
     static uint8_t arp_packet_is_myreply_arp ( uint8_t *buf )
         {
-        uint8_t i;
-
         // if packet type is not arp packet exit from function
         if (buf[ETH_TYPE_H_P] != ETHTYPE_ARP_H_V
             || buf[ETH_TYPE_L_P] != ETHTYPE_ARP_L_V)
@@ -608,7 +563,7 @@ public:
             || buf[ARP_OPCODE_L_P] != ARP_OPCODE_REPLY_L_V )
             return 0;
         // if destination ip address in arp packet not match with avr ip address
-        for(i=0; i<4; i++)
+        for(byte i = 0; i < 4; ++i)
             if(buf[ETH_ARP_DST_IP_P+i] != ipaddr_[i])
                 return 0;
         return 1;
@@ -622,7 +577,6 @@ public:
 				       uint16_t next_ack_num, uint16_t dlength,
 				       uint8_t *dest_mac, uint8_t *dest_ip)
         {
-        uint8_t i=0;
         uint8_t tseq;
         uint16_t ck;
     
@@ -638,7 +592,7 @@ public:
         // add the rel ack num to SEQACK
 
         if(next_ack_num)
-            for(i=4; i>0; i--)
+            for(byte i = 4; i > 0; i--)
                 {
                 next_ack_num=buf[TCP_SEQ_H_P+i-1]+next_ack_num;
                 tseq=buf[TCP_SEQACK_H_P+i-1];
