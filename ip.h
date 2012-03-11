@@ -31,7 +31,7 @@ static int16_t info_hdr_len=0;
 static int16_t info_data_len=0;
 static uint8_t seqnum=0xa; // my initial tcp sequence number
 
-template <class Ethernet, byte wwwport> class IP
+template <class Ethernet, byte port> class IP
     {
 public:
     // The Ip checksum is calculated over the ip header only starting
@@ -279,7 +279,7 @@ public:
             i++;
             }
         // set source port  (http):
-        buf[TCP_SRC_PORT_L_P]=wwwport;
+        buf[TCP_SRC_PORT_L_P]=port;
         i=4;
         // sequence numbers:
         // add the rel ack num to SEQACK
@@ -381,7 +381,7 @@ public:
 
     // you can send a max of 220 bytes of data
     static void make_udp_reply_from_request(uint8_t *buf, char *data,
-					    uint8_t datalen, uint16_t port)
+					    uint8_t datalen, uint16_t dstport)
         {
         uint8_t i=0;
         uint16_t ck;
@@ -392,8 +392,8 @@ public:
         buf[IP_TOTLEN_H_P]=0;
         buf[IP_TOTLEN_L_P]=IP_HEADER_LEN+UDP_HEADER_LEN+datalen;
         make_ip(buf);
-        buf[UDP_DST_PORT_H_P]=port>>8;
-        buf[UDP_DST_PORT_L_P]=port & 0xff;
+        buf[UDP_DST_PORT_H_P]=dstport>>8;
+        buf[UDP_DST_PORT_L_P]=dstport & 0xff;
         // source port does not matter and is what the sender used.
         // calculte the udp length:
         buf[UDP_LEN_H_P]=0;
