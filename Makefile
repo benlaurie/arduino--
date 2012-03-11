@@ -1,7 +1,7 @@
 include Makefile.local
 
 OPTIMIZE = -O3 -Os
-DEFS = -I /usr/local/avr/avr/include -DF_CPU=$(CPU_FREQUENCY)
+DEFS = -I /usr/local/avr/avr/include -I. -DF_CPU=$(CPU_FREQUENCY)
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
 CXX = avr-g++
@@ -9,26 +9,30 @@ AR = avr-ar
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 
+VPATH=test
+
 CFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 CXXFLAGS = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
 LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 
-BIN = blink.bin test_clock.bin test_enc28j60.bin onewire_test.bin test_ip.bin \
-      test_serial.bin test_rf12.bin test_nanode_mac.bin test_pushbutton.bin \
-      test_watchdog.bin test_serial.bin test_rf12.bin test_nanode_mac.bin \
-      test_timer.bin test_onewire_serial.bin blink_nanode.bin \
-      test_rf12_layered.bin test_star.bin test_star_slave.bin \
-      test_star_slave_onewire.bin
+BIN = test/blink.bin test/test_clock.bin test/test_enc28j60.bin \
+	  test/test_onewire.bin test/test_ip.bin test/test_serial.bin \
+	  test/test_rf12.bin test/test_nanode_mac.bin test/test_pushbutton.bin \
+      test/test_watchdog.bin test/test_serial.bin test/test_rf12.bin \
+	  test/test_nanode_mac.bin test/test_timer.bin \
+	  test/test_onewire_serial.bin test/blink_nanode.bin \
+      test/test_rf12_layered.bin test/test_star.bin test/test_star_slave.bin \
+      test/test_star_slave_onewire.bin
 
 all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
-.depend: *.cc *.h
-	$(CC) -mmcu=$(MCU_TARGET) -MM *.cc > .depend
+.depend: test/*.cc *.h
+	$(CC) $(DEFS) -mmcu=$(MCU_TARGET) -MM test/*.cc | sed 's;^\(.*\):;test/\1:;'> .depend
 
-.SUFFIXES: .lst .elf .bin _upload
+.SUFFIXES: .elf .lst .bin _upload
 
-.cpp.o:
-	$(CXX) $(CXXFLAGS) -c -o $(<:.cpp=.o) $<
+.cc.o: 
+	$(CXX) $(CXXFLAGS) -c -o $(<:.cc=.o) $<
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $(<:.c=.o) $<
@@ -43,13 +47,19 @@ all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 sizes/recent_sizes.json sizes/sizes.html: $(BIN)
-	python sizes/sizes.py generate
+	python sizes/sizes.py recent generate
+
+get-ports.cc: Makefile.local
 
 avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl -f $(CPU_FREQUENCY) < get-ports.lst > avr-ports.h
 
-clean:
-	rm -f *.o *.map *.lst *.elf *.bin avr-ports.h .depend
+sizeclean:
+	rm -f sizes/recent_sizes.json
+
+clean: sizeclean
+	rm -f *.o *.map *.lst *.elf *.bin test/*.o test/*.map test/*.lst \
+	test/*.elf test/*.bin avr-ports.h .depend 
 
 .bin_upload:
 	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:$<

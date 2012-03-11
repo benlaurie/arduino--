@@ -1,7 +1,7 @@
 #ifndef SPI_H_
 #define SPI_H
 
-#include "arduino++.h"
+#include "arduino--.h"
 
 template <class Sck, class Miso, class Mosi, class Ss> 
     class _SPI
@@ -29,7 +29,7 @@ public:
     
     static void mode(byte config, bool double_speed)
         {
-        byte tmp;
+        byte tmp __attribute__((unused));
 
         // enable SPI master with configuration byte specified
         Register::SPCR = 0;

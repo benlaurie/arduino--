@@ -3,7 +3,7 @@
 #ifndef PUSHBUTTON_H_
 #define PUSHBUTTON_H_
 
-#include "arduino++.h"
+#include "arduino--.h"
 
 template<class Timer_, class Pin, int debounce>
 class PushButton

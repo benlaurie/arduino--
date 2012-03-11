@@ -30,7 +30,7 @@
 
 #include <util/crc16.h>
 
-#include "arduino++.h"
+#include "arduino--.h"
 #include "clock16.h"
 #include "spi.h"
 

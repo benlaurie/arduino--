@@ -1,4 +1,4 @@
-#include "arduino++.h"
+#include "arduino--.h"
 
 // Note: with avr-gcc 4.5.1 this DOES NOT WORK when compiled with -O3
 // and not -Os
