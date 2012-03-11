@@ -68,23 +68,24 @@ class Pin
 public:
     // Port B
     typedef _Pin<NDDRB, NPORTB, NPINB, PB0> D_B0;
-    typedef _PWMPin<D_B0, Timer1, Timer1::T_OCRA, NTCCR1C, FOC1A> OC1A;
-    typedef _ChangeInterruptPin<OC1A, NPCMSK0, PCIE0, NPCICR, PCINT0> B0; 
+    typedef _ChangeInterruptPin<D_B0, NPCMSK0, PCIE0, NPCICR, PCINT0> B0; 
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB1> D_B1;
-    typedef _ChangeInterruptPin<D_B1, NPCMSK0, PCIE0, NPCICR, PCINT1> B1;
+    typedef _PWMPin<D_B1, Timer1, Timer1::T_OCRA, NTCCR1C, FOC1A> OC1A;
+    typedef _ChangeInterruptPin<OC1A, NPCMSK0, PCIE0, NPCICR, PCINT1> B1;
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB2> D_B2;
-    typedef _PWMPin<D_B2, Timer2, Timer2::T_OCRA, NTCCR2B, FOC2A> OC2A;
-    typedef _ChangeInterruptPin<OC2A, NPCMSK0, PCIE0, NPCICR, PCINT2> B2;
+    typedef _PWMPin<D_B2, Timer1, Timer1::T_OCRB, NTCCR1C, FOC1B> OC1B;
+    typedef _ChangeInterruptPin<OC1B, NPCMSK0, PCIE0, NPCICR, PCINT2> B2;
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB3> D_B3;
-    typedef _ChangeInterruptPin<D_B3, NPCMSK0, PCIE0, NPCICR, PCINT3> B3;
+    typedef _PWMPin<D_B3, Timer2, Timer2::T_OCRB, NTCCR2B, FOC2A> OC2A;
+    typedef _ChangeInterruptPin<OC2A, NPCMSK0, PCIE0, NPCICR, PCINT3> B3;
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB4> D_B4; 
     typedef _ChangeInterruptPin<D_B4, NPCMSK0, PCIE0, NPCICR, PCINT4> B4;
 
-    typedef _Pin<NDDRB, NPORTB, NPINB, PB3> D_B5;
+    typedef _Pin<NDDRB, NPORTB, NPINB, PB5> D_B5;
     typedef _ChangeInterruptPin<D_B5, NPCMSK0, PCIE0, NPCICR, PCINT5> B5;
 
     // Port C
@@ -108,6 +109,13 @@ public:
     typedef _AnalogPin<D_C4, 4> ADC4;
     typedef _ChangeInterruptPin<ADC4, NPCMSK1, PCIE1, NPCICR, PCINT12> C4;
 
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC5> D_C5;
+    typedef _AnalogPin<D_C5, 5> ADC5;
+    typedef _ChangeInterruptPin<ADC5, NPCMSK1, PCIE1, NPCICR, PCINT13> C5;
+
+    typedef _Pin<NDDRC, NPORTC, NPINC, PC6> D_C6;
+    typedef _ChangeInterruptPin<D_C6, NPCMSK1, PCIE1, NPCICR, PCINT14> C6;
+
     // Port D
     typedef _Pin<NDDRD, NPORTD, NPIND, PD0> D_D0;
     typedef _ChangeInterruptPin<D_D0, NPCMSK2, PCIE2, NPCICR, PCINT16> D0;
@@ -120,7 +128,7 @@ public:
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD3> D_D3;
     typedef _PWMPin<D_D3, Timer2, Timer2::T_OCRB, NTCCR2B, FOC2B> OC2B;
-    typedef _ChangeInterruptPin<OC2A, NPCMSK2, PCIE2, NPCICR, PCINT19> D3;
+    typedef _ChangeInterruptPin<OC2B, NPCMSK2, PCIE2, NPCICR, PCINT19> D3;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD4> D_D4;
     typedef _ChangeInterruptPin<D_D4, NPCMSK2, PCIE2, NPCICR, PCINT20> D4;
@@ -130,11 +138,11 @@ public:
     typedef _ChangeInterruptPin<OC0B, NPCMSK2, PCIE2, NPCICR, PCINT21> D5;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD6> D_D6;
-    typedef _ChangeInterruptPin<D_D6, NPCMSK2, PCIE2, NPCICR, PCINT22> D6;
+    typedef _PWMPin<D_D6, Timer0, Timer0::T_OCRA, NTCCR0A, FOC0A> OC0A;
+    typedef _ChangeInterruptPin<OC0A, NPCMSK2, PCIE2, NPCICR, PCINT22> D6;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD7> D_D7;
-    typedef _PWMPin<D_D7, Timer0, Timer0::T_OCRA, NTCCR0A, FOC0A> OC0A;
-    typedef _ChangeInterruptPin<OC0B, NPCMSK2, PCIE2, NPCICR, PCINT23> D7;
+    typedef _ChangeInterruptPin<D_D7, NPCMSK2, PCIE2, NPCICR, PCINT23> D7;
 
     typedef Pin::B2 SPI_SS;
     typedef Pin::B3 SPI_MOSI;
