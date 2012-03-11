@@ -62,11 +62,13 @@ protected:
         {
         // Slave
         REQUEST_ID = 0x00,
+        USER_SLAVE_MESSAGE = 0x80,
 
         // Master
         ALLOCATE_ID = 0x40,
         OUT_OF_IDS = 0x41,
         RESET_ID = 0x42,
+        USER_MASTER_MESSAGE = 0xc0,
         };
     enum MasterType
         {
@@ -113,6 +115,14 @@ public:
             getID();
             return;
             }
+        if (Network::canSend())
+            Observer::canSend();
+        }
+    // Only call this from Observer::canSend()
+    static void sendPacket(byte type, byte length, const byte *data)
+        {
+        StarNode<Network, Observer>::sendPacket
+            (id_, type | StarBase::USER_SLAVE_MESSAGE, length, data);
         }
 private:
     static void processPacket()
@@ -254,7 +264,6 @@ private:
     static byte resetCount_;
     };
 
-
 uint32_t StarBase::protocolError_;
 template <class Network, class Observer>
   typename StarMaster<Network, Observer>::Mac
@@ -268,3 +277,31 @@ template <class Network, class Observer>
   byte StarSlave<Network, Observer>::length_;
 template <class Network, class Observer>
   const byte *StarSlave<Network, Observer>::mac_;
+
+class SerialSlaveObserver
+    {
+public:
+    static void cantSend() { Serial.write('.'); }
+    static void gotPacket(byte id, byte type, byte length, const byte *data)
+	{
+	Serial.write("Got packet, id: ");
+	Serial.writeDecimal(id);
+	Serial.write(" type: ");
+	Serial.writeDecimal(type);
+	Serial.write(" data: ");
+	Serial.writeHex(data, length);
+	Serial.write("\r\n");
+	}
+    static void sentPacket(byte id, byte type, byte length, const byte *data)
+	{
+	Serial.write("Sent packet, id: ");
+	Serial.writeDecimal(id);
+	Serial.write(" type: ");
+	Serial.writeDecimal(type);
+	Serial.write(" data: ");
+	Serial.writeHex(data, length);
+	Serial.write("\r\n");
+	}
+    static void canSend() {}
+    };
+
