@@ -1,3 +1,4 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
 /*
   HardwareSerial.cpp - Hardware serial library for Wiring
   Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
@@ -22,6 +23,9 @@
   Modified 5 February 2012 by Lars Immisch (template remix)  
 */
 
+#ifndef SERIAL_H
+#define SERIAL_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -35,7 +39,7 @@ template <byte rx_buffer_size> class RingBuffer
  public:
     void store(byte c)
         {
-        int i = (_head + 1) % rx_buffer_size;
+        byte i = (_head + 1) % rx_buffer_size;
 
         // if we should be storing the received character into the location
         // just before the tail (meaning that the head would advance to the
@@ -148,10 +152,14 @@ try_again:
         { HexWriter<HardwareSerial>::write(this, b); }
     void writeHex(uint16_t i) 
         { HexWriter<HardwareSerial>::write(this, i); }
+    void writeHex(const byte *b, byte n)
+        { HexWriter<HardwareSerial>::write(this, b, n); }
     void write(const char *str)
         { StringWriter<HardwareSerial>::write(this, str); }
     void write_P(const char *str)
         { StringWriter<HardwareSerial>::write_P(this, str); }
+    void writeDecimal(uint32_t d, byte digits = 1)
+	{ DecimalWriter<HardwareSerial>::write(this, d, digits); }
 };
 
 // typedefs for serial classes
@@ -220,3 +228,5 @@ SIGNAL(USART_RX_vect)
     }
 
 #endif
+
+#endif  // ndef SERIAL_H

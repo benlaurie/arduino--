@@ -458,6 +458,11 @@ public:
         write(out, static_cast<byte>(i >> 8));
         write(out, static_cast<byte>(i & 0xff));
         }
+    static void write(Out *out, const byte *b, byte n)
+        {
+        for (int k = 0; k < n; ++k)
+            write(out, b[k]);
+        }
     static void writeNibble(Out *out, byte b)
         {
         if (b < 10)
@@ -481,6 +486,18 @@ public:
         byte v;
 		while ((v = pgm_read_byte(str++)))
             out->write(v);
+        }
+    };
+
+template <class Out> class DecimalWriter
+    {
+public:
+    static void write(Out *out, uint32_t d, char digits)
+        {
+        if (d == 0 && digits <= 0)
+            return;
+        write(out, d/10, digits - 1);
+        out->write('0' + d % 10);
         }
     };
 

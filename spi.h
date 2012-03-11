@@ -29,7 +29,7 @@ public:
     
     static void mode(byte config, bool double_speed)
         {
-        byte tmp;
+        byte tmp __attribute__((unused));
 
         // enable SPI master with configuration byte specified
         Register::SPCR = 0;

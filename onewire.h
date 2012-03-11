@@ -3,6 +3,8 @@
 // Note: with avr-gcc 4.5.1 this DOES NOT WORK when compiled with -O3
 // and not -Os
 
+#include "serial.h"  // FIXME: should not need to depend on this.
+
 template <class Pin> class Button
     {
 public:
@@ -25,6 +27,11 @@ public:
     byte InByte() const;
     void Select() const;
     void GetTemperature();
+    void Dump(_Serial *serial) const;
+    uint16_t Temperature() const
+	{ return temperature_; }
+    const byte *ID() const
+	{ return id_; }
 
     enum Command
 	{
@@ -46,6 +53,7 @@ private:
     uint16_t temperature_;  // as read from the device.
     };
 
+// FIXME: no reason all functions shouldn't be static?
 template <class Pin> class Buttons
     {
 public:
@@ -83,6 +91,12 @@ public:
 	return b == 0;
 	}
     Button<Pin> &operator[](unsigned n) { return buttons_[n]; }
+    void Dump(_Serial *serial) const
+	{
+	for (byte b = 0; b < num_; ++b)
+	    buttons_[b].Dump(serial);
+	}
+    byte Count() const { return num_; }
 private:
     static const int MAX_BUTTONS = 10;
     Button<Pin> buttons_[MAX_BUTTONS];
@@ -196,8 +210,8 @@ template <class Pin> void Button<Pin>::Select() const
     {
     Reset();
     OutByte(MATCH_ROM);
-    for (char n = 7; n >= 0; --n)
-	OutByte(id_[n]);
+    for (byte n = 0; n < 8; ++n)
+	OutByte(id_[7 - n]);
     }
 
 template <class Pin> void Buttons<Pin>::GetTemperatures()
@@ -247,11 +261,11 @@ public:
     void Bit(int nBit)
 	{
 	//assert(!(nBit&~1));
-	nBit&=1;
-	nBit^=m_ucCRC&1;
-	m_ucCRC>>=1;
+	nBit &= 1;
+	nBit ^= m_ucCRC&1;
+	m_ucCRC >>= 1;
 	if(nBit)
-	    m_ucCRC^=0x8c;
+	    m_ucCRC ^= 0x8c;
 //	m_ucCRC^=(nBit << 7)|(nBit << 3)|(nBit << 2);
 	}
     void Bits(unsigned un,unsigned nBits)
