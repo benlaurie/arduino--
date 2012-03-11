@@ -100,7 +100,7 @@ public:
 
     // you must call this function once before you use any of the
     // other functions:
-    void init_ip_arp_udp_tcp(uint8_t *mymac, uint8_t *myip)
+    static void init_ip_arp_udp_tcp(uint8_t *mymac, uint8_t *myip)
         {
         uint8_t i=0;
 
@@ -117,7 +117,7 @@ public:
             }
         }
 
-    uint8_t eth_type_is_arp_and_my_ip(uint8_t *buf, uint16_t len)
+    static uint8_t eth_type_is_arp_and_my_ip(uint8_t *buf, uint16_t len)
         {
         uint8_t i=0;
 
@@ -135,7 +135,7 @@ public:
         return 1;
         }
 
-    uint8_t eth_type_is_ip_and_my_ip(uint8_t *buf, uint16_t len)
+    static uint8_t eth_type_is_ip_and_my_ip(uint8_t *buf, uint16_t len)
         {
         uint8_t i = 0;
 
@@ -158,7 +158,7 @@ public:
         }
 
     // make a return eth header from a received eth packet
-    void make_eth(uint8_t *buf)
+    static void make_eth(uint8_t *buf)
         {
         uint8_t i = 0;
 
@@ -172,7 +172,7 @@ public:
         }
 
     // make a new eth header for IP packet
-    void make_eth_ip_new(uint8_t *buf, uint8_t* dst_mac)
+    static void make_eth_ip_new(uint8_t *buf, uint8_t* dst_mac)
         {
         uint8_t i=0;
 
@@ -188,7 +188,7 @@ public:
         buf[ETH_TYPE_L_P] = ETHTYPE_IP_L_V;
         }
 
-    void fill_ip_hdr_checksum(uint8_t *buf)
+    static void fill_ip_hdr_checksum(uint8_t *buf)
         {
         uint16_t ck;
         // clear the 2 byte checksum
@@ -206,7 +206,7 @@ public:
     // make a new ip header for tcp packet
 
     // make a return ip header from a received ip packet
-    void make_ip_tcp_new(uint8_t *buf, uint16_t len,uint8_t *dst_ip)
+    static void make_ip_tcp_new(uint8_t *buf, uint16_t len,uint8_t *dst_ip)
         {
         uint8_t i=0;
         
@@ -245,9 +245,8 @@ public:
         fill_ip_hdr_checksum(buf);
         }
 
-
     // make a return ip header from a received ip packet
-    void make_ip(uint8_t *buf)
+    static void make_ip(uint8_t *buf)
         {
         uint8_t i=0;
         while(i<4)
@@ -268,8 +267,8 @@ public:
     // at TCP_OPTIONS_P+4. If cp_seq=0 then an initial sequence number
     // is used (should be use in synack) otherwise it is copied from
     // the packet we received
-    void make_tcphead(uint8_t *buf,uint16_t rel_ack_num,uint8_t mss,
-                      uint8_t cp_seq)
+    static void make_tcphead(uint8_t *buf,uint16_t rel_ack_num,uint8_t mss,
+			     uint8_t cp_seq)
         {
         uint8_t i=0;
         uint8_t tseq;
@@ -341,7 +340,7 @@ public:
             }
         }
 
-    void make_arp_answer_from_request(uint8_t *buf)
+    static void make_arp_answer_from_request(uint8_t *buf)
         {
         uint8_t i=0;
         
@@ -366,7 +365,7 @@ public:
         Ethernet::PacketSend(42,buf); 
         }
 
-    void make_echo_reply_from_request(uint8_t *buf,uint16_t len)
+    static void make_echo_reply_from_request(uint8_t *buf,uint16_t len)
         {
         make_eth(buf);
         make_ip(buf);
@@ -381,8 +380,8 @@ public:
         }
 
     // you can send a max of 220 bytes of data
-    void make_udp_reply_from_request(uint8_t *buf,char *data,uint8_t datalen,
-                                     uint16_t port)
+    static void make_udp_reply_from_request(uint8_t *buf, char *data,
+					    uint8_t datalen, uint16_t port)
         {
         uint8_t i=0;
         uint16_t ck;
@@ -414,7 +413,7 @@ public:
         Ethernet::PacketSend(UDP_HEADER_LEN+IP_HEADER_LEN+ETH_HEADER_LEN+datalen,buf);
         }
 
-    void make_tcp_synack_from_syn(uint8_t *buf)
+    static void make_tcp_synack_from_syn(uint8_t *buf)
         {
         uint16_t ck;
         make_eth(buf);
@@ -437,7 +436,7 @@ public:
     // get a pointer to the start of tcp data in buf
     // Returns 0 if there is no data
     // You must call init_len_info once before calling this function
-    uint16_t get_tcp_data_pointer(void)
+    static uint16_t get_tcp_data_pointer(void)
         {
         if (info_data_len)
             return((uint16_t)TCP_SRC_PORT_H_P+info_hdr_len);
@@ -447,7 +446,7 @@ public:
 
     // do some basic length calculations and store the result in
     // static varibales
-    void init_len_info(uint8_t *buf)
+    static void init_len_info(uint8_t *buf)
         {
         info_data_len=(buf[IP_TOTLEN_H_P]<<8)|(buf[IP_TOTLEN_L_P]&0xff);
         info_data_len-=IP_HEADER_LEN;
@@ -460,7 +459,7 @@ public:
     // fill in tcp data at position pos. pos=0 means start of
     // tcp data. Returns the position at which the string after
     // this string could be filled.
-    uint16_t fill_tcp_data_p(uint8_t *buf, uint16_t pos,
+    static uint16_t fill_tcp_data_p(uint8_t *buf, uint16_t pos,
                              const char *progmem_s)
         {
         char c;
@@ -478,7 +477,7 @@ public:
     // fill in tcp data at position pos. pos=0 means start of
     // tcp data. Returns the position at which the string after
     // this string could be filled.
-    uint16_t fill_tcp_data(uint8_t *buf,uint16_t pos, const char *s)
+    static uint16_t fill_tcp_data(uint8_t *buf,uint16_t pos, const char *s)
         {
         // fill in tcp data at position pos
         //
@@ -494,7 +493,7 @@ public:
 
     // Make just an ack packet with no tcp data inside
     // This will modify the eth/ip/tcp header 
-    void make_tcp_ack_from_any(uint8_t *buf)
+    static void make_tcp_ack_from_any(uint8_t *buf)
         {
         uint16_t j;
         make_eth(buf);
@@ -525,7 +524,7 @@ public:
     // send in this packet You can use this function only immediately
     // after make_tcp_ack_from_any This is because this function will
     // NOT modify the eth/ip/tcp header except for length and checksum
-    void make_tcp_ack_with_data(uint8_t *buf,uint16_t dlen)
+    static void make_tcp_ack_with_data(uint8_t *buf,uint16_t dlen)
         {
         uint16_t j;
         // fill the header:
@@ -551,7 +550,7 @@ public:
         }
 
     /* new functions for web client interface */
-    void make_arp_request(uint8_t *buf, uint8_t *server_ip)
+    static void make_arp_request(uint8_t *buf, uint8_t *server_ip)
         {
         uint8_t i=0;
     
@@ -602,7 +601,7 @@ public:
         Ethernet::PacketSend(42,buf);
         }
 
-    uint8_t arp_packet_is_myreply_arp ( uint8_t *buf )
+    static uint8_t arp_packet_is_myreply_arp ( uint8_t *buf )
         {
         uint8_t i;
 
@@ -622,12 +621,12 @@ public:
         }
 
     // make a  tcp header
-    void tcp_client_send_packet(uint8_t *buf,uint16_t dest_port,
-                                uint16_t src_port, uint8_t flags,
-                                uint8_t max_segment_size, 
-                                uint8_t clear_seqack, uint16_t next_ack_num,
-                                uint16_t dlength, uint8_t *dest_mac,
-                                uint8_t *dest_ip)
+    static void tcp_client_send_packet(uint8_t *buf, uint16_t dest_port,
+				       uint16_t src_port, uint8_t flags,
+				       uint8_t max_segment_size, 
+				       uint8_t clear_seqack,
+				       uint16_t next_ack_num, uint16_t dlength,
+				       uint8_t *dest_mac, uint8_t *dest_ip)
         {
         uint8_t i=0;
         uint8_t tseq;
@@ -720,7 +719,7 @@ public:
         Ethernet::PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlength+ETH_HEADER_LEN,buf);
         }
 
-    uint16_t tcp_get_dlength ( uint8_t *buf )
+    static uint16_t tcp_get_dlength ( uint8_t *buf )
         {
         int dlength, hlength;
         
