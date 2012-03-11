@@ -36,16 +36,16 @@ public:
 	}
     };
 
-StarMaster<RF12Star, SerialObserver> master;
+typedef StarMaster<RF12Star, SerialObserver> Master;
 
 int main()
     {
     Arduino::init();
     Serial.begin(57600);
-    master.init();
+    Master::init();
 
     Serial.write("Start\r\n");
 
     for ( ; ; )
-	master.poll();
+	Master::poll();
     }

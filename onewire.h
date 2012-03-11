@@ -28,6 +28,10 @@ public:
     void Select() const;
     void GetTemperature();
     void Dump(_Serial *serial) const;
+    uint16_t Temperature() const
+	{ return temperature_; }
+    const byte *ID() const
+	{ return id_; }
 
     enum Command
 	{
@@ -49,6 +53,7 @@ private:
     uint16_t temperature_;  // as read from the device.
     };
 
+// FIXME: no reason all functions shouldn't be static?
 template <class Pin> class Buttons
     {
 public:
@@ -91,6 +96,7 @@ public:
 	for (byte b = 0; b < num_; ++b)
 	    buttons_[b].Dump(serial);
 	}
+    byte Count() const { return num_; }
 private:
     static const int MAX_BUTTONS = 10;
     Button<Pin> buttons_[MAX_BUTTONS];
