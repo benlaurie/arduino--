@@ -68,7 +68,14 @@ function compiler_versions() {
         }
     }
 
-    return keys(versions)
+    var vlist = [compiler_version]
+    for (var v in versions) {
+        if (v != compiler_version) {
+            vlist.push(v)
+        }
+    }
+
+    return vlist
 }
 
 // collect all binfiles as an object
@@ -95,6 +102,10 @@ function binfiles() {
 }
 
 function update_mean(data, acc, count) {
+    if (!data) {
+        return data
+    }
+
     if (data.mean === null) {
         data.mean = acc / count
     }
@@ -106,17 +117,13 @@ function update_mean(data, acc, count) {
 }
 
 function next_index(data) {
-    if (!data.data.length)
+    if (!data || !data.data.length)
         return 0
 
     return data.data[data.data.length-1][0] + 1
 }
 
 function git_plot_data(version, fn, data, offset) {
-
-    data = data || { 'data': [], 'meta': [], 'label': fn,
-                     'min': Infinity, 'max': 0, 'mean': null,
-                     'version': version }
 
     version = version || compiler_version
 
@@ -130,17 +137,22 @@ function git_plot_data(version, fn, data, offset) {
 
     for (var i = 0; i < git_sizes.length; i++) {
         var gi = git_sizes[i][version]
-        if (gi === undefined) 
-            continue
+        if (gi !== undefined) { 
 
-        var sz = gi[fn]
-        if (sz !== undefined) {
-            data.data.push([index, sz])
-            data.meta.push(git_sizes[i].git)
-            data.min = Math.min(data.min, sz)
-            data.max = Math.max(data.max, sz)
-            acc = acc + sz
-            count++
+            var sz = gi[fn]
+            if (sz !== undefined) {
+
+                data = data || { 'data': [], 'meta': [], 'label': fn,
+                                 'min': Infinity, 'max': 0, 'mean': null,
+                                 'version': version }
+
+                data.data.push([index, sz])
+                data.meta.push(git_sizes[i].git)
+                data.min = Math.min(data.min, sz)
+                data.max = Math.max(data.max, sz)
+                acc = acc + sz
+                count++
+            }
         }
         index = index + 1
     }
@@ -150,8 +162,6 @@ function git_plot_data(version, fn, data, offset) {
 
 function recent_plot_data(version, fn, data, offset) {
 
-    data = data || { 'data': [], 'meta': [], 'label': fn,
-                     'min': Infinity, 'max': 0, 'mean': null }
     version = version || compiler_version
     if (recent_sizes[version] === undefined) {
         return data
@@ -167,6 +177,10 @@ function recent_plot_data(version, fn, data, offset) {
     var sz
 
     for (var i = 0; i < bdata.length; i++) {
+
+        data = data || { 'data': [], 'meta': [], 'label': fn,
+                         'min': Infinity, 'max': 0, 'mean': null }
+
         sz = bdata[i].size
         data.data.push([index + bdata[i].index, sz])
         data.min = Math.min(data.min, sz)
@@ -174,6 +188,9 @@ function recent_plot_data(version, fn, data, offset) {
         acc = acc + sz
         data.meta.push({'mtime': bdata[i].mtime})
     }
+
+    if (sz === undefined)
+        return undefined
 
     return update_mean(data, acc, i)
 }
@@ -188,10 +205,13 @@ function split_plot_data(version, fn) {
     version = version || compiler_version
     var sl = []
     var gd = git_plot_data(version, fn)
-
-    sl.push(gd)
+    if (gd)
+        sl.push(gd)
     
     var rd = recent_plot_data(version, fn, undefined, gd.data.length)
+    if (!rd)
+        return sl
+
     delete rd.label
     sl.push(rd)
 
@@ -274,10 +294,12 @@ function add_plots_grouped(version, fnlist) {
     // Get all the data 
     for (var i = 0; i < fnlist.length; i++) {
         var data = all_plot_data(version, fnlist[i])
-        min = Math.min(data.min, min)
-        max = Math.max(data.max, max)
-        data.color = i
-        all_data[fnlist[i]] = data
+        if (data) {
+            min = Math.min(data.min, min)
+            max = Math.max(data.max, max)
+            data.color = i
+            all_data[fnlist[i]] = data
+        }
     }
 
     var lower = Math.floor(min/partition_size) * partition_size
@@ -417,16 +439,16 @@ function curryclick(id, plot) {
 }
 
 function update() {
-    var version = $("#compiler_version option:selected").text()
+    var version = $("#compiler_version option:selected").val()
     var group = $('input:radio[name=group]:checked').val()
 
     remove_plots()
 
     if (group == 'grouped') {
-        add_plots_grouped()
+        add_plots_grouped(version)
     }
     else {
-        add_plots_single()
+        add_plots_single(version)
     }
 }
 

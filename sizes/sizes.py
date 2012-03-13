@@ -156,6 +156,12 @@ def git_branch():
 
     raise ValueError('Cannot find git branch')
 
+def git_revlist(branch = None):
+    if branch is None:
+        branch = git_branch()
+    revlist, _ = run('git', 'rev-list', branch, '--')
+    return revlist
+
 def github_url(url):
     '''Rewrite a github ssh read/write URL into the corresponding public URL'''
 
@@ -256,27 +262,7 @@ def clean():
 def bname(b):
     return os.path.split(b)[1]
 
-def generate(version, git_sizes, recent_sizes, remote='origin'):
-    '''Generate HTML for the sizes'''
-    
-    remote_url = github_url(git_remote_url(remote))
-
-    prune_git_sizes(git_sizes)
-
-    f = open(template, 'r')
-    templ = f.read()
-    f.close()
-    
-    f = open(html, 'w')
-    f.write(templ % {
-        'git_sizes': json_indented(git_sizes, 4, 4),
-        'recent_sizes': json_indented(recent_sizes, 4, 4),
-        'compiler_version': version,
-        'remote_url': remote_url
-        })
-    f.close()
-
-def read_git_sizes(fname='sizes/git_sizes.json'):
+def read_git_sizes(revlist = None, fname=git_sizes_json):
     '''Return the git (historic) sizes or an empty array.'''
     
     try:
@@ -285,8 +271,16 @@ def read_git_sizes(fname='sizes/git_sizes.json'):
         f.close()
     except IOError:
         git_sizes = []
+
+    if revlist is None:
+        return git_sizes
+        
+    sizes = []
+    for g in git_sizes:
+        if g['git']['hash'] in revlist:
+            sizes.append(g)
     
-    return git_sizes
+    return sizes
 
 def equal_sizes(a, b):
     '''Return true if a and b are equal, but ignore the key "git"
@@ -316,11 +310,11 @@ def prune_git_sizes(sizes):
 
     return sizes
 
-def read_recent_sizes():
+def read_recent_sizes(fname=recent_sizes_json):
     '''Return the recent sizes on the file system or an empty dict'''
     
     try:
-        f = open(recent_sizes_json, 'r')
+        f = open(fname, 'r')
         recent = json.load(f)
         f.close()
     except IOError:
@@ -332,7 +326,7 @@ def update_recent(version):
     '''Update the recent sizes.'''
 
     recent = read_recent_sizes()
-    counter = recent.get('counter', 0) + 1
+    counter = recent.get('counter', 0)
 
     increment = False
     for b in binfiles():
@@ -350,7 +344,7 @@ def update_recent(version):
         if not len(bfile) or bfile[-1].get('size', None) != size:
             mt = os.path.getmtime(b)
             increment = True
-            bfile.append({'index': counter, 'size': size,
+            bfile.append({'index': counter + 1, 'size': size,
                            'mtime': int(mt)})
 
     if increment:
@@ -359,65 +353,87 @@ def update_recent(version):
     
     return recent
 
-def append_git_size(version, sizes):
-    '''Append the current sizes from the working copy in git_sizes format.'''
+def generate(version, git_sizes = None, recent_sizes = None, remote='origin'):
+    '''Generate HTML for the sizes'''
+    
+    remote_url = github_url(git_remote_url(remote))
 
-    hashes = set()
-    for s in sizes:
-        hashes.add(s['git']['hash'])
+    if recent_sizes is None:
+        recent_sizes = read_recent_sizes()
 
-    git_info = git_log(1)[0]
+    if git_sizes is None:
+        git_sizes = read_git_sizes()
+        
+    prune_git_sizes(git_sizes)
+
+    f = open(template, 'r')
+    templ = f.read()
+    f.close()
+    
+    f = open(html, 'w')
+    f.write(templ % {
+        'git_sizes': json_indented(git_sizes, 4, 4),
+        'recent_sizes': json_indented(recent_sizes, 4, 4),
+        'compiler_version': version,
+        'remote_url': remote_url
+        })
+    f.close()
+
+def update_git_size(version, rev, make, sizes):
+    '''Update the current sizes from the working copy in git_sizes format.'''
+
+    # in case make clean doesn't work
+    clean()
+    rc = silent(make, '-k', 'clean', 'all')
+
     info = {}
-
     for b in binfiles():
         info[bname(b)] = os.path.getsize(b)
 
-    if not git_info['hash'] in hashes:
+    updated = False
+    for s in sizes:
+        if rev == s['git']['hash']:
+            updated = True
+            s[version] = info
+            
+    if not updated:
+        git_info = git_log(1)[0]
         sizes.append({version: info, 'git': git_info})
 
-    return sizes
+    return rc
 
 def write_sizes(sizes, fname):
     f = open(fname, 'w')
-    json.dump(sizes, f, indent=4)
+    json.dump(sizes, f, sort_keys=True, indent=4)
     f.close()
 
-def update_history(version):
+def update_history(version, branch = None):
     '''Update the history in git_sizes.json'''
 
-    branch = git_branch()
-    make = get_make_cmd('bsd')
-    sizes = read_git_sizes()
-    
-    revlist, _ = run('git', 'rev-list', branch, '--')
+    if branch is None:
+        branch = git_branch()
 
-    hashes = set()
-    stale = []
-    for i, s in enumerate(sizes):
+    revlist = git_revlist(branch)
+    make = get_make_cmd('bsd')
+    sizes = read_git_sizes(revlist)
+    
+    known = set()
+    for s in sizes:
         h = s['git']['hash']
         # populate known hashes
-        hashes.add(h)
-        if not h in revlist:
-            # remove stale entries, i.e. unrelated commits from other branches
-            # or commits that were deleted through an interactive rebase
-            # (or whatever else git throws our way) 
-            print '%s removed (stale)' % h
-            stale.append(i)
-
-    for u in reversed(stale):
-        del sizes[u]
+        if s.has_key(version):
+            known.add(h)
 
     try:
         for r in reversed(revlist):
-            if not r in hashes:
+            if not r in known:
+                if os.path.exists('sizes/sizes.json'):
+                    os.unlink('sizes/sizes.json')
                 rc = subprocess.call(['git', 'checkout', '-q', r])
                 if rc:
                     raise RuntimeError('git checkout -q ' + r + ' failed')
 
-                # in case make clean doesn't work
-                clean()
-                rc = silent(make, '-k', 'clean', 'all')
-                append_git_size(version, sizes)
+                rc = update_git_size(version, r, make, sizes)
                 if not rc:
                     print '%s ok' % r
                 else:
@@ -445,8 +461,9 @@ if __name__ == '__main__':
     quiet = options.quiet
 
     version = avr_gcc_version()
-    recent_sizes = read_recent_sizes()
-    git_sizes = read_git_sizes()
+    recent_sizes = None
+    git_sizes = None
+
     for a in args:
         if a == 'recent':
             recent_sizes = update_recent(version)
