@@ -28,6 +28,7 @@ var compiler_version = "%(compiler_version)s"
 var remote_url = "%(remote_url)s"
 var plot_id = 0
 var bin_to_id = {}
+var version_commit_count = {}
 
 var partition_size = 1024
 
@@ -101,39 +102,32 @@ function binfiles() {
     return keys(bf)
 }
 
-function update_mean(data, acc, count) {
-    if (!data) {
-        return data
+function max_commits(version) {
+
+    // cache number of commits by version
+    var count = version_commit_count[version]
+    if (count !== undefined) 
+        return count
+
+    count = 0
+    for (var i = 0; i < git_sizes.length; i++) {
+        if (git_sizes[i][version] !== undefined) {
+            count++
+        }
     }
 
-    if (data.mean === null) {
-        data.mean = acc / count
-    }
-    else {
-        data.mean = (acc / count + data.mean) / 2
-    }
-
-    return data
+    version_commit_count[version] = count
+    return count
 }
 
-function next_index(data) {
-    if (!data || !data.data.length)
-        return 0
-
-    return data.data[data.data.length-1][0] + 1
-}
-
-function git_plot_data(version, fn, data, offset) {
+function git_plot_data(fn, version, offset) {
+    var data = { 'data': [], 'meta': [], 'label': fn,
+                 'min': Infinity, 'max': 0, 'acc': null,
+                 'version': version }
 
     version = version || compiler_version
 
-    if (git_sizes === undefined) {
-        return data
-    }
-
-    var acc = 0
-    var index = offset || next_index(data)
-    var count = 0
+    var index = offset || 0
 
     for (var i = 0; i < git_sizes.length; i++) {
         var gi = git_sizes[i][version]
@@ -142,80 +136,74 @@ function git_plot_data(version, fn, data, offset) {
             var sz = gi[fn]
             if (sz !== undefined) {
 
-                data = data || { 'data': [], 'meta': [], 'label': fn,
-                                 'min': Infinity, 'max': 0, 'mean': null,
-                                 'version': version }
-
                 data.data.push([index, sz])
                 data.meta.push(git_sizes[i].git)
                 data.min = Math.min(data.min, sz)
                 data.max = Math.max(data.max, sz)
-                acc = acc + sz
-                count++
+                data.acc = data.acc + sz
             }
         }
         index = index + 1
     }
 
-    return update_mean(data, acc, count)
+    if (data.data.length == 0)
+        return undefined
+
+    return data
 }
 
-function recent_plot_data(version, fn, data, offset) {
+function recent_plot_data(fn, version, offset) {
+    var data = { 'data': [], 'meta': [], 'label': fn,
+                  'min': Infinity, 'max': 0, 'acc': null }
 
     version = version || compiler_version
     if (recent_sizes[version] === undefined) {
-        return data
+        return undefined
     }
 
     var bdata = recent_sizes[version][fn]
     if (bdata === undefined) {
-        return data
+        return undefined
     }
 
-    var acc = 0
-    var index = offset || next_index(data)
-    var sz
+    var index = offset || 0
 
     for (var i = 0; i < bdata.length; i++) {
-
-        data = data || { 'data': [], 'meta': [], 'label': fn,
-                         'min': Infinity, 'max': 0, 'mean': null }
-
-        sz = bdata[i].size
+        var sz = bdata[i].size
         data.data.push([index + bdata[i].index, sz])
         data.min = Math.min(data.min, sz)
         data.max = Math.max(data.max, sz)
-        acc = acc + sz
+        data.acc = data.acc + sz
         data.meta.push({'mtime': bdata[i].mtime})
     }
 
     if (sz === undefined)
         return undefined
 
-    return update_mean(data, acc, i)
+    return data
 }
 
-function all_plot_data(version, fn) {
-    version = version || compiler_version
+function merge(d0, d1) {
 
-    return recent_plot_data(version, fn, git_plot_data(version, fn))
-}
-
-function split_plot_data(version, fn) {
-    version = version || compiler_version
-    var sl = []
-    var gd = git_plot_data(version, fn)
-    if (gd)
-        sl.push(gd)
+    if (!d1)
+        return d0
     
-    var rd = recent_plot_data(version, fn, undefined, gd.data.length)
-    if (!rd)
-        return sl
+    if (d0.label != d1.label)
+        return undefined
 
-    delete rd.label
-    sl.push(rd)
+    return { 'data': d0.data.concat(d1.data), 
+             'meta': d0.meta.concat(d1.meta), 'label': d0.label,
+             'min': Math.min(d0.min, d1.min),
+             'max': Math.max(d0.max, d1.max), 
+             'acc': d0.acc + d1.acc }
+    
+}
 
-    return sl
+function all_plot_data(fn, version) {
+    version = version || compiler_version
+
+    return merge(git_plot_data(fn, version), 
+                 recent_plot_data(fn, version, max_commits(version)))
 }
 
 /** Generate the html for the plot(s)
@@ -247,10 +235,14 @@ function plot_html(title, fnlist, id) {
 }
 
 function cmp_mean(a, b) {
-    if (a.mean == b.mean) {
+
+    var ma = a.acc / a.data.lentgh
+    var mb = b.acc / b.data.length
+
+    if (ma == mb) {
         return 0
     }
-    return a.mean < b.mean ? -1 : 1
+    return ma < mb ? -1 : 1
 }
 
 function plot(id, data) {
@@ -283,7 +275,7 @@ function kb(s) {
  * @param version Compiler version (default is the installed compiler)
  * @param fnlist List of binfiles to display
  */
-function add_plots_grouped(version, fnlist) {
+function add_plots_grouped(fnlist, version) {
     version = version || compiler_version
     fnlist = fnlist || binfiles()
 
@@ -293,7 +285,7 @@ function add_plots_grouped(version, fnlist) {
 
     // Get all the data 
     for (var i = 0; i < fnlist.length; i++) {
-        var data = all_plot_data(version, fnlist[i])
+        var data = all_plot_data(fnlist[i], version)
         if (data) {
             min = Math.min(data.min, min)
             max = Math.max(data.max, max)
@@ -336,13 +328,13 @@ function add_plots_grouped(version, fnlist) {
  * @param version Compiler version (default is the installed compiler)
  * @param fnlist List of binfiles to display
  */
-function add_plots_single(version, fnlist) {
+function add_plots_single(fnlist, version) {
     version = version || compiler_version
     fnlist = fnlist || binfiles()
 
     var data = []
     for (var i = 0; i < fnlist.length; i++) {
-        data.push(all_plot_data(version, fnlist[i]))
+        data.push(all_plot_data(fnlist[i], version))
     }
 
     data.sort(cmp_mean)
@@ -444,11 +436,13 @@ function update() {
 
     remove_plots()
 
+    var bfl = binfiles()
+
     if (group == 'grouped') {
-        add_plots_grouped(version)
+        add_plots_grouped(bfl, version)
     }
     else {
-        add_plots_single(version)
+        add_plots_single(bfl, version)
     }
 }
 
