@@ -162,6 +162,25 @@ def git_revlist(branch = None):
     revlist, _ = run('git', 'rev-list', branch, '--')
     return revlist
 
+def git_changed_files(rev):
+    files, _ = run('git', 'show', '--pretty=format:', '--name-only', rev)
+    # the first line is the empty format
+    del files[0]
+
+    return files
+
+def rev_is_interesting(rev):
+    files = git_changed_files(rev)
+    for f in files:
+        path, fn = os.path.split(f)
+        if fn == 'Makefile':
+            return True
+        _, ext = os.path.splitext(fn)
+        if ext in ['.cc', '.c', '.h']:
+            return True
+
+    return False
+            
 def github_url(url):
     '''Rewrite a github ssh read/write URL into the corresponding public URL'''
 
@@ -407,6 +426,24 @@ def write_sizes(sizes, fname):
     json.dump(sizes, f, sort_keys=True, indent=4)
     f.close()
 
+def prune_boring_git_sizes(branch = None):
+    '''remove all uninteresting commits from git_sizes.json'''
+
+    if branch is None:
+        branch = git_branch()
+
+    pruned = []
+    revlist = git_revlist(branch)
+    sizes = read_git_sizes(revlist)
+    for s in sizes:
+        h = s['git']['hash']
+        if rev_is_interesting(h):
+            pruned.append(s)
+        else:
+            print 'removing ', h
+
+    write_sizes(pruned, 'sizes/git_sizes.json')
+    
 def update_history(version, branch = None):
     '''Update the history in git_sizes.json'''
 
@@ -427,17 +464,19 @@ def update_history(version, branch = None):
     try:
         for r in reversed(revlist):
             if not r in known:
-                if os.path.exists('sizes/sizes.json'):
-                    os.unlink('sizes/sizes.json')
-                rc = subprocess.call(['git', 'checkout', '-q', r])
-                if rc:
-                    raise RuntimeError('git checkout -q ' + r + ' failed')
+                interesting = rev_is_interesting(r)
+                if interesting:
+                    if os.path.exists('sizes/sizes.json'):
+                        os.unlink('sizes/sizes.json')
+                    rc = subprocess.call(['git', 'checkout', '-q', r])
+                    if rc:
+                        raise RuntimeError('git checkout -q ' + r + ' failed')
 
-                rc = update_git_size(version, r, make, sizes)
-                if not rc:
-                    print '%s ok' % r
-                else:
-                    print '%s make failed' % r
+                    rc = update_git_size(version, r, make, sizes)
+                    if not rc:
+                        print '%s ok' % r
+                    else:
+                        print '%s make failed' % r
             else:
                 if not quiet:
                     print '%s already recorded' % r
@@ -473,6 +512,8 @@ if __name__ == '__main__':
             write_sizes(git_sizes, 'sizes/git_sizes.json')
         elif a == 'generate':
             generate(version, git_sizes, recent_sizes, options.remote)
+        elif a == 'prune-boring':
+            prune_boring_git_sizes()
     else:
         generate(version, git_sizes, recent_sizes, options.remote)
         
