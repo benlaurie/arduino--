@@ -18,8 +18,8 @@ LDFLAGS = -Wl,-Map,$@.map $(LIBS)
 BIN = test/blink.bin test/test_clock.bin test/test_enc28j60.bin \
 	  test/test_onewire.bin test/test_ip.bin test/test_serial.bin \
 	  test/test_rf12.bin test/test_nanode_mac.bin test/test_pushbutton.bin \
-      test/test_watchdog.bin test/test_serial.bin test/test_rf12.bin \
-	  test/test_nanode_mac.bin test/test_timer.bin \
+      test/test_watchdog.bin test/test_serial.bin test/test_pcint.bin \
+	  test/test_rf12.bin test/test_nanode_mac.bin test/test_timer.bin \
 	  test/test_onewire_serial.bin test/blink_nanode.bin \
       test/test_rf12_layered.bin test/test_star.bin test/test_star_slave.bin \
       test/test_star_slave_onewire.bin
@@ -53,6 +53,9 @@ get-ports.cc: Makefile.local
 
 avr-ports.h: get-ports.lst extract-ports.pl
 	./extract-ports.pl -f $(CPU_FREQUENCY) < get-ports.lst > avr-ports.h
+
+history:
+	python sizes.py history generate
 
 sizeclean:
 	rm -f sizes/recent_sizes.json
