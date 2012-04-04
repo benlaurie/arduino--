@@ -6,6 +6,9 @@
         "4.6.2": {
             "test_enc28j60.bin": 1358
         }, 
+        "4.7.0": {
+            "test_enc28j60.bin": 1248
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "First cut.", 
@@ -22,21 +25,8 @@
         "4.6.2": {
             "test_enc28j60.bin": 1358
         }, 
-        "git": {
-            "author": "Ben Laurie", 
-            "comment": "Git drives me nuts.", 
-            "date": "2011-12-18 22:30:08 +0000", 
-            "email": "ben@links.org", 
-            "hash": "9c23325e2b11aa760ccee769c83e8e832610ea46", 
-            "short": "9c23325"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "test_enc28j60.bin": 1436
-        }, 
-        "4.6.2": {
-            "test_enc28j60.bin": 1358
+        "4.7.0": {
+            "test_enc28j60.bin": 1248
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -54,6 +44,9 @@
         "4.6.2": {
             "test_enc28j60.bin": 1358
         }, 
+        "4.7.0": {
+            "test_enc28j60.bin": 1248
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Makefile bugfix.", 
@@ -69,6 +62,9 @@
         }, 
         "4.6.2": {
             "test_enc28j60.bin": 1358
+        }, 
+        "4.7.0": {
+            "test_enc28j60.bin": 1248
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -86,21 +82,8 @@
         "4.6.2": {
             "test_enc28j60.bin": 1358
         }, 
-        "git": {
-            "author": "Ben Laurie", 
-            "comment": "Remove executable bits.", 
-            "date": "2011-12-20 06:22:25 +0000", 
-            "email": "ben@links.org", 
-            "hash": "9ca0c707c1dffbc6e8176ad53b878e5112d51fc8", 
-            "short": "9ca0c70"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "test_enc28j60.bin": 1436
-        }, 
-        "4.6.2": {
-            "test_enc28j60.bin": 1358
+        "4.7.0": {
+            "test_enc28j60.bin": 1248
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -115,39 +98,8 @@
         "4.5.1": {
             "test_enc28j60.bin": 1436
         }, 
-        "4.6.2": {
-            "test_enc28j60.bin": 1358
-        }, 
-        "git": {
-            "author": "Ben Laurie", 
-            "comment": "Other half of rename :-)", 
-            "date": "2011-12-20 06:24:33 +0000", 
-            "email": "ben@links.org", 
-            "hash": "0d93aad29a0e52fce8b4662b940eab38d6af90a2", 
-            "short": "0d93aad"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "test_enc28j60.bin": 1436
-        }, 
-        "4.6.2": {
-            "test_enc28j60.bin": 1358
-        }, 
-        "git": {
-            "author": "Ben Laurie", 
-            "comment": "Ignore library.", 
-            "date": "2011-12-20 06:25:01 +0000", 
-            "email": "ben@links.org", 
-            "hash": "9b54d7688b2e4b7fec65090cd88c509980b78862", 
-            "short": "9b54d76"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "test_enc28j60.bin": 1436
-        }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Fold in blink example.", 
@@ -162,6 +114,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Code style.", 
@@ -176,20 +129,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
-        "git": {
-            "author": "Ben Laurie", 
-            "comment": "First port extracted incorrectly.", 
-            "date": "2011-12-20 12:36:31 +0000", 
-            "email": "ben@links.org", 
-            "hash": "70b442f876e065a113b6c02cc957cdbbcfe68249", 
-            "short": "70b442f"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "test_enc28j60.bin": 1436
-        }, 
-        "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Fix toggle (duh).", 
@@ -204,6 +144,7 @@
             "blink.bin": 794
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "More Pins.", 
@@ -218,6 +159,7 @@
             "blink.bin": 4198
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added constantDelay.", 
@@ -232,6 +174,7 @@
             "blink.bin": 794
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "constantDelay breaks blink.", 
@@ -247,6 +190,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added SPI, rename in enc28j60.h", 
@@ -262,6 +206,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "blink.cc: added comments", 
@@ -277,6 +222,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "constantDelay should be ms not us.", 
@@ -292,6 +238,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Renamed Pin::in and out to modeInput/modeOutput.", 
@@ -307,6 +254,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added constantDelayMicroseconds.", 
@@ -322,6 +270,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Renamed Arduino Pin typedefs to lower case.", 
@@ -337,6 +286,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": ".depend needs to go before blink.bin (thanks Ben)", 
@@ -352,6 +302,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Changes after code review from Ben.", 
@@ -367,6 +318,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Whitespace changes.", 
@@ -382,6 +334,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Arduino::a[n] pins renamed, whitespace.", 
@@ -394,6 +347,7 @@
     {
         "4.5.1": {}, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "_SPI::init bugfix.", 
@@ -409,6 +363,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "read() bugfix, NullPin improvements.", 
@@ -423,6 +378,7 @@
             "blink.bin": 3172
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Local flags.", 
@@ -439,6 +395,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Simpler example, minor consistency fix.", 
@@ -456,6 +413,7 @@
             "test_enc28j60.bin": 4594
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add 1-wire support.", 
@@ -473,6 +431,7 @@
             "test_enc28j60.bin": 1436
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add -Os back.", 
@@ -491,6 +450,7 @@
             "test_ip.bin": 3186
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Working TCP/IP.", 
@@ -509,6 +469,7 @@
             "test_ip.bin": 3186
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Layout.", 
@@ -527,6 +488,7 @@
             "test_ip.bin": 3178
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Templating port saves 8 bytes in test_ip.", 
@@ -546,6 +508,7 @@
             "test_ip.bin": 12308
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added pin change interrupts.", 
@@ -565,6 +528,7 @@
             "test_serial.bin": 2020
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Serial support.", 
@@ -584,6 +548,7 @@
             "test_serial.bin": 1890
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Seperate concerns (and save bytes).", 
@@ -603,6 +568,7 @@
             "test_serial.bin": 1790
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "More bytes saved.", 
@@ -622,6 +588,7 @@
             "test_serial.bin": 1890
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Include our nice .depend", 
@@ -641,6 +608,7 @@
             "test_serial.bin": 1890
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Documentation; pushbutton.", 
@@ -660,6 +628,7 @@
             "test_serial.bin": 1890
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Merged branch 'master' of https://github.com/benlaurie/arduino--", 
@@ -679,6 +648,7 @@
             "test_serial.bin": 1790
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Formatting.", 
@@ -699,6 +669,7 @@
             "test_serial.bin": 1790
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Incomplete but working RF12 support.", 
@@ -719,6 +690,7 @@
             "test_serial.bin": 1790
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Note about our own packets.", 
@@ -739,6 +711,7 @@
             "test_serial.bin": 1790
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Reduce whitespace mayhem.", 
@@ -759,6 +732,7 @@
             "test_serial.bin": 1750
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "More info. Ack should be 0-length. Detect ack replies.", 
@@ -779,6 +753,7 @@
             "test_serial.bin": 1750
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "More detabification.", 
@@ -799,6 +774,7 @@
             "test_serial.bin": 1782
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Bug fixed.", 
@@ -819,6 +795,7 @@
             "test_serial.bin": 1098
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Arduino timer resolution is a template parameter.", 
@@ -839,6 +816,7 @@
             "test_serial.bin": 1098
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Ben's comments incorporated.", 
@@ -859,6 +837,7 @@
             "test_serial.bin": 1098
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added forgotten files.", 
@@ -879,6 +858,7 @@
             "test_serial.bin": 1098
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Merge branch 'master' of https://github.com/benlaurie/arduino--", 
@@ -899,6 +879,7 @@
             "test_serial.bin": 1098
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Merge branch 'master' into timertemplate", 
@@ -919,6 +900,7 @@
             "test_serial.bin": 1098
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "BSD make compatibility.", 
@@ -940,6 +922,7 @@
             "test_serial.bin": 640
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Merge errors fixed.", 
@@ -961,6 +944,7 @@
             "test_serial.bin": 640
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Correct time types.", 
@@ -989,6 +973,15 @@
             "test_pushbutton.bin": 612, 
             "test_rf12.bin": 3364, 
             "test_serial.bin": 666
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_pushbutton.bin": 598, 
+            "test_rf12.bin": 3390, 
+            "test_serial.bin": 650
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -1019,6 +1012,15 @@
             "test_rf12.bin": 3364, 
             "test_serial.bin": 666
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_pushbutton.bin": 598, 
+            "test_rf12.bin": 3390, 
+            "test_serial.bin": 650
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added documentation.", 
@@ -1047,6 +1049,15 @@
             "test_pushbutton.bin": 612, 
             "test_rf12.bin": 3504, 
             "test_serial.bin": 666
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_pushbutton.bin": 598, 
+            "test_rf12.bin": 3524, 
+            "test_serial.bin": 650
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -1077,6 +1088,15 @@
             "test_rf12.bin": 3504, 
             "test_serial.bin": 666
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_pushbutton.bin": 598, 
+            "test_rf12.bin": 3524, 
+            "test_serial.bin": 650
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "More clarifications on usage.", 
@@ -1097,6 +1117,7 @@
             "test_serial.bin": 1098
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add a watchdog timer to counter hangs.", 
@@ -1122,6 +1143,14 @@
             "test_enc28j60.bin": 4694, 
             "test_pushbutton.bin": 612, 
             "test_serial.bin": 666
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_pushbutton.bin": 598, 
+            "test_serial.bin": 650
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -1152,6 +1181,15 @@
             "test_rf12.bin": 3520, 
             "test_serial.bin": 666
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_pushbutton.bin": 594, 
+            "test_rf12.bin": 3548, 
+            "test_serial.bin": 650
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Shorter and simpler timer interrupt.", 
@@ -1178,6 +1216,14 @@
             "test_enc28j60.bin": 4668, 
             "test_rf12.bin": 3852, 
             "test_serial.bin": 1140
+        }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_rf12.bin": 3874, 
+            "test_serial.bin": 1108
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -1206,6 +1252,14 @@
             "test_rf12.bin": 3852, 
             "test_serial.bin": 1140
         }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_rf12.bin": 3874, 
+            "test_serial.bin": 1108
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Extract non-Arduino stuff.", 
@@ -1232,6 +1286,14 @@
             "test_enc28j60.bin": 4668, 
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
+        }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -1262,6 +1324,15 @@
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
         }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 2862, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add Nanode MAC support.", 
@@ -1290,6 +1361,15 @@
             "test_nanode_mac.bin": 2584, 
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
+        }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 2862, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -1320,6 +1400,15 @@
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
         }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 2862, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "constify.", 
@@ -1348,6 +1437,15 @@
             "test_nanode_mac.bin": 2646, 
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
+        }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 2872, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -1378,6 +1476,15 @@
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
         }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 2862, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Remove debugging.", 
@@ -1406,6 +1513,15 @@
             "test_nanode_mac.bin": 2586, 
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
+        }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 2862, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -1436,6 +1552,15 @@
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
         }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 2840, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Prepare for correctness checks.", 
@@ -1464,6 +1589,15 @@
             "test_nanode_mac.bin": 2924, 
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
+        }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 3178, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -1494,6 +1628,15 @@
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
         }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 3218, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Almost complete error checking.", 
@@ -1522,6 +1665,15 @@
             "test_pushbutton.bin": 602, 
             "test_rf12.bin": 3520, 
             "test_serial.bin": 666
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_pushbutton.bin": 594, 
+            "test_rf12.bin": 3548, 
+            "test_serial.bin": 650
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -1552,6 +1704,15 @@
             "test_rf12.bin": 3902, 
             "test_serial.bin": 1140
         }, 
+        "4.7.0": {
+            "blink.bin": 162, 
+            "blink2.bin": 162, 
+            "onewire_test.bin": 5272, 
+            "test_enc28j60.bin": 2644, 
+            "test_nanode_mac.bin": 3218, 
+            "test_rf12.bin": 3910, 
+            "test_serial.bin": 1108
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Remove tabs.", 
@@ -1575,6 +1736,9 @@
         }, 
         "4.6.2": {
             "test_pushbutton.bin": 602
+        }, 
+        "4.7.0": {
+            "test_pushbutton.bin": 594
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -1600,6 +1764,9 @@
         "4.6.2": {
             "test_pushbutton.bin": 602
         }, 
+        "4.7.0": {
+            "test_pushbutton.bin": 594
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Merge branch 'master' of https://github.com/larsimmisch/arduino--", 
@@ -1621,6 +1788,7 @@
             "test_serial.bin": 640
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Merge error.", 
@@ -1642,6 +1810,7 @@
             "test_serial.bin": 640
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "We seem to need a timer interrupt running. Not sure why.", 
@@ -1663,6 +1832,7 @@
             "test_serial.bin": 640
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add a soak test.", 
@@ -1684,6 +1854,7 @@
             "test_serial.bin": 640
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "libarduino++.a is gone", 
@@ -1712,6 +1883,15 @@
             "test_nanode_mac.bin": 2978, 
             "test_rf12.bin": 3570, 
             "test_serial.bin": 666
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5180, 
+            "test_rf12.bin": 3582, 
+            "test_serial.bin": 650
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -1742,6 +1922,15 @@
             "test_rf12.bin": 3568, 
             "test_serial.bin": 666
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5180, 
+            "test_rf12.bin": 3590, 
+            "test_serial.bin": 650
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Fix wrap problem.", 
@@ -1770,6 +1959,15 @@
             "test_nanode_mac.bin": 2978, 
             "test_rf12.bin": 3578, 
             "test_serial.bin": 666
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5180, 
+            "test_rf12.bin": 3602, 
+            "test_serial.bin": 650
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -1800,6 +1998,15 @@
             "test_rf12.bin": 3578, 
             "test_serial.bin": 666
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5180, 
+            "test_rf12.bin": 3602, 
+            "test_serial.bin": 650
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "typename? wtf?", 
@@ -1829,6 +2036,15 @@
             "test_rf12.bin": 3578, 
             "test_serial.bin": 666
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5180, 
+            "test_rf12.bin": 3602, 
+            "test_serial.bin": 650
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Fix formatting.", 
@@ -1857,6 +2073,15 @@
             "test_nanode_mac.bin": 2792, 
             "test_rf12.bin": 3578, 
             "test_serial.bin": 656
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 4994, 
+            "test_rf12.bin": 3602, 
+            "test_serial.bin": 640
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -1889,6 +2114,16 @@
             "test_rf12.bin": 3578, 
             "test_serial.bin": 656
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 4994, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 3602, 
+            "test_serial.bin": 640
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Missing target.", 
@@ -1920,6 +2155,16 @@
             "test_rf12.bin": 3578, 
             "test_serial.bin": 656
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 4994, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 3602, 
+            "test_serial.bin": 640
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Missing target.", 
@@ -1948,6 +2193,15 @@
             "test_nanode_mac.bin": 2792, 
             "test_rf12.bin": 3578, 
             "test_serial.bin": 656
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 4994, 
+            "test_rf12.bin": 3602, 
+            "test_serial.bin": 640
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -1982,6 +2236,17 @@
             "test_serial.bin": 656, 
             "test_watchdog.bin": 618
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 4994, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 3550, 
+            "test_serial.bin": 640, 
+            "test_watchdog.bin": 610
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add a watchdog test (which currently causes a hard hang).", 
@@ -2015,6 +2280,17 @@
             "test_serial.bin": 656, 
             "test_watchdog.bin": 618
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 4994, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 3550, 
+            "test_serial.bin": 640, 
+            "test_watchdog.bin": 610
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add a watchdog test (which currently causes a hard hang).", 
@@ -2038,6 +2314,7 @@
             "test_watchdog.bin": 636
         }, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Work on timers.", 
@@ -2070,6 +2347,17 @@
             "test_rf12.bin": 3564, 
             "test_serial.bin": 692, 
             "test_watchdog.bin": 654
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3578, 
+            "test_serial.bin": 668, 
+            "test_watchdog.bin": 638
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2104,38 +2392,16 @@
             "test_serial.bin": 692, 
             "test_watchdog.bin": 654
         }, 
-        "git": {
-            "author": "Lars Immisch", 
-            "comment": "Merge branch 'master' of https://github.com/benlaurie/arduino--", 
-            "date": "2012-01-07 21:22:14 +0100", 
-            "email": "lars@ibp.de", 
-            "hash": "27d8811826358768e000069d47b09d6efd4f94e7", 
-            "short": "27d8811"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "blink.bin": 190, 
-            "blink2.bin": 190, 
-            "onewire_test.bin": 4008, 
-            "test_enc28j60.bin": 4620, 
-            "test_ip.bin": 12300, 
-            "test_nanode_mac.bin": 2854, 
-            "test_pushbutton.bin": 648, 
-            "test_rf12.bin": 3542, 
-            "test_serial.bin": 666, 
-            "test_watchdog.bin": 636
-        }, 
-        "4.6.2": {
-            "blink.bin": 226, 
-            "blink2.bin": 226, 
-            "onewire_test.bin": 3660, 
-            "test_enc28j60.bin": 4694, 
-            "test_nanode_mac.bin": 2828, 
-            "test_pushbutton.bin": 676, 
-            "test_rf12.bin": 3564, 
-            "test_serial.bin": 692, 
-            "test_watchdog.bin": 654
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3578, 
+            "test_serial.bin": 668, 
+            "test_watchdog.bin": 638
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2170,6 +2436,17 @@
             "test_serial.bin": 692, 
             "test_watchdog.bin": 654
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3578, 
+            "test_serial.bin": 668, 
+            "test_watchdog.bin": 638
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added _Clock::sleep.", 
@@ -2202,6 +2479,17 @@
             "test_rf12.bin": 3564, 
             "test_serial.bin": 692, 
             "test_watchdog.bin": 704
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3578, 
+            "test_serial.bin": 668, 
+            "test_watchdog.bin": 688
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2236,6 +2524,17 @@
             "test_serial.bin": 656, 
             "test_watchdog.bin": 954
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 4994, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 3550, 
+            "test_serial.bin": 640, 
+            "test_watchdog.bin": 930
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Run for long enough to make reprogramming not a panic.", 
@@ -2269,6 +2568,17 @@
             "test_serial.bin": 656, 
             "test_watchdog.bin": 954
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink2.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 4994, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 3856, 
+            "test_serial.bin": 640, 
+            "test_watchdog.bin": 930
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Disable suspicious OPTIMIZE_SPI.", 
@@ -2301,6 +2611,17 @@
             "test_rf12.bin": 3564, 
             "test_serial.bin": 692, 
             "test_watchdog.bin": 688
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3578, 
+            "test_serial.bin": 668, 
+            "test_watchdog.bin": 690
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2337,6 +2658,18 @@
             "test_timer.bin": 1112, 
             "test_watchdog.bin": 688
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3578, 
+            "test_serial.bin": 668, 
+            "test_timer.bin": 1182, 
+            "test_watchdog.bin": 690
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Improved Timer support and minimal test.", 
@@ -2371,6 +2704,18 @@
             "test_serial.bin": 692, 
             "test_timer.bin": 1112, 
             "test_watchdog.bin": 994
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3884, 
+            "test_serial.bin": 668, 
+            "test_timer.bin": 1182, 
+            "test_watchdog.bin": 1014
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2407,6 +2752,18 @@
             "test_timer.bin": 1112, 
             "test_watchdog.bin": 994
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3884, 
+            "test_serial.bin": 668, 
+            "test_timer.bin": 1182, 
+            "test_watchdog.bin": 1014
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "ILock -> ScopedInterruptDisable", 
@@ -2441,6 +2798,18 @@
             "test_serial.bin": 692, 
             "test_timer.bin": 1146, 
             "test_watchdog.bin": 994
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3884, 
+            "test_serial.bin": 668, 
+            "test_timer.bin": 1192, 
+            "test_watchdog.bin": 1014
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2478,6 +2847,19 @@
             "test_timer.bin": 1146, 
             "test_watchdog.bin": 994
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_ip.bin": 8242, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3884, 
+            "test_serial.bin": 668, 
+            "test_timer.bin": 1192, 
+            "test_watchdog.bin": 1014
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Adjustments for avr-libc 1.8.", 
@@ -2513,6 +2895,19 @@
             "test_serial.bin": 516, 
             "test_timer.bin": 742, 
             "test_watchdog.bin": 678
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_ip.bin": 8242, 
+            "test_nanode_mac.bin": 4570, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3190, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 724, 
+            "test_watchdog.bin": 670
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2550,6 +2945,19 @@
             "test_timer.bin": 740, 
             "test_watchdog.bin": 676
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_ip.bin": 8242, 
+            "test_nanode_mac.bin": 4568, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3188, 
+            "test_serial.bin": 482, 
+            "test_timer.bin": 722, 
+            "test_watchdog.bin": 668
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "HardwareSerial::begin() merged with current Arduino version.", 
@@ -2586,6 +2994,19 @@
             "test_timer.bin": 1146, 
             "test_watchdog.bin": 994
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_ip.bin": 8242, 
+            "test_nanode_mac.bin": 5022, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3884, 
+            "test_serial.bin": 668, 
+            "test_timer.bin": 1192, 
+            "test_watchdog.bin": 1014
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added size tracking.", 
@@ -2593,42 +3014,6 @@
             "email": "lars@ibp.de", 
             "hash": "0ccc922cfa5d4d12193f47c2692013f0e028a390", 
             "short": "0ccc922"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "blink.bin": 190, 
-            "onewire_test.bin": 4008, 
-            "test_clock.bin": 548, 
-            "test_enc28j60.bin": 4620, 
-            "test_ip.bin": 12300, 
-            "test_nanode_mac.bin": 2854, 
-            "test_pushbutton.bin": 648, 
-            "test_rf12.bin": 3830, 
-            "test_serial.bin": 666, 
-            "test_timer.bin": 1146, 
-            "test_watchdog.bin": 994
-        }, 
-        "4.6.2": {
-            "blink.bin": 226, 
-            "onewire_test.bin": 3660, 
-            "test_clock.bin": 574, 
-            "test_enc28j60.bin": 4694, 
-            "test_ip.bin": 12450, 
-            "test_nanode_mac.bin": 2828, 
-            "test_pushbutton.bin": 676, 
-            "test_rf12.bin": 3860, 
-            "test_serial.bin": 692, 
-            "test_timer.bin": 1146, 
-            "test_watchdog.bin": 994
-        }, 
-        "git": {
-            "author": "Lars Immisch", 
-            "comment": "JS bugfixes.", 
-            "date": "2012-02-09 17:17:32 +0100", 
-            "email": "lars@ibp.de", 
-            "hash": "75c8d866c0fe6cfd36d3c64f954a5e707f94f3e4", 
-            "short": "75c8d86"
         }
     }, 
     {
@@ -2657,6 +3042,19 @@
             "test_serial.bin": 514, 
             "test_timer.bin": 740, 
             "test_watchdog.bin": 676
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 5298, 
+            "test_clock.bin": 544, 
+            "test_enc28j60.bin": 2670, 
+            "test_ip.bin": 8242, 
+            "test_nanode_mac.bin": 4568, 
+            "test_pushbutton.bin": 656, 
+            "test_rf12.bin": 3188, 
+            "test_serial.bin": 482, 
+            "test_timer.bin": 722, 
+            "test_watchdog.bin": 668
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2694,6 +3092,19 @@
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 1126, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Makefile bug: wrong size file used.", 
@@ -2704,45 +3115,9 @@
         }
     }, 
     {
-        "4.5.1": {
-            "blink.bin": 206, 
-            "onewire_test.bin": 1378, 
-            "test_clock.bin": 680, 
-            "test_enc28j60.bin": 1462, 
-            "test_ip.bin": 3204, 
-            "test_nanode_mac.bin": 5274, 
-            "test_pushbutton.bin": 832, 
-            "test_rf12.bin": 2564, 
-            "test_serial.bin": 646, 
-            "test_timer.bin": 726, 
-            "test_watchdog.bin": 780
-        }, 
-        "4.6.2": {
-            "blink.bin": 226, 
-            "onewire_test.bin": 1246, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 3082, 
-            "test_nanode_mac.bin": 5372, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2022, 
-            "test_serial.bin": 508, 
-            "test_timer.bin": 612, 
-            "test_watchdog.bin": 642
-        }, 
-        "git": {
-            "Temporary": "use make instead of bsdmake.", 
-            "author": "Ben Laurie", 
-            "comment": "Temporary: use make instead of bsdmake.", 
-            "date": "2012-02-09 23:15:59 +0000", 
-            "email": "ben@links.org", 
-            "hash": "8ddaf0bcc5ad899253f1b5ff6040eaa1128c4e45", 
-            "short": "8ddaf0b"
-        }
-    }, 
-    {
         "4.5.1": {}, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Reorganisation in progress.", 
@@ -2755,6 +3130,7 @@
     {
         "4.5.1": {}, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Oops. Forgot defs.", 
@@ -2767,6 +3143,7 @@
     {
         "4.5.1": {}, 
         "4.6.2": {}, 
+        "4.7.0": {}, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Fixed .depends for sources in ./test", 
@@ -2804,6 +3181,20 @@
             "test_serial.bin": 508, 
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire.bin": 1126, 
+            "test_pcint.bin": 242, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2843,6 +3234,20 @@
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 1124, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire_serial.bin": 1378, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Serial one-wire test.", 
@@ -2880,6 +3285,20 @@
             "test_serial.bin": 508, 
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire.bin": 1126, 
+            "test_pcint.bin": 242, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2919,43 +3338,19 @@
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
         }, 
-        "git": {
-            "author": "Lars Immisch", 
-            "comment": "Remove unrelated commit info from git_sizes.json.", 
-            "date": "2012-02-13 23:50:04 +0100", 
-            "email": "lars@ibp.de", 
-            "hash": "062896c4eae07118de3ae1ec2b596366bc23d7b0", 
-            "short": "062896c"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "blink.bin": 206, 
-            "test_clock.bin": 680, 
-            "test_enc28j60.bin": 1462, 
-            "test_ip.bin": 3204, 
-            "test_nanode_mac.bin": 5274, 
-            "test_onewire.bin": 1378, 
-            "test_pcint.bin": 352, 
-            "test_pushbutton.bin": 832, 
-            "test_rf12.bin": 2564, 
-            "test_serial.bin": 646, 
-            "test_timer.bin": 726, 
-            "test_watchdog.bin": 780
-        }, 
-        "4.6.2": {
-            "blink.bin": 226, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 3082, 
-            "test_nanode_mac.bin": 5372, 
-            "test_onewire.bin": 1246, 
-            "test_pcint.bin": 280, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2022, 
-            "test_serial.bin": 508, 
-            "test_timer.bin": 612, 
-            "test_watchdog.bin": 642
+        "4.7.0": {
+            "blink.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire.bin": 1126, 
+            "test_pcint.bin": 242, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -2995,43 +3390,19 @@
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
         }, 
-        "git": {
-            "author": "Lars Immisch", 
-            "comment": "Determine name of make halfways intelligently.", 
-            "date": "2012-02-15 14:42:18 +0100", 
-            "email": "lars@ibp.de", 
-            "hash": "7a311479cb254d9f9e62b97943e68011d764e5c4", 
-            "short": "7a31147"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "blink.bin": 206, 
-            "test_clock.bin": 680, 
-            "test_enc28j60.bin": 1462, 
-            "test_ip.bin": 3204, 
-            "test_nanode_mac.bin": 5274, 
-            "test_onewire.bin": 1378, 
-            "test_pcint.bin": 352, 
-            "test_pushbutton.bin": 832, 
-            "test_rf12.bin": 2564, 
-            "test_serial.bin": 646, 
-            "test_timer.bin": 726, 
-            "test_watchdog.bin": 780
-        }, 
-        "4.6.2": {
-            "blink.bin": 226, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 3082, 
-            "test_nanode_mac.bin": 5372, 
-            "test_onewire.bin": 1246, 
-            "test_pcint.bin": 280, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2022, 
-            "test_serial.bin": 508, 
-            "test_timer.bin": 612, 
-            "test_watchdog.bin": 642
+        "4.7.0": {
+            "blink.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire.bin": 1126, 
+            "test_pcint.bin": 242, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -3071,6 +3442,20 @@
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 1218, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire_serial.bin": 1468, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "I have no idea why I thought this would work!", 
@@ -3109,6 +3494,20 @@
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 1218, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire_serial.bin": 1534, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Use the right pin (for nanode), output temp in hex.", 
@@ -3146,6 +3545,20 @@
             "test_serial.bin": 500, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1526, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -3187,6 +3600,21 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1526, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add a Nanode blink test.", 
@@ -3226,6 +3654,21 @@
             "test_serial.bin": 500, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -3267,6 +3710,21 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Explain the protocol.", 
@@ -3307,6 +3765,21 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "A bit more explanation.", 
@@ -3346,6 +3819,21 @@
             "test_serial.bin": 500, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -3389,6 +3877,22 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2052, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add layered RF12B driver.", 
@@ -3401,80 +3905,6 @@
     {
         "4.5.1": {
             "blink.bin": 206, 
-            "test_clock.bin": 680, 
-            "test_enc28j60.bin": 1462, 
-            "test_ip.bin": 3204, 
-            "test_nanode_mac.bin": 5274, 
-            "test_onewire.bin": 1378, 
-            "test_pcint.bin": 352, 
-            "test_pushbutton.bin": 832, 
-            "test_rf12.bin": 2564, 
-            "test_serial.bin": 646, 
-            "test_timer.bin": 726, 
-            "test_watchdog.bin": 780
-        }, 
-        "4.6.2": {
-            "blink.bin": 226, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 3082, 
-            "test_nanode_mac.bin": 5372, 
-            "test_onewire.bin": 1246, 
-            "test_pcint.bin": 280, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2022, 
-            "test_serial.bin": 508, 
-            "test_timer.bin": 612, 
-            "test_watchdog.bin": 642
-        }, 
-        "git": {
-            "author": "Lars Immisch", 
-            "comment": "Clean historic libarduino++.a", 
-            "date": "2012-02-20 11:42:20 +0100", 
-            "email": "lars@ibp.de", 
-            "hash": "6589e5d5f4309b62ec1b856472627589deec53b0", 
-            "short": "6589e5d"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "blink.bin": 206, 
-            "onewire_test.bin": 1378, 
-            "test_clock.bin": 680, 
-            "test_enc28j60.bin": 1462, 
-            "test_ip.bin": 3204, 
-            "test_nanode_mac.bin": 5274, 
-            "test_pushbutton.bin": 832, 
-            "test_rf12.bin": 2564, 
-            "test_serial.bin": 646, 
-            "test_timer.bin": 726, 
-            "test_watchdog.bin": 780
-        }, 
-        "4.6.2": {
-            "blink.bin": 226, 
-            "onewire_test.bin": 1246, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 3082, 
-            "test_nanode_mac.bin": 5372, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2022, 
-            "test_serial.bin": 508, 
-            "test_timer.bin": 612, 
-            "test_watchdog.bin": 642
-        }, 
-        "git": {
-            "author": "Lars Immisch", 
-            "comment": "Improved sizes.py from reorg branch.", 
-            "date": "2012-02-20 11:48:42 +0100", 
-            "email": "lars@ibp.de", 
-            "hash": "d1438fcde52ee41cf4f6c107417888ca22354033", 
-            "short": "d1438fc"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "blink.bin": 206, 
             "blink_nanode.bin": 206, 
             "onewire_test.bin": 1502, 
             "test_clock.bin": 680, 
@@ -3505,47 +3935,21 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
-        "git": {
-            "author": "Lars Immisch", 
-            "comment": "Merge branch 'master' of https://github.com/benlaurie/arduino--", 
-            "date": "2012-02-20 12:19:18 +0100", 
-            "email": "lars@ibp.de", 
-            "hash": "66758244b205885455e6c6d6f729df7ac7e2df63", 
-            "short": "6675824"
-        }
-    }, 
-    {
-        "4.5.1": {
-            "blink.bin": 206, 
-            "blink_nanode.bin": 206, 
-            "onewire_test.bin": 1502, 
-            "test_clock.bin": 680, 
-            "test_enc28j60.bin": 1462, 
-            "test_ip.bin": 3204, 
-            "test_nanode_mac.bin": 5270, 
-            "test_onewire_serial.bin": 2380, 
-            "test_pushbutton.bin": 832, 
-            "test_rf12.bin": 2560, 
-            "test_rf12_layered.bin": 2644, 
-            "test_serial.bin": 642, 
-            "test_timer.bin": 722, 
-            "test_watchdog.bin": 776
-        }, 
-        "4.6.2": {
-            "blink.bin": 226, 
-            "blink_nanode.bin": 226, 
-            "onewire_test.bin": 1330, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 3082, 
-            "test_nanode_mac.bin": 5364, 
-            "test_onewire_serial.bin": 2060, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2014, 
-            "test_rf12_layered.bin": 2108, 
-            "test_serial.bin": 500, 
-            "test_timer.bin": 604, 
-            "test_watchdog.bin": 634
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2052, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -3585,6 +3989,20 @@
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire.bin": 1126, 
+            "test_pcint.bin": 242, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Added (preliminary) support for ATtiny25/45/85", 
@@ -3623,6 +4041,20 @@
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 1004, 
+            "test_onewire.bin": 1126, 
+            "test_pcint.bin": 300, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "More modular Pin definitions.", 
@@ -3660,6 +4092,20 @@
             "test_serial.bin": 508, 
             "test_timer.bin": 612, 
             "test_watchdog.bin": 642
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 976, 
+            "test_onewire.bin": 1062, 
+            "test_pcint.bin": 242, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1972, 
+            "test_serial.bin": 484, 
+            "test_timer.bin": 604, 
+            "test_watchdog.bin": 626
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -3700,6 +4146,21 @@
             "test_serial.bin": 500, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -3743,6 +4204,22 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2084, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Supply SelectPin.", 
@@ -3784,6 +4261,22 @@
             "test_serial.bin": 500, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2084, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -3827,6 +4320,22 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2084, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Return a length.", 
@@ -3868,6 +4377,22 @@
             "test_serial.bin": 500, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -3915,6 +4440,23 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2310, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add prototype star network.", 
@@ -3960,6 +4502,23 @@
             "test_star_slave.bin": 2434, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2310, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -4009,6 +4568,24 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "1-wire over star.", 
@@ -4056,6 +4633,24 @@
             "test_star_slave_onewire.bin": 3608, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -4105,6 +4700,24 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Add Nanode variant.", 
@@ -4152,6 +4765,24 @@
             "test_star_slave_onewire.bin": 3608, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -4201,6 +4832,24 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Eliminate Ethernet instance.", 
@@ -4248,6 +4897,24 @@
             "test_star_slave_onewire.bin": 3608, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3084, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -4297,6 +4964,24 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Make stuff static.", 
@@ -4344,6 +5029,24 @@
             "test_star_slave_onewire.bin": 3608, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -4393,6 +5096,24 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Rename wwwport to port.", 
@@ -4440,6 +5161,24 @@
             "test_star_slave_onewire.bin": 3608, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Ben Laurie", 
@@ -4489,6 +5228,24 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Layout.", 
@@ -4537,6 +5294,24 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 968, 
+            "test_onewire.bin": 1146, 
+            "test_onewire_serial.bin": 1842, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2388, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2296, 
+            "test_star_slave_onewire.bin": 3396, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Ben Laurie", 
             "comment": "Merge branch 'master' of https://github.com/larsimmisch/arduino--", 
@@ -4544,64 +5319,6 @@
             "email": "ben@links.org", 
             "hash": "e408de260fa5ae7d48cd28418fb12d2193d4fdcd", 
             "short": "e408de2"
-        }
-    }, 
-    {
-        "4.6.2": {
-            "blink.bin": 226, 
-            "blink_nanode.bin": 226, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 2974, 
-            "test_nanode_mac.bin": 5332, 
-            "test_onewire.bin": 1254, 
-            "test_onewire_serial.bin": 1982, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2014, 
-            "test_rf12_layered.bin": 2504, 
-            "test_serial.bin": 500, 
-            "test_star.bin": 2908, 
-            "test_star_slave.bin": 2420, 
-            "test_star_slave_onewire.bin": 3508, 
-            "test_timer.bin": 604, 
-            "test_watchdog.bin": 634
-        }, 
-        "git": {
-            "author": "Ben Laurie", 
-            "comment": "Share sizes...", 
-            "date": "2012-03-11 16:41:55 +0000", 
-            "email": "ben@links.org", 
-            "hash": "54e0bc986ef3a11c7306c46d9cf2a3909d9e2bee", 
-            "short": "54e0bc9"
-        }
-    }, 
-    {
-        "4.6.2": {
-            "blink.bin": 226, 
-            "blink_nanode.bin": 226, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 2974, 
-            "test_nanode_mac.bin": 5332, 
-            "test_onewire.bin": 1254, 
-            "test_onewire_serial.bin": 1982, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2014, 
-            "test_rf12_layered.bin": 2504, 
-            "test_serial.bin": 500, 
-            "test_star.bin": 2908, 
-            "test_star_slave.bin": 2420, 
-            "test_star_slave_onewire.bin": 3508, 
-            "test_timer.bin": 604, 
-            "test_watchdog.bin": 634
-        }, 
-        "git": {
-            "author": "Ben Laurie", 
-            "comment": "Share the right sizes.", 
-            "date": "2012-03-11 16:56:28 +0000", 
-            "email": "ben@links.org", 
-            "hash": "cd82fe0bb689e0a88d99b578fb70046a7deeae63", 
-            "short": "cd82fe0"
         }
     }, 
     {
@@ -4643,6 +5360,24 @@
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
         }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3134, 
+            "test_nanode_mac.bin": 968, 
+            "test_onewire.bin": 1146, 
+            "test_onewire_serial.bin": 1842, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2388, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2296, 
+            "test_star_slave_onewire.bin": 3396, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
         "git": {
             "author": "Lars Immisch", 
             "comment": "Merge branch 'master' into reorg", 
@@ -4650,6 +5385,34 @@
             "email": "lars@ibp.de", 
             "hash": "278adbb51ae92719a52386a685bb9a4a35b9a8fa", 
             "short": "278adbb"
+        }
+    }, 
+    {
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "onewire_test.bin": 1210, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 996, 
+            "test_onewire_serial.bin": 1910, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2408, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2316, 
+            "test_star_slave_onewire.bin": 3486, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
+        "git": {
+            "author": "Ben Laurie", 
+            "comment": "Tidy.", 
+            "date": "2012-03-11 18:02:30 +0000", 
+            "email": "ben@links.org", 
+            "hash": "79a352c91e2ff430cacaf5d327ff445ab8286a92", 
+            "short": "79a352c"
         }
     }, 
     {
@@ -4671,6 +5434,24 @@
             "test_star_slave_onewire.bin": 3508, 
             "test_timer.bin": 604, 
             "test_watchdog.bin": 634
+        }, 
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 968, 
+            "test_onewire.bin": 1146, 
+            "test_onewire_serial.bin": 1842, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2388, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2296, 
+            "test_star_slave_onewire.bin": 3396, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Lars Immisch", 
@@ -4682,32 +5463,62 @@
         }
     }, 
     {
-        "4.6.2": {
-            "blink.bin": 226, 
-            "blink_nanode.bin": 226, 
-            "test_clock.bin": 572, 
-            "test_enc28j60.bin": 1384, 
-            "test_ip.bin": 2974, 
-            "test_nanode_mac.bin": 5336, 
-            "test_onewire.bin": 1254, 
-            "test_onewire_serial.bin": 1982, 
-            "test_pushbutton.bin": 642, 
-            "test_rf12.bin": 2014, 
-            "test_rf12_layered.bin": 2504, 
-            "test_serial.bin": 500, 
-            "test_star.bin": 2908, 
-            "test_star_slave.bin": 2420, 
-            "test_star_slave_onewire.bin": 3508, 
-            "test_timer.bin": 604, 
-            "test_watchdog.bin": 634
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 968, 
+            "test_onewire.bin": 1146, 
+            "test_onewire_serial.bin": 1842, 
+            "test_pcint.bin": 242, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2388, 
+            "test_serial.bin": 476, 
+            "test_star_slave.bin": 2296, 
+            "test_star_slave_onewire.bin": 3396, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
         }, 
         "git": {
             "author": "Lars Immisch", 
-            "comment": "Size graphs and multiple compilers.", 
-            "date": "2012-03-13 02:00:37 +0100", 
+            "comment": "Fix revision offsets in graph.", 
+            "date": "2012-03-20 01:38:48 +0100", 
             "email": "lars@ibp.de", 
-            "hash": "6fa9b9d7c31046832bae43b517c565b8c4b2ab43", 
-            "short": "6fa9b9d"
+            "hash": "a74905d4c731e45fb6535b7424cfe6c3d6a11fed", 
+            "short": "a74905d"
+        }
+    }, 
+    {
+        "4.7.0": {
+            "blink.bin": 188, 
+            "blink_nanode.bin": 188, 
+            "test_clock.bin": 550, 
+            "test_enc28j60.bin": 1274, 
+            "test_ip.bin": 3020, 
+            "test_nanode_mac.bin": 968, 
+            "test_onewire.bin": 1146, 
+            "test_onewire_serial.bin": 1842, 
+            "test_pcint.bin": 242, 
+            "test_pushbutton.bin": 632, 
+            "test_rf12.bin": 1964, 
+            "test_rf12_layered.bin": 2388, 
+            "test_serial.bin": 476, 
+            "test_star.bin": 2860, 
+            "test_star_slave.bin": 2296, 
+            "test_star_slave_onewire.bin": 3396, 
+            "test_timer.bin": 596, 
+            "test_watchdog.bin": 618
+        }, 
+        "git": {
+            "author": "Lars Immisch", 
+            "comment": "Name resolution bugfix.", 
+            "date": "2012-03-29 23:38:53 +0200", 
+            "email": "lars@ibp.de", 
+            "hash": "f6ce9552cf0a4ad94cf156449542b6a1855112da", 
+            "short": "f6ce955"
         }
     }
 ]

@@ -490,7 +490,7 @@ def update_history(version, branch = None):
     return sizes
 
 if __name__ == '__main__':
-    parser = OptionParser('usage: %prog OPTIONS recent|generate|history+')
+    parser = OptionParser('usage: %prog OPTIONS recent|generate|history|prune-boring+')
     parser.add_option("-r", "--remote", default='origin',
                       help="the git REMOTE name (default is origin)")
     parser.add_option("-q", "--quiet", action='store_true',
@@ -514,6 +514,8 @@ if __name__ == '__main__':
             generate(version, git_sizes, recent_sizes, options.remote)
         elif a == 'prune-boring':
             prune_boring_git_sizes()
+        else:
+            parser.print_help()
     else:
         generate(version, git_sizes, recent_sizes, options.remote)
         
