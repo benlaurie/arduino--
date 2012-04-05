@@ -22,7 +22,8 @@ BIN = test/blink.bin test/test_clock.bin test/test_enc28j60.bin \
       test/test_rf12.bin test/test_nanode_mac.bin test/test_timer.bin \
       test/test_onewire_serial.bin test/blink_nanode.bin \
       test/test_rf12_layered.bin test/test_star.bin test/test_star_slave.bin \
-      test/test_star_slave_onewire.bin
+      test/test_star_slave_onewire.bin test/test_star_bridge.bin \
+      test/test_ip_layered.bin
 
 all: avr-ports.h .depend $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
