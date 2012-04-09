@@ -17,40 +17,8 @@ static uint8_t myip[4] = {192,168,1,111};
 
 void setup()
     {
-    Nanode::init();
-
     /*initialize enc28j60*/
-    Ethernet::Init(mymac);
-    Ethernet::clkout(2); // change clkout from 6.25MHz to 12.5MHz
-    _delay_ms(10);
-        
-    /* Magjack leds configuration, see enc28j60 datasheet, page 11 */
-    // LEDA=greed LEDB=yellow
-
-    // 0x880 is PHLCON LEDB=on, LEDA=on
-    // enc28j60PhyWrite(PHLCON,0b0000 1000 1000 00 00);
-    Ethernet::phlcon(0x880);
-    _delay_ms(500);
-
-    // 0x990 is PHLCON LEDB=off, LEDA=off
-    // enc28j60PhyWrite(PHLCON,0b0000 1001 1001 00 00);
-    Ethernet::phlcon(0x990);
-    _delay_ms(500);
-
-    // 0x880 is PHLCON LEDB=on, LEDA=on
-    // enc28j60PhyWrite(PHLCON,0b0000 1000 1000 00 00);
-    Ethernet::phlcon(0x880);
-    _delay_ms(500);
-
-    // 0x990 is PHLCON LEDB=off, LEDA=off
-    // enc28j60PhyWrite(PHLCON,0b0000 1001 1001 00 00);
-    Ethernet::phlcon(0x990);
-    _delay_ms(500);
-
-    // 0x476 is PHLCON LEDA=links status, LEDB=receive/transmit
-    // enc28j60PhyWrite(PHLCON,0b0000 0100 0111 01 10);
-    Ethernet::phlcon(0x476);
-    _delay_ms(100);
+    Ethernet::setup(mymac);
 
     //init the ethernet/ip layer:
     IP80::init_ip_arp_udp_tcp(mymac,myip);

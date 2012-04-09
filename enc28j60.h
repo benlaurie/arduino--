@@ -149,14 +149,14 @@ public:
 	//setup clkout: 2 is 12.5MHz:
 	Write(ECOCON, clk & 0x7);
 	}
-    static void Init(uint8_t* macaddr)
+    static void Init(const uint8_t *macaddr)
 	{
 	// initialize I/O
+	//CSPASSIVE; // ss=0
+	Deselect();
 	// ss as output:
 	//pinMode(ENC28J60_CONTROL_CS, OUTPUT);
 	CSPin::modeOutput();
-	//CSPASSIVE; // ss=0
-	Deselect();
 
 	//pinMode(SPI_MOSI, OUTPUT);
 	Pin::SPI_MOSI::modeOutput();
@@ -334,6 +334,40 @@ public:
 	return len;
 	}
     static void phlcon(uint16_t val) { PhyWrite(PHLCON, val); }
+    static void setup(const byte *mac)
+	{
+	Init(mac);
+	clkout(2); // change clkout from 6.25MHz to 12.5MHz
+	_delay_ms(10);
+        
+	/* Magjack leds configuration, see enc28j60 datasheet, page 11 */
+	// LEDA=greed LEDB=yellow
+
+	// 0x880 is PHLCON LEDB=on, LEDA=on
+	// enc28j60PhyWrite(PHLCON,0b0000 1000 1000 00 00);
+	phlcon(0x880);
+	_delay_ms(500);
+
+	// 0x990 is PHLCON LEDB=off, LEDA=off
+	// enc28j60PhyWrite(PHLCON,0b0000 1001 1001 00 00);
+	phlcon(0x990);
+	_delay_ms(500);
+
+	// 0x880 is PHLCON LEDB=on, LEDA=on
+	// enc28j60PhyWrite(PHLCON,0b0000 1000 1000 00 00);
+	phlcon(0x880);
+	_delay_ms(500);
+
+	// 0x990 is PHLCON LEDB=off, LEDA=off
+	// enc28j60PhyWrite(PHLCON,0b0000 1001 1001 00 00);
+	phlcon(0x990);
+	_delay_ms(500);
+
+	// 0x476 is PHLCON LEDA=links status, LEDB=receive/transmit
+	// enc28j60PhyWrite(PHLCON,0b0000 0100 0111 01 10);
+	phlcon(0x476);
+	_delay_ms(100);
+	}
 
 private:
     static const byte ADDR_MASK = 0x1f;

@@ -31,16 +31,7 @@ int main()
     Clock16::time_res_t last = 0;
     byte seq = 0;
 
-    Arduino::init();
-
-    // Disable other SPI devices on the Nanode
-    // FIXME: framework should take care of this
-    // ENC28J60
-    Pin::B0::set();
-    Pin::B0::modeOutput();
-    // 23K256
-    Pin::B1::set();
-    Pin::B1::modeOutput();
+    Nanode::init();
 
     Serial.begin(57600);
     RF12B::init(id, RF12B::MHZ868);
