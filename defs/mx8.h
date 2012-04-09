@@ -1,3 +1,4 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
 #ifndef ARDUINO_MINUS_MINUS_MX8
 #define ARDUINO_MINUS_MINUS_MX8
 
@@ -216,6 +217,28 @@ public:
         // here so they can be used as normal digital i/o; they will be
         // reconnected in Serial.begin()
         UCSR0B = 0;
+        }
+    };
+
+class Nanode : public AVRBase
+    {
+public:
+    static void init()
+        {
+        // For good measure.
+        // FIXME: figure out what's really needed.
+        Arduino::init();
+
+        // Disable all SPI chips...
+        // Ethernet
+        Pin::B0::set();
+        Pin::B0::modeOutput();
+        // IC7
+        Pin::B1::set();
+        Pin::B1::modeOutput();
+        // RF12
+        Pin::B2::set();
+        Pin::B2::modeOutput();
         }
     };
 
