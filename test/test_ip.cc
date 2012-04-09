@@ -18,6 +18,18 @@ static uint8_t myip[4] = {192,168,1,111};
 void setup()
     {
     Arduino::init();
+
+    // Disable all chips...
+    // Ethernet
+    Pin::B0::set();
+    Pin::B0::modeOutput();
+    // IC7
+    Pin::B1::set();
+    Pin::B1::modeOutput();
+    // RF12
+    Pin::B2::set();
+    Pin::B2::modeOutput();
+
     /*initialize enc28j60*/
     Ethernet::Init(mymac);
     Ethernet::clkout(2); // change clkout from 6.25MHz to 12.5MHz
