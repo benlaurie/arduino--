@@ -152,11 +152,11 @@ public:
     static void Init(const uint8_t *macaddr)
 	{
 	// initialize I/O
+	//CSPASSIVE; // ss=0
+	Deselect();
 	// ss as output:
 	//pinMode(ENC28J60_CONTROL_CS, OUTPUT);
 	CSPin::modeOutput();
-	//CSPASSIVE; // ss=0
-	Deselect();
 
 	//pinMode(SPI_MOSI, OUTPUT);
 	Pin::SPI_MOSI::modeOutput();
