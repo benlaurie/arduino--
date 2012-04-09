@@ -233,7 +233,7 @@ public:
         // Ethernet
         Pin::B0::set();
         Pin::B0::modeOutput();
-        // IC7
+        // 23K256
         Pin::B1::set();
         Pin::B1::modeOutput();
         // RF12
