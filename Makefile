@@ -1,3 +1,5 @@
+# GNU make (hint for sizes.py, must be in the first line)
+
 include Makefile.local
 
 OPTIMIZE = -O3 -Os
@@ -68,4 +70,4 @@ clean: sizeclean
 .bin_upload:
 	avrdude -F -V -p $(MCU_TARGET) -P $(AVR_TTY) -c $(AVR_PROGRAMMER) -b $(AVR_RATE) -U flash:w:$<
 
-.sinclude ".depend"
+-include ".depend"

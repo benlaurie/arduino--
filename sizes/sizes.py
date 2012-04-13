@@ -115,10 +115,20 @@ def silent(*args):
 
     return rc
 
+def get_make_flavour():
+    '''Reads the magical comment in the first line of the Makefile to determine
+    the flavour'''
+    f = open('Makefile', 'r')
+    line = f.readline()
+    f.close()
+    if line.find('# GNU make') != -1:
+        return 'gnu'
+    return 'bsd'
+
 def get_make_cmd(flavour):
     '''Get the name of the make command.
     Flavour is one of "gnu" or "bsd"'''
-    
+
     p_gnu_version = re.compile('GNU Make [0-9.]+')
     cmds = ('make', 'bsdmake', 'gmake')
     for c in cmds:
@@ -127,7 +137,7 @@ def get_make_cmd(flavour):
             if flavour == 'gnu' and p_gnu_version.search(out[0]) is not None:
                 return c
         except subprocess.CalledProcessError:
-            # bsd make doesn't understand '--version' and return an error
+            # bsd make doesn't understand '--version' and returns an error
             # (hopefully everywhere)
             if flavour == 'bsd':
                 return c
@@ -319,6 +329,8 @@ def equal_sizes(a, b):
     return True
 
 def prune_git_sizes(sizes):
+    '''Remove entries where nothing has changed'''
+    
     prune = []
     for idx, info in enumerate(sizes):
         if idx > 0 and equal_sizes(sizes[idx-1], info):
@@ -451,7 +463,6 @@ def update_history(version, branch = None):
         branch = git_branch()
 
     revlist = git_revlist(branch)
-    make = get_make_cmd('bsd')
     sizes = read_git_sizes(revlist)
     
     known = set()
@@ -472,11 +483,14 @@ def update_history(version, branch = None):
                     if rc:
                         raise RuntimeError('git checkout -q ' + r + ' failed')
 
+                    flavour = get_make_flavour()
+                    make = get_make_cmd(flavour)
+                    
                     rc = update_git_size(version, r, make, sizes)
                     if not rc:
                         print '%s ok' % r
                     else:
-                        print '%s make failed' % r
+                        print '%s make failed (%s)' % (r, flavour)
             else:
                 if not quiet:
                     print '%s already recorded' % r
