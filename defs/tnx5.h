@@ -12,20 +12,27 @@ const uint8_t REF_INT_2_56 = 6;
 // Internal 2.56V Voltage Reference with bypass capacitor at AREF/PB0
 const uint8_t REF_INT_2_56_EXT_CAP = 7;
 
-typedef _Timer<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
-               _Register<NTCCR0A>, _Register<NTCCR0B>, _Register<NTIFR>, 
-               _Register<NTIMSK>, TOIE0, OCIE0A, OCF0A, OCIE0B, OCF0B,
-               CS00, CS01, CS02, WGM00, WGM01, WGM02> Timer0;
+typedef _Timer_2C2<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
+                   _Register<NTCCR0A>, _Register<NTCCR0B>, _Register<NTIFR>, 
+                   _Register<NTIMSK> > 
+Timer0;
+
+typedef _TimerTiny_3C2<_Register<NTCNT1>, _Register<NOCR1A>, _Register<NOCR1B>,
+                       _Register<NOCR1C>, _Register<NTCCR>, _Register<NGTCCR>,
+                       _Register<NTIFR>, _Register<NTIMSK> >
+Timer1;
 
 class Pin
     {
 public:
     typedef _Pin<NDDRB, NPORTB, NPINB, PB0> D_B0;
-    typedef _PWMPin<D_B0, Timer0, Timer0::T_OCRA, NTCCR0A, FOC0A> OC0A;
+    typedef _PWMPin<D_B0, Timer0::CompA> OC0A;
     typedef OC0A B0;
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB1> D_B1;
-    typedef D_B1 B1;
+    typedef _PWMPin<D_B1, Timer0::CompB> OC0B;
+    typedef _PWMPin<D_B1, Timer1::CompA> OC1A;
+    typedef OC0B B1;
 
     // The ADC ordering is irregular
     typedef _Pin<NDDRB, NPORTB, NPINB, PB2> D_B2;
@@ -38,7 +45,8 @@ public:
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB4> D_B4;
     typedef _AnalogPin<D_B4, 2> ADC2;
-    typedef _ChangeInterruptPin<ADC2, NPCMSK, PCIE, NGIFR, PCIF> B4;
+    typedef _PWMPin<ADC2, Timer1::CompB> OC1B;
+    typedef _ChangeInterruptPin<OC1B, NPCMSK, PCIE, NGIFR, PCIF> B4;
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB5> D_B5;
     typedef _AnalogPin<D_B5, 0> ADC0;

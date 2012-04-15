@@ -6,7 +6,7 @@ volatile uint16_t delta = 0;
 ISR(TIMER0_COMPA_vect)
     {
     ScopedInterruptDisable sid;
-    delta = Timer1::R_TCNT;
+    delta = Timer1::read();
     Arduino::D13::set();
     }
 
@@ -26,13 +26,13 @@ int main(void)
         delta = 0;
         Timer1::reset();
         Timer0::reset();
-        Timer0::enableCompareInterruptA(128);
+        Timer0::CompA::enableInterrupt(128);
         }
 
         // wait for interrupt
         while (!delta)
             ;
-        Timer0::disableCompareInterruptA();
+        Timer0::CompA::disableInterrupt();
         Arduino::D13::clear();
         
         Serial.write_P(PSTR("0x"));
