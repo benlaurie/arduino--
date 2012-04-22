@@ -225,7 +225,7 @@ public:
                               TIFR_, OCFxA, TCCRB_, FOCxA>
     CompA;
 
-    typedef _OutputComparator<OCRB_, TCCRB_, COMxB1, COMxB0, TIMSK_, OCIExB,
+    typedef _OutputComparator<OCRB_, TCCRA_, COMxB1, COMxB0, TIMSK_, OCIExB,
                               TIFR_, OCFxB, TCCRB_, FOCxB>
     CompB;
 
@@ -250,16 +250,18 @@ private:
     static void prescaler(byte pre)
         {
         byte tmp = TCCRB_::read() & ~7;
-        TCCRB_::write(tmp |= pre);
+        TCCRB_::write(tmp | pre);
         }
 
     static void wgm(byte waveform)
         {
         byte tmpb = TCCRB_::read() & ~_BV(WGMx2);
         tmpb |= waveform & _BV(WGMx2);
-        TCCRA_::write(tmpb);
-        byte tmpa = TCCRA_::read() & ~3;
-        tmpa |= waveform & 3;
+        TCCRB_::write(tmpb);
+
+        const byte mask10 = _BV(WGMx1) | _BV(WGMx0);
+        byte tmpa = TCCRA_::read() & ~mask10;
+        tmpa |= waveform & mask10;
         TCCRA_::write(tmpa);
         }
     };
@@ -400,14 +402,15 @@ private:
 
     static void wgm(byte waveform)
         {
-        const byte maskB = _BV(WGMx3) | _BV(WGMx2);
-        byte tmpb = TCCRB_::read() & ~(maskB);
-        tmpb |= waveform & maskB;
-        TCCRA_::write(tmpb);
-        const byte maskA = _BV(WGMx1) | _BV(WGMx0);
-        byte tmpa = TCCRA_::read() & ~maskA;
-        tmpa |= waveform & maskA;
-        TCCRA_::write(tmpa);
+        const byte mask32 = _BV(WGMx3) | _BV(WGMx2);
+        byte tmp32 = TCCRB_::read() & ~(mask32);
+        tmp32 |= waveform & mask32;
+        TCCRA_::write(tmp32);
+
+        const byte mask10 = _BV(WGMx1) | _BV(WGMx0);
+        byte tmp10 = TCCRA_::read() & ~mask10;
+        tmp10 |= waveform & mask10;
+        TCCRA_::write(tmp10);
         }
     };
 

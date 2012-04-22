@@ -37,6 +37,11 @@ atmega328_pwm_pins.o: atmega328_pwm_pins.cc
 atmega328_pwm_pins.d: atmega328_pwm_pins.cc
 	$(CC) $(DEFS) -mmcu=atmega328p -MM $< > $@
 
+.PHONY: test clean
+
+test: all tests.py adapter.py
+	python tests.py
+
 clean:
 	rm -f *.o *.elf *.d *.map *.pyc
 

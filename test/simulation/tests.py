@@ -39,12 +39,13 @@ class Atmega328PinTest(unittest.TestCase):
 
     def checkPWMValue(self, a, b, msg):
         # Up to two cycles deviation are ok
-        delta = 2
+        delta_ok = 2
 
-        if abs(a - b) <= delta * Sim.cycleLength:
+        if abs(a - b) <= delta_ok * Sim.cycleLength:
             return True
 
-        self.fail(('more than %d cycles deviation ' % delta) + msg) 
+        delta = (a - b) / Sim.cycleLength
+        self.fail(('%d cpu cycles deviation: ' % delta) + msg) 
 
     def checkPWMValues(self, values, ocr, prescaler=64, reset=256, fast=False):
         # assumes normal PWM mode, i.e. timer counts up
@@ -56,7 +57,7 @@ class Atmega328PinTest(unittest.TestCase):
             low = low * 2
 
         if len(values) < 4:
-            self.fail('Not enough values for PWM check')
+            self.fail('Not enough values for PWM check ' + str(values))
 
         for i, v in enumerate(values):
             if i > 3:
@@ -64,10 +65,10 @@ class Atmega328PinTest(unittest.TestCase):
                 if v[1] == 'H':
                     # transition to H is end of low period
                     self.checkPWMValue(
-                        l, low, '%d (H): %s' % (i, str(values)))
+                        l, low, 'pwm cycle %d (H): %s' % (i, str(values)))
                 else:
                     self.checkPWMValue(
-                        l, high, '%d (L): %s' % (i, str(values)))
+                        l, high, 'pwm cycle %d (L): %s' % (i, str(values)))
                     
             last = v[2]
 
@@ -99,11 +100,31 @@ class Atmega328PinTest(unittest.TestCase):
         dev.RegisterTerminationSymbol('exit')
 
         b1 = PinMonitor(dev, 'B1')
+        b2 = PinMonitor(dev, 'B2')
+        b3 = PinMonitor(dev, 'B3')
+        d3 = PinMonitor(dev, 'D3')
+        d5 = PinMonitor(dev, 'D5')
+        d6 = PinMonitor(dev, 'D6')
 
         Sim.doRun()
 
-        # The OCR of B1 is set to 16
+        # Timer0
+        # The OCR of D5 is set to 4
+        self.checkPWMValues(d5.values, 4, prescaler=1, fast=True)
+        # The OCR of D6 is set to 8
+        self.checkPWMValues(d6.values, 8, prescaler=1, fast=True)
+
+        # Timer1
+        # The OCR of B1 is set to 4
         self.checkPWMValues(b1.values, 16, prescaler=1, fast=False)
+        # The OCR of B2 is set to 8
+        self.checkPWMValues(b2.values, 32, prescaler=1, fast=False)
+
+        # Timer2
+        # The OCR of B3 is set to 64
+        self.checkPWMValues(b3.values, 64, prescaler=8, fast=False)
+        # The OCR of D2 is set to 128
+        self.checkPWMValues(d3.values, 128, prescaler=8, fast=False)
  
 if __name__ == '__main__':
 
