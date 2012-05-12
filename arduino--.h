@@ -24,11 +24,18 @@ private:
 
 template <byte reg> class _Register
     {
- public:    
+ public:
     typedef byte value_t;
 
     static void set(byte bit) { _SFR_IO8(reg) |= _BV(bit); }
     static void clear(byte bit) { _SFR_IO8(reg) &= ~_BV(bit); }
+
+    static void write(byte val) { _SFR_IO8(reg) = val; }
+    static byte read() { return _SFR_IO8(reg); }
+
+    static void writeAnd(byte val) { _SFR_IO8(reg) &= val; }
+    static void writeOr(byte val) { _SFR_IO8(reg) |= val; }
+
     static byte atomicRead()
         {
         ScopedInterruptDisable sid;
@@ -52,8 +59,13 @@ template <byte reg> class _Register16
 
     static void setHigh(byte bit) { _SFR_IO8(reg + 1) |= _BV(bit); }
     static void setLow(byte bit) { _SFR_IO8(reg) |= _BV(bit); }
+
     static void clearHigh(byte bit) { _SFR_IO8(reg + 1) &= ~_BV(bit); }
     static void clearLow(byte bit) { _SFR_IO8(reg) &= ~_BV(bit); }
+
+    static uint16_t read() { return _SFR_IO16(reg); }
+    static void write(uint16_t val) { _SFR_IO16(reg) = val; }
+
     static uint16_t atomicRead()
         {
         ScopedInterruptDisable sid;
@@ -68,139 +80,457 @@ template <byte reg> class _Register16
     byte readLow() { return _SFR_IO8(reg); };
     byte readHigh() { return _SFR_IO8(reg + 1); };
 
+    void operator&=(byte bits) { _SFR_IO8(reg) &= bits; }
+    void operator|=(byte bits) { _SFR_IO8(reg) |= bits; }
     void operator=(uint16_t bits) { _SFR_IO16(reg) = bits; }
     operator uint16_t() const { return _SFR_IO16(reg); }
     };
 
-template <class TCNT_, class OCRA_, class OCRB_, class TCCRA_, class TCCRB_,
-          class TIFR_, class TIMSK_, byte toiex, byte ociexa, byte ocfxa, 
-          byte ociexb, byte ocfxb, byte csx0, byte csx1, byte csx2,
-          byte wgmx0, byte wgmx1, byte wgmx2> 
+/** An Output comparator, part of a timer
+
+    When new Timer types need to be implemented, make sure that:
+
+    * OCFx_ is on TIFR_
+    * OCIEx_ is on TIMSK_
+    * COM0_ and COM1_ are on TCCR_
+    * FOC_ is on TCCRF_
+*/
+template <class OCR_, class TCCR_, byte COM1_, byte COM0_,
+          class TIMSK_,  byte OCIEx_,
+          class TIFR_, byte OCFx_,
+          class TCCRF_, byte FOC_>
+class _OutputComparator
+    {
+public:
+    static typename OCR_::value_t read() { return OCR_::read(); }
+    static void write(typename OCR_::value_t val) { OCR_::write(val); }
+
+    static void enableInterrupt(typename OCR_::value_t count)
+        {
+        // clear compare interrupt flag
+        TIFR_::set(OCFx_);
+        OCR_::write(count);
+        TIMSK_::set(OCIEx_);
+        }
+
+    static void enableInterrupt() {  TIMSK_::set(OCIEx_); }
+    static void disableInterrupt() { TIMSK_::clear(OCIEx_); }
+
+    static void modeToggle() { TCCR_::set(COM0_); }
+    static void modeClear() { TCCR_::set(COM1_); }
+    static void modeSet() { TCCR_::write(_BV(COM1_) | _BV(COM0_)); }
+    static void disable()
+        { TCCR_::writeAnd(~(_BV(COM0_) | _BV(COM1_))); }
+
+    /** Force the comparison of the output compare register.
+
+        Advanced functionality: This avoids a glitch in PWM generation
+        when the clock associated with this PWM Pin is not yet in a
+        PWM mode.
+
+        This method should not be called if the timer is already in
+        PWM mode.
+
+        So don't call this if you have called Arduino::init before.
+    */
+    static void forceCompare() __attribute__((always_inline))
+        {
+        TCCRF_::set(FOC_);
+        }
+    };
+
+/** A basic Timer with the counter register and overflow interrupt.
+ */
+template <class TCNT_, class TIMSK_, byte TOIE_>
 class _Timer
     {
 public:
+    static void reset() { TCNT_::write(0); }
+    static typename TCNT_::value_t read() { return TCNT_::read(); }
+    static void write(typename TCNT_::value_t val) { TCNT_::write(val); }
 
-    typedef OCRA_ T_OCRA;
-    typedef OCRB_ T_OCRB;
+    static void enableOverflowInterrupt() { TIMSK_::set(TOIE_); }
+    static void disableOverflowInterrupt() { TIMSK_::clear(TOIE_); }
 
-    static TCNT_ R_TCNT;
-    static OCRA_ R_OCRA;
-    static OCRB_ R_OCRB;
-    static TCCRA_ R_TCCRA;
-    static TCCRB_ R_TCCRB;
-    static TIFR_ R_TIFR;
-    static TIMSK_ R_TIMSK;
+    static void stop() { prescaler(0); }
 
-    static void reset() { R_TCNT = 0; }
+private:
 
-    static void enableOverflowInterrupt() { R_TIMSK |= _BV(toiex); }
-    static void disableOverflowInterrupt() { R_TIMSK &= ~_BV(toiex); }
+    // must be implemented by subclasses
+    static void prescaler(byte pre);
+    };
 
-    static void enableCompareInterruptA(typename OCRA_::value_t count) 
-        {
-        // clear compare interrupt flag
-        R_TIFR &= _BV(ocfxa);
-        R_OCRA = count;
-        R_TIMSK |= _BV(ociexa); 
-        }
-    static void enableCompareInterruptA() {  R_TIMSK |= _BV(ociexa); }
-    static void disableCompareInterruptA() { R_TIMSK &= ~_BV(ociexa); }
+/** Hardware timer with 2 output compare units and 2 config registers
+    (TCCRA_ and TCCRB_)
 
-    static void enableCompareInterruptB(typename OCRB_::value_t count) 
-        { 
-        // clear compare interrupt flag
-        R_TIFR &= _BV(ocfxb);
-        R_OCRB = count;
-        R_TIMSK |= _BV(ociexb);
-        }
-    static void enableCompareInterruptB() {  R_TIMSK |= _BV(ociexb); }
-    static void disableCompareInterruptB() { R_TIMSK &= ~_BV(ociexb); }
+  This timer unit is used by the following devices: ATMega48/88/168/328
+  (Timer0 and Timer2)
 
-    static void stop() { R_TCCRB &= ((1 << 5) - 1) << 3; }
-    static void prescaler1() { prescaler(_BV(csx0)); }
-    static void prescaler8() { prescaler(_BV(csx1)); }
-    static void prescaler64() { prescaler(_BV(csx1) | _BV(csx0)); }
-    static void prescaler256() { prescaler(_BV(csx2)); }
-    static void prescaler1024() { prescaler(_BV(csx2) | _BV(csx0)); }
+  The TCCRA_ register contains the following configuration bits (x=#timer):
 
-    static void externalFalling() { prescaler(_BV(csx2) | _BV(csx1)); }
-    static void externalRising() 
-        { prescaler(_BV(csx2) | _BV(csx1) | _BV(csx0)); }
+  @verbatim
+  +------+------+------+------+---+---+-----+-----+
+  |COMxA1|COMxA0|COMxB1|COMxB0| - | - |WGMx1|WGMx0|
+  +------+------+------+------+---+---+-----+-----+
+  @endverbatim
 
+  The TCCRB_ register contains the following configuration bits (x=#timer):
 
-    //** Mode 0 */
-    static void normal() 
-        { 
-        // clear WGMx2
-        R_TCCRB &= ~_BV(wgmx2);
-        wgm01(0);
-        }
+  @verbatim
+  +-----+-----+---+---+-----+----+----+----+
+  |FOCxA|FOCxB| - | - |WGMx2|CSx2|CSx1|CSx0|
+  +-----+-----+---+---+-----+----+----+----+
+  @endverbatim
 
-    //* Mode 1 */
-    static void phaseCorrectPWM()
-        {
-        // clear WGMx2
-        R_TCCRB &= ~_BV(wgmx2);
-        wgm01(_BV(wgmx0));
-        }
+  The TIMSK_ register contains the following configuration bits (x=#timer):
 
-    /** Mode 2 */
-    static void clearTimerOnCompare()
-        { 
-        // clear WGMx2
-        R_TCCRB &= ~_BV(wgmx2);
-        wgm01(_BV(wgmx1));
-        }
+  @verbatim
+  +---+---+---+---+---+------+------+-----+
+  | - | - | - | - | - |OCIExB|OCIExA|TOIEx|
+  +---+---+---+---+---+------+------+-----+
+  @endverbatim
 
-    /** Mode 3 */
-    static void fastPWM()
-        { 
-        // clear WGMx2
-        R_TCCRB &= ~_BV(wgmx2);
-        wgm01(_BV(wgmx1) | _BV(wgmx0));
-        }
+  The TIFR_ register contains the following configuration bits (x=#timer):
 
-    /** Mode 5 */
-    static void phaseCorrectPWMOCRA()
-        { 
-        // set WGMx2
-        R_TCCRB |= _BV(wgmx2);
-        wgm01(_BV(wgmx0));
-        }
-    
-    /** Mode 7 */
-    static void fastPWMOCRA() 
-        { 
-        // set WGMx2
-        R_TCCRB |= _BV(wgmx2);
-        wgm01(_BV(wgmx1) | _BV(wgmx0));
-        }
+  @verbatim
+  +---+---+---+---+---+-----+-----+----+
+  | - | - | - | - | - |OCFxB|OCFxA|TOVx|
+  +---+---+---+---+---+-----+-----+----+
+  @endverbatim
+*/
+template <class TCNT_, class OCRA_, class OCRB_, class TCCRA_, class TCCRB_,
+          class TIMSK_, class TIFR_>
+class _Timer_2C2 : public _Timer<TCNT_, TIMSK_, 0> // 0 is TOIEx
+    {
+public:
+
+    // TCCRA_
+    static const byte COMxA1 = 7, COMxA0 = 6, COMxB1 = 5, COMxB0 = 4;
+    static const byte WGMx1 = 1, WGMx0 = 0;
+
+    // TCCRB_
+    static const byte FOCxA = 7, FOCxB = 6;
+    static const byte WGMx2 = 3;
+    static const byte CSx2 = 2, CSx1 = 1, CSx0 = 0;
+
+    // TIMSK_
+    static const byte OCIExB = 2, OCIExA = 1;
+    static const byte TOIEx = 0;
+
+    // TIFR_
+    static const byte OCFxB = 2, OCFxA = 1;
+    static const byte TOVx = 0;
+
+    typedef _OutputComparator<OCRA_, TCCRA_, COMxA1, COMxA0, TIMSK_, OCIExA,
+                              TIFR_, OCFxA, TCCRB_, FOCxA>
+    CompA;
+
+    typedef _OutputComparator<OCRB_, TCCRA_, COMxB1, COMxB0, TIMSK_, OCIExB,
+                              TIFR_, OCFxB, TCCRB_, FOCxB>
+    CompB;
+
+    static void prescaler1() { prescaler(_BV(CSx0)); }
+    static void prescaler8() { prescaler(_BV(CSx1)); }
+    static void prescaler64() { prescaler(_BV(CSx1) | _BV(CSx0)); }
+    static void prescaler256() { prescaler(_BV(CSx2)); }
+    static void prescaler1024() { prescaler(_BV(CSx2) | _BV(CSx0)); }
+
+    static void externalFalling() { prescaler(_BV(CSx2) | _BV(CSx1)); }
+    static void externalRising()
+        { prescaler(_BV(CSx2) | _BV(CSx1) | _BV(CSx0)); }
+
+    static void modeNormal() { wgm(0); }
+    static void modePhaseCorrectPWM() { wgm(_BV(WGMx0)); }
+    static void modeClearTimerOnCompare() { wgm(_BV(WGMx1)); }
+    static void modeFastPWM() { wgm(_BV(WGMx1) | _BV(WGMx0)); }
+    static void modePhaseCorrectPWMOCRA() { wgm(_BV(WGMx2) | _BV(WGMx0)); }
+    static void modeFastPWMOCRA() { wgm(_BV(WGMx2) | _BV(WGMx1) | _BV(WGMx0)); }
 
 private:
     static void prescaler(byte pre)
-        { 
-        byte tmp = R_TCCRB & (((1 << 2) - 1) << 3);
-        tmp |= pre;
-        R_TCCRB = tmp;
+        {
+        byte tmp = TCCRB_::read() & ~7;
+        TCCRB_::write(tmp | pre);
         }
 
-    static void wgm01(byte waveform)
-        { 
-        byte tmp = R_TCCRA & 3;
-        tmp |= waveform;
-        R_TCCRA = tmp;
+    static void wgm(byte waveform)
+        {
+        byte tmpb = TCCRB_::read() & ~_BV(WGMx2);
+        tmpb |= waveform & _BV(WGMx2);
+        TCCRB_::write(tmpb);
+
+        const byte mask10 = _BV(WGMx1) | _BV(WGMx0);
+        byte tmpa = TCCRA_::read() & ~mask10;
+        tmpa |= waveform & mask10;
+        TCCRA_::write(tmpa);
+        }
+    };
+
+/** Hardware timer with 2 output compare units and 3 config registers
+    (TCCRA_ - TCCRC_)
+
+  This timer unit is used by the following devices: ATMega48/88/168/328
+  (Timer1)
+
+  The TCCRA_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +------+------+------+------+---+---+-----+-----+
+  |COMxA1|COMxA0|COMxB1|COMxB0| - | - |WGMx1|WGMx0|
+  +------+------+------+------+---+---+-----+-----+
+  @endverbatim
+
+  The TCCRB_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +-----+-----+---+-----+-----+----+----+----+
+  |ICNCx|ICESx| - |WGMx3|WGMx2|CSx2|CSx1|CSx0|
+  +-----+-----+---+-----+-----+----+----+----+
+  @endverbatim
+
+  TCCRC_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +-----+-----+---+---+---+---+---+---+
+  |FOCxA|FOCxB| - | - | - | - | - | - |
+  +-----+-----+---+---+---+---+---+---+
+  @endverbatim
+
+  The TIMSK_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +---+---+-----+---+---+------+------+-----+
+  | - | - |ICIEx| - | - |OCIExB|OCIExA|TOIEx|
+  +---+---+-----+---+---+------+------+-----+
+  @endverbatim
+
+  ICIEx is only available on _Timer_2C3.
+
+  The TIFR_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +---+---+----+---+---+-----+-----+----+
+  | - | - |ICFx| - | - |OCFxB|OCFxA|TOVx|
+  +---+---+----+---+---+-----+-----+----+
+  @endverbatim
+
+  ICFx is only available on _Timer_2C3.
+
+*/
+template <class TCNT_, class ICR_, class OCRA_, class OCRB_, class TCCRA_,
+          class TCCRB_, class TCCRC_, class TIMSK_, class TIFR_>
+class _Timer_2C3 : public _Timer<TCNT_, TIMSK_, 0> // 0 is TOIEx
+    {
+public:
+
+    // TCCRA_
+    static const byte COMxA1 = 7, COMxA0 = 6, COMxB1 = 5, COMxB0 = 4;
+    static const byte WGMx1 = 1, WGMx0 = 0;
+
+    // TCCRB_
+    static const byte ICNCx = 7, ICESx = 6;
+    static const byte WGMx3 = 4, WGMx2 = 3;
+    static const byte CSx2 = 2, CSx1 = 1, CSx0 = 0;
+
+    // TCCRC_
+    static const byte FOCxA = 7, FOCxB = 6;
+
+    // TIMSK_
+    static const byte ICIEx = 5;
+    static const byte OCIExB = 2, OCIExA = 1;
+    static const byte TOIEx = 0;
+
+    // TIFR_
+    static const byte ICFx = 5;
+    static const byte OCFxB = 2, OCFxA = 1;
+    static const byte TOVx = 0;
+
+    typedef ICR_ ICR;
+    typedef OCRA_ OCRA;
+    typedef OCRB_ OCRB;
+
+    typedef _OutputComparator<OCRA_, TCCRA_, COMxA1, COMxA0, TIMSK_, OCIExA,
+                              TIFR_, OCFxA, TCCRB_, FOCxA>
+    CompA;
+
+    typedef _OutputComparator<OCRB_, TCCRA_, COMxB1, COMxB0, TIMSK_, OCIExB,
+                              TIFR_, OCFxB, TCCRB_, FOCxB>
+    CompB;
+
+    static void prescaler1() { prescaler(_BV(CSx0)); }
+    static void prescaler8() { prescaler(_BV(CSx1)); }
+    static void prescaler64() { prescaler(_BV(CSx1) | _BV(CSx0)); }
+    static void prescaler256() { prescaler(_BV(CSx2)); }
+    static void prescaler1024() { prescaler(_BV(CSx2) | _BV(CSx0)); }
+
+    static void externalFalling() { prescaler(_BV(CSx2) | _BV(CSx1)); }
+    static void externalRising()
+        { prescaler(_BV(CSx2) | _BV(CSx1) | _BV(CSx0)); }
+
+    static void modeNormal() { wgm(0); }
+    static void modePhaseCorrectPWM() { wgm(_BV(WGMx0)); }
+    static void modePhaseCorrectPWM9bit()
+        { wgm(_BV(WGMx1) | _BV(WGMx0)); }
+    static void modePhaseCorrectPWM10bit()
+        { wgm(_BV(WGMx2) | _BV(WGMx0)); }
+    static void modeClearTimerOnCompare() { wgm(_BV(WGMx2)); }
+    static void modeFastPWM() { wgm(_BV(WGMx2) | _BV(WGMx0)); }
+    static void modeFastPWM9bit() { wgm(_BV(WGMx2) | _BV(WGMx1)); }
+    static void modeFastPWM10bit()
+        { wgm(_BV(WGMx2) | _BV(WGMx1) | _BV(WGMx1)); }
+    static void modePhaseAndFreqCorrectPWMICR()
+        { wgm(_BV(WGMx3)); }
+    static void modePhaseAndFreqCorrectPWMOCRA()
+        { wgm(_BV(WGMx3) | _BV(WGMx0)); }
+    static void modePhaseCorrectPWMICR()
+        { wgm(_BV(WGMx3) | _BV(WGMx1)); }
+    static void modePhaseCorrectPWMOCRA()
+        { wgm(_BV(WGMx3) | _BV(WGMx1) | _BV(WGMx0)); }
+    static void modeClearTimerOnCompareICR()
+        { wgm(_BV(WGMx3) | _BV(WGMx2)); }
+    static void modeFastPWMICR() { wgm(_BV(WGMx3) | _BV(WGMx2) | _BV(WGMx1)); }
+    static void modeFastPWMOCRA()
+        { wgm(_BV(WGMx3) | _BV(WGMx2) | _BV(WGMx1) | _BV(WGMx0)); }
+
+private:
+    static void prescaler(byte pre)
+        {
+        const byte mask = _BV(CSx2) | _BV(CSx1) | _BV(CSx0);
+        byte tmp = TCCRB_::read() & ~mask;
+        TCCRB_::write(tmp |= pre);
+        }
+
+    static void wgm(byte waveform)
+        {
+        const byte mask32 = _BV(WGMx3) | _BV(WGMx2);
+        byte tmp32 = TCCRB_::read() & ~(mask32);
+        tmp32 |= waveform & mask32;
+        TCCRA_::write(tmp32);
+
+        const byte mask10 = _BV(WGMx1) | _BV(WGMx0);
+        byte tmp10 = TCCRA_::read() & ~mask10;
+        tmp10 |= waveform & mask10;
+        TCCRA_::write(tmp10);
+        }
+    };
+
+
+/** Hardware timer with 3 output compare units and 2 config registers
+    (TCCR_ and GTCCR_)
+
+  This timer unit is used by the following devices: ATtiny25/45/85
+  (Timer1)
+
+  The TCCR_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +----+-----+------+------+----+----+----+----+
+  |CTCx|PWMxA|COMxA1|COMxA0|CSx3|CSx2|CSx1|CSx0|
+  +----+-----+------+------+----+----+----+----+
+  @endverbatim
+
+  The GTCCR_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +---+-----+------+------+-----+-----+----+----+
+  | - |PWMxB|COMxB1|COMxB0|FOCxB|FOCxA|PSR1|PSR0|
+  +---+-----+------+------+-----+-----+----+----+
+  @endverbatim
+
+  The TIMSK_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +---+------+------+---+---+-----+---+---+
+  | - |OCIExA|OCIExB| - | - |TOIEx| - | - |
+  +---+------+------+---+---+-----+---+---+
+  @endverbatim
+
+  The TIFR_ register contains the following configuration bits (x=#timer):
+
+  @verbatim
+  +---+-----+-----+---+---+---+----+---+
+  | - |OCFxA|OCFxB| - | - | - |TOVx| - |
+  +---+-----+-----+---+---+---+----+---+
+  @endverbatim
+*/
+template <class TCNT_, class OCRA_, class OCRB_, class OCRC_, class TCCR_,
+          class GTCCR_, class TIMSK_, class TIFR_>
+class _TimerTiny_3C2 : public _Timer<TCNT_, TIMSK_, 2> // 2 is TOIEx
+    {
+public:
+
+    // TCCR_
+    static const byte CTCx = 7;
+    static const byte PWMxA = 6;
+    static const byte COMxA1 = 5, COMxA0 = 4;
+    static const byte CSx3 = 3, CSx2 = 2, CSx1 = 1, CSx0 = 0;
+
+    // GTCCR_
+    static const byte PWMxB = 6;
+    static const byte COMxB1 = 5, COMxB0 = 4;
+    static const byte FOCxB = 3, FOCxA = 2;
+    static const byte PSR1 = 1, PSR0 = 0;
+
+    // TIMSK_
+    static const byte OCIExA = 6, OCIExB = 5;
+    static const byte TOIEx = 2;
+
+    // TIFR_
+    static const byte OCFxA = 6, OCFxB = 5;
+    static const byte TOVx = 1;
+
+    typedef OCRA_ OCRA;
+    typedef OCRB_ OCRB;
+    typedef OCRC_ OCRC;
+
+    typedef _OutputComparator<OCRA_, TCCR_, COMxA1, COMxA0, TIMSK_, OCIExA,
+                              TIFR_, OCFxA, GTCCR_, FOCxA>
+    CompA;
+
+    typedef _OutputComparator<OCRB_, TCCR_, COMxB1, COMxB0, TIMSK_, OCIExB,
+                              TIFR_, OCFxB, GTCCR_, FOCxB>
+    CompB;
+
+    static void stop() { prescaler(0); }
+
+    static void prescaler1() { prescaler(_BV(CSx0)); }
+    static void prescaler2() { prescaler(_BV(CSx1)); }
+    static void prescaler4() { prescaler(_BV(CSx1) | _BV(CSx0)); }
+    static void prescaler8() { prescaler(_BV(CSx2)); }
+    static void prescaler16() { prescaler(_BV(CSx2) | _BV(CSx0)); }
+    static void prescaler32() { prescaler(_BV(CSx2) | _BV(CSx1)); }
+    static void prescaler64() { prescaler(_BV(CSx2) | _BV(CSx1) | _BV(CSx0)); }
+    static void prescaler128() { prescaler(_BV(CSx3)); }
+    static void prescaler256() { prescaler(_BV(CSx3) | _BV(CSx0)); }
+    static void prescaler512() { prescaler(_BV(CSx3) | _BV(CSx1)); }
+    static void prescaler1024()
+        { prescaler(_BV(CSx3) | _BV(CSx1) | _BV(CSx0)); }
+    static void prescaler2048() { prescaler(_BV(CSx3) | _BV(CSx2)); }
+    static void prescaler4096()
+        { prescaler(_BV(CSx3) | _BV(CSx2) | _BV(CSx0)); }
+    static void prescaler8192()
+        { prescaler(_BV(CSx3) | _BV(CSx2) | _BV(CSx1)); }
+    static void prescaler16384()
+        { prescaler(_BV(CSx3) | _BV(CSx2) | _BV(CSx1) | _BV(CSx0)); }
+
+    static void modePWMA() { TCCR_::set(PWMxA); }
+    static void modePWMB() { GTCCR_::set(PWMxB); }
+    static void clearOnMatchOCRC() { TCCR_::set(CTCx); }
+
+private:
+    static void prescaler(byte pre)
+        {
+        byte tmp = TCCR_::read() & ~15;
+        TCCR_::write(tmp |= pre);
         }
     };
 
 /*
-  We are forcing gcc to inline the _Pin methods. I think this shouldn't be 
-  necessary, but when the _Pin methods are used via a subclass like 
+  We are forcing gcc to inline the _Pin methods. I think this shouldn't be
+  necessary, but when the _Pin methods are used via a subclass like
   _ChangeInterruptPin, gcc doesn't automatically inline these methods any more.
-
-  This might be a bug in the inliner, but to be fair, we are mixing template 
-  arguments with inheritance.
  */
-template <byte ddr, byte port, byte in, byte bit> 
+template <byte ddr, byte port, byte in, byte bit>
 class _Pin
     {
 public:
@@ -211,6 +541,8 @@ public:
         { _SFR_IO8(ddr) &= ~_BV(bit); }
     static void modeInputPullup() __attribute__((always_inline))
         { modeInput(); set(); }
+    static void modeInputTristate() __attribute__((always_inline))
+        { modeInput(); clear(); }
     static void set() __attribute__((always_inline))
         { _SFR_IO8(port) |= _BV(bit); }
     static void clear() __attribute__((always_inline))
@@ -223,54 +555,57 @@ public:
         { return (_SFR_IO8(port) ^= _BV(bit)); }
     };
 
-template <class Pin_, class Timer_, class OCR_, byte tccrc, byte foc>
+template <class Pin_, class OCR_>
 class _PWMPin : public Pin_
     {
-    static Timer_ Timer;
-    static OCR_ R_OCR;
+public:
 
-    /** Force the comparison of the output compare register.
+    /** Enable the Pin as an output and enable the noninverting PWM mode
+        on the output comparator.
 
-        Advanced functionality: This avoids a glitch in PWM generation
-        when the clock associated with this PWM Pin is not yet in a
-        PWM mode. 
-
-        This method should not be called if the clock is already in PWM mode.
+        Note: this does not enable PWM mode on the timer, that step needs to 
+        be done separately.
      */
-    static void forceCompare() __attribute__((always_inline))
+    static void modePWM() __attribute__((always_inline))
         {
-        _SFR_IO8(tccrc) |= foc;
+        Pin_::modeOutput();
+        OCR_::modeClear();
+        }
+
+    static void pwmOff() __attribute__((always_inline))
+        {
+        OCR_::disablePWM();
         }
 
     static void pwmWrite(byte value) __attribute__((always_inline))
         {
-        R_OCR = value;
+        OCR_::write(value);
         }
     };
 
-// pcicr is the interrupy control register address, pcen is the enable bit, 
-// pcmsk is pin change mask register and pcbit the value bit
-template <class Pin_, byte pcicr, byte pcen, byte pcmsk, byte pcbit> 
+// PCICR_ is the interrupt control register address, PCEN_ is the enable bit,
+// PCMSK_ is pin change mask register and PCBIT_ the value bit
+template <class Pin_, byte PCICR_, byte PCEN_, byte PCMSK_, byte PCBIT_>
 class _ChangeInterruptPin : public Pin_
     {
 public:
 
     static void enableChangeInterrupt() __attribute__((always_inline))
         {
-        _SFR_IO8(pcicr) |= _BV(pcen);
-        _SFR_IO8(pcmsk) |= _BV(pcbit); 
+        _SFR_IO8(PCICR_) |= _BV(PCEN_);
+        _SFR_IO8(PCMSK_) |= _BV(PCBIT_);
         }
     static void disableChangeInterrupt() __attribute__((always_inline))
-        { 
-        if (_SFR_IO8(pcmsk) &= ~_BV(pcbit))
-            _SFR_IO8(pcicr) &= ~_BV(pcen);
+        {
+        if (_SFR_IO8(PCMSK_) &= ~_BV(PCBIT_))
+            _SFR_IO8(PCICR_) &= ~_BV(PCEN_);
         }
     };
 
 #if defined (ADMUX) && defined (ADCSRA) && defined (ADSC) && defined (ADCH) \
   && defined (ADCL)
 
-template <class Pin_, byte ain>
+template <class Pin_, byte AIN_>
 class _AnalogPin : public Pin_
     {
     static void analogStart(uint8_t reference) __attribute__((always_inline))
@@ -278,7 +613,7 @@ class _AnalogPin : public Pin_
         // set the analog reference (high two bits of ADMUX) and select the
         // channel (low 4 bits).  this also sets ADLAR (left-adjust result)
         // to 0 (the default).
-        ADMUX = (reference << 6) | (ain & 0x07);
+        ADMUX = (reference << 6) | (AIN_ & 0x07);
         // start the conversion
         ADCSRA |= (1 << (ADSC));
         }
@@ -286,7 +621,7 @@ class _AnalogPin : public Pin_
     static int analogRead(uint8_t reference)
         {
         analogStart(reference);
-        
+
         // ADSC is cleared when the conversion finishes
         while (ADCSRA & (1 << ADSC))
             ;
@@ -350,7 +685,7 @@ public:
     static void delay(timeres_t ms)
         {
         const timeres_t start = millis();
-        
+
         while (millis() - start <= ms)
             ;
         }
@@ -358,7 +693,7 @@ public:
     static void sleep(timeres_t ms)
         {
         const timeres_t start = millis();
-        
+
         set_sleep_mode(SLEEP_MODE_IDLE);
         sleep_enable();
 #ifdef sleep_bod_disable
@@ -369,7 +704,7 @@ public:
             sei();
             sleep_cpu();
             }
-        
+
         sei();
         sleep_disable();
         }
@@ -379,13 +714,13 @@ public:
     volatile static timeres_t timer_millis;
     };
 
-template<typename timeres_t, class Timer> 
+template<typename timeres_t, class Timer>
 volatile timeres_t _Clock<timeres_t, Timer>::timer_overflow_count = 0;
 
-template<typename timeres_t, class Timer> 
+template<typename timeres_t, class Timer>
 volatile uint16_t _Clock<timeres_t, Timer>::timer_fract = 0;
 
-template<typename timeres_t, class Timer> 
+template<typename timeres_t, class Timer>
 volatile timeres_t _Clock<timeres_t, Timer>::timer_millis = 0;
 
 /** busy wait */
@@ -397,7 +732,7 @@ void delayMicroseconds(unsigned int us)
 
 #if F_CPU >= 16000000L
     // for the 16 MHz clock on most Arduino boards
-    
+
     // for a one-microsecond delay, simply return.  the overhead
     // of the function call yields a delay of approximately 1 1/8 us.
     if (--us == 0)
@@ -425,7 +760,7 @@ void delayMicroseconds(unsigned int us)
     // per iteration, so execute it twice for each microsecond of
     // delay requested.
     us <<= 1;
-    
+
     // partially compensate for the time taken by the preceeding commands.
     // we can't subtract any more than this or we'd overflow w/ small delays.
     us--;

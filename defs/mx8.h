@@ -46,22 +46,20 @@ template <byte lsb, byte maskbit> class _Interrupt
 typedef class _Interrupt<ISC00, INT0> Interrupt0;
 typedef class _Interrupt<ISC10, INT1> Interrupt1;
 
-typedef _Timer<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
-               _Register<NTCCR0A>, _Register<NTCCR0B>, _Register<NTIFR0>, 
-               _Register<NTIMSK0>, TOIE0, OCIE0A, OCF0A, OCIE0B, OCF0B,
-               CS00, CS01, CS02, WGM00, WGM01, WGM02> 
+typedef _Timer_2C2<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
+                   _Register<NTCCR0A>, _Register<NTCCR0B>, 
+                   _Register<NTIFR0>, _Register<NTIMSK0> >
 Timer0;
 
-typedef _Timer<_Register16<NTCNT1>, _Register16<NOCR1A>, _Register16<NOCR1B>,
-               _Register<NTCCR1A>, _Register<NTCCR1B>, _Register<NTIFR1>, 
-               _Register<NTIMSK1>, TOIE1, OCIE1A, OCF1A, OCIE1B, OCF1B,
-               CS10, CS11, CS12, WGM10, WGM11, WGM12> 
+typedef _Timer_2C3<_Register16<NTCNT1>, _Register16<NICR1>, 
+                   _Register16<NOCR1A>, _Register16<NOCR1B>, 
+                   _Register<NTCCR1A>, _Register<NTCCR1B>, _Register<NTCCR1C>,
+                   _Register<NTIFR1>, _Register<NTIMSK1> >
 Timer1;
 
-typedef _Timer<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
-               _Register<NTCCR2A>, _Register<NTCCR2B>, _Register<NTIFR2>, 
-               _Register<NTIMSK2>, TOIE2, OCIE2A, OCF2A, OCIE2B, OCF2B, 
-               CS20, CS21, CS22, WGM20, WGM21, WGM22> 
+typedef _Timer_2C2<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
+                   _Register<NTCCR2A>, _Register<NTCCR2B>, 
+                   _Register<NTIFR2>, _Register<NTIMSK2> >
 Timer2;
 
 class Pin
@@ -72,15 +70,15 @@ public:
     typedef _ChangeInterruptPin<D_B0, NPCMSK0, PCIE0, NPCICR, PCINT0> B0; 
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB1> D_B1;
-    typedef _PWMPin<D_B1, Timer1, Timer1::T_OCRA, NTCCR1C, FOC1A> OC1A;
+    typedef _PWMPin<D_B1, Timer1::CompA> OC1A;
     typedef _ChangeInterruptPin<OC1A, NPCMSK0, PCIE0, NPCICR, PCINT1> B1;
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB2> D_B2;
-    typedef _PWMPin<D_B2, Timer1, Timer1::T_OCRB, NTCCR1C, FOC1B> OC1B;
+    typedef _PWMPin<D_B2, Timer1::CompB> OC1B;
     typedef _ChangeInterruptPin<OC1B, NPCMSK0, PCIE0, NPCICR, PCINT2> B2;
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB3> D_B3;
-    typedef _PWMPin<D_B3, Timer2, Timer2::T_OCRB, NTCCR2B, FOC2A> OC2A;
+    typedef _PWMPin<D_B3, Timer2::CompA> OC2A;
     typedef _ChangeInterruptPin<OC2A, NPCMSK0, PCIE0, NPCICR, PCINT3> B3;
 
     typedef _Pin<NDDRB, NPORTB, NPINB, PB4> D_B4; 
@@ -128,18 +126,18 @@ public:
     typedef _ChangeInterruptPin<D_D2, NPCMSK2, PCIE2, NPCICR, PCINT18> D2;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD3> D_D3;
-    typedef _PWMPin<D_D3, Timer2, Timer2::T_OCRB, NTCCR2B, FOC2B> OC2B;
+    typedef _PWMPin<D_D3, Timer2::CompB> OC2B;
     typedef _ChangeInterruptPin<OC2B, NPCMSK2, PCIE2, NPCICR, PCINT19> D3;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD4> D_D4;
     typedef _ChangeInterruptPin<D_D4, NPCMSK2, PCIE2, NPCICR, PCINT20> D4;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD5> D_D5;
-    typedef _PWMPin<D_D5, Timer0, Timer0::T_OCRB, NTCCR0B, FOC0B> OC0B;
+    typedef _PWMPin<D_D5, Timer0::CompB> OC0B;
     typedef _ChangeInterruptPin<OC0B, NPCMSK2, PCIE2, NPCICR, PCINT21> D5;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD6> D_D6;
-    typedef _PWMPin<D_D6, Timer0, Timer0::T_OCRA, NTCCR0A, FOC0A> OC0A;
+    typedef _PWMPin<D_D6, Timer0::CompA> OC0A;
     typedef _ChangeInterruptPin<OC0A, NPCMSK2, PCIE2, NPCICR, PCINT22> D6;
 
     typedef _Pin<NDDRD, NPORTD, NPIND, PD7> D_D7;
@@ -182,7 +180,7 @@ public:
         {
         interrupts();
     
-        Timer0::fastPWM();
+        Timer0::modeFastPWM();
 
         // set timer 0 prescale factor to 64
         Timer0::prescaler64();
@@ -198,11 +196,11 @@ public:
         // set timer 1 prescale factor to 64
         Timer1::prescaler64();
         // put timer 1 in 8-bit phase correct pwm mode
-        Timer1::phaseCorrectPWM();
+        Timer1::modePhaseCorrectPWM();
 
         // set timer 2 prescale factor to 64
         Timer2::prescaler64();
-        Timer2::phaseCorrectPWM();
+        Timer2::modePhaseCorrectPWM();
 
         // set a2d prescale factor to 128
         // 16 MHz / 128 = 125 KHz, inside the desired 50-200 KHz range.

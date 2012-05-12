@@ -229,8 +229,10 @@ private:
             }
         if (macs_[empty].length() != 0)
             {
-            sendPacket(0, StarBase::OUT_OF_IDS, Network::getLength(),
-                       Network::getData());
+            StarNode<Network, Observer>::sendPacket(
+              0, 
+              StarBase::OUT_OF_IDS, Network::getLength(),
+              Network::getData());
             return;
             }
         macs_[empty].set(Network::getLength(), Network::getData());

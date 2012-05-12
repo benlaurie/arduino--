@@ -115,10 +115,20 @@ def silent(*args):
 
     return rc
 
+def get_make_flavour():
+    '''Reads the magical comment in the first line of the Makefile to determine
+    the flavour'''
+    f = open('Makefile', 'r')
+    line = f.readline()
+    f.close()
+    if line.find('# GNU make') != -1:
+        return 'gnu'
+    return 'bsd'
+
 def get_make_cmd(flavour):
     '''Get the name of the make command.
     Flavour is one of "gnu" or "bsd"'''
-    
+
     p_gnu_version = re.compile('GNU Make [0-9.]+')
     cmds = ('make', 'bsdmake', 'gmake')
     for c in cmds:
@@ -127,7 +137,7 @@ def get_make_cmd(flavour):
             if flavour == 'gnu' and p_gnu_version.search(out[0]) is not None:
                 return c
         except subprocess.CalledProcessError:
-            # bsd make doesn't understand '--version' and return an error
+            # bsd make doesn't understand '--version' and returns an error
             # (hopefully everywhere)
             if flavour == 'bsd':
                 return c
@@ -162,6 +172,25 @@ def git_revlist(branch = None):
     revlist, _ = run('git', 'rev-list', branch, '--')
     return revlist
 
+def git_changed_files(rev):
+    files, _ = run('git', 'show', '--pretty=format:', '--name-only', rev)
+    # the first line is the empty format
+    del files[0]
+
+    return files
+
+def rev_is_interesting(rev):
+    files = git_changed_files(rev)
+    for f in files:
+        path, fn = os.path.split(f)
+        if fn == 'Makefile':
+            return True
+        _, ext = os.path.splitext(fn)
+        if ext in ['.cc', '.c', '.h']:
+            return True
+
+    return False
+            
 def github_url(url):
     '''Rewrite a github ssh read/write URL into the corresponding public URL'''
 
@@ -300,6 +329,8 @@ def equal_sizes(a, b):
     return True
 
 def prune_git_sizes(sizes):
+    '''Remove entries where nothing has changed'''
+    
     prune = []
     for idx, info in enumerate(sizes):
         if idx > 0 and equal_sizes(sizes[idx-1], info):
@@ -407,6 +438,24 @@ def write_sizes(sizes, fname):
     json.dump(sizes, f, sort_keys=True, indent=4)
     f.close()
 
+def prune_boring_git_sizes(branch = None):
+    '''remove all uninteresting commits from git_sizes.json'''
+
+    if branch is None:
+        branch = git_branch()
+
+    pruned = []
+    revlist = git_revlist(branch)
+    sizes = read_git_sizes(revlist)
+    for s in sizes:
+        h = s['git']['hash']
+        if rev_is_interesting(h):
+            pruned.append(s)
+        else:
+            print 'removing ', h
+
+    write_sizes(pruned, 'sizes/git_sizes.json')
+    
 def update_history(version, branch = None):
     '''Update the history in git_sizes.json'''
 
@@ -414,7 +463,6 @@ def update_history(version, branch = None):
         branch = git_branch()
 
     revlist = git_revlist(branch)
-    make = get_make_cmd('bsd')
     sizes = read_git_sizes(revlist)
     
     known = set()
@@ -427,17 +475,22 @@ def update_history(version, branch = None):
     try:
         for r in reversed(revlist):
             if not r in known:
-                if os.path.exists('sizes/sizes.json'):
-                    os.unlink('sizes/sizes.json')
-                rc = subprocess.call(['git', 'checkout', '-q', r])
-                if rc:
-                    raise RuntimeError('git checkout -q ' + r + ' failed')
+                interesting = rev_is_interesting(r)
+                if interesting:
+                    if os.path.exists('sizes/sizes.json'):
+                        os.unlink('sizes/sizes.json')
+                    rc = subprocess.call(['git', 'checkout', '-q', r])
+                    if rc:
+                        raise RuntimeError('git checkout -q ' + r + ' failed')
 
-                rc = update_git_size(version, r, make, sizes)
-                if not rc:
-                    print '%s ok' % r
-                else:
-                    print '%s make failed' % r
+                    flavour = get_make_flavour()
+                    make = get_make_cmd(flavour)
+                    
+                    rc = update_git_size(version, r, make, sizes)
+                    if not rc:
+                        print '%s ok' % r
+                    else:
+                        print '%s make failed (%s)' % (r, flavour)
             else:
                 if not quiet:
                     print '%s already recorded' % r
@@ -451,7 +504,7 @@ def update_history(version, branch = None):
     return sizes
 
 if __name__ == '__main__':
-    parser = OptionParser('usage: %prog OPTIONS recent|generate|history+')
+    parser = OptionParser('usage: %prog OPTIONS recent|generate|history|prune-boring+')
     parser.add_option("-r", "--remote", default='origin',
                       help="the git REMOTE name (default is origin)")
     parser.add_option("-q", "--quiet", action='store_true',
@@ -473,6 +526,10 @@ if __name__ == '__main__':
             write_sizes(git_sizes, 'sizes/git_sizes.json')
         elif a == 'generate':
             generate(version, git_sizes, recent_sizes, options.remote)
+        elif a == 'prune-boring':
+            prune_boring_git_sizes()
+        else:
+            parser.print_help()
     else:
         generate(version, git_sizes, recent_sizes, options.remote)
         

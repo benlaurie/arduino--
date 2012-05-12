@@ -28,6 +28,7 @@ var compiler_version = "%(compiler_version)s"
 var remote_url = "%(remote_url)s"
 var plot_id = 0
 var bin_to_id = {}
+var compiler_versions = compute_compiler_versions()
 var version_commit_count = {}
 
 var partition_size = 1024
@@ -54,22 +55,32 @@ function generate_id(fnlist) {
 
 /** collect all compiler versions
 */
-function compiler_versions() {
+function compute_compiler_versions() {
     var versions = {}
+    var vlist = []
     for (var i = 0; i < git_sizes.length; i++) {
         for (var v in git_sizes[i]) {
             if (v != 'git') {
+                // put the current compiler version at the front of the list,
+                // but only if it appears in the sizes at all.
+                if (v == compiler_version && vlist.length == 0) {
+                    vlist.push(v)
+                }
                 versions[v] = null
             }
         }
     }
     for (var v in recent_sizes) {
         if (v != 'counter') {
+            // put the current compiler version at the front of the list,
+            // but only if it appears in the sizes at all.
+            if (v == compiler_version && vlist.length == 0) {
+                vlist.push(v)
+            }
             versions[v] = null
         }
     }
 
-    var vlist = [compiler_version]
     for (var v in versions) {
         if (v != compiler_version) {
             vlist.push(v)
@@ -185,9 +196,12 @@ function recent_plot_data(fn, version, offset) {
 
 function merge(d0, d1) {
 
+    if (!d0)
+        return d1
+
     if (!d1)
-        return d0
-    
+        return d0    
+
     if (d0.label != d1.label)
         return undefined
 
@@ -203,7 +217,7 @@ function all_plot_data(fn, version) {
     version = version || compiler_version
 
     return merge(git_plot_data(fn, version), 
-                 recent_plot_data(fn, version, max_commits(version)))
+                  recent_plot_data(fn, version, max_commits(version)))
 }
 
 /** Generate the html for the plot(s)
@@ -234,20 +248,7 @@ function plot_html(title, fnlist, id) {
     return s
 }
 
-function cmp_mean(a, b) {
-
-    var ma = a.acc / a.data.lentgh
-    var mb = b.acc / b.data.length
-
-    if (ma == mb) {
-        return 0
-    }
-    return ma < mb ? -1 : 1
-}
-
 function plot(id, data) {
-
-    data.sort(cmp_mean)
 
     var pl = $.plot($("#" + id + '_plot'),
                     data,
@@ -270,12 +271,12 @@ function kb(s) {
     return (s / 1024) + 'kb'
 }
 
-/** Add all plots, grouped by sizes
+/** Draw all plots, grouped by sizes
  *
- * @param version Compiler version (default is the installed compiler)
  * @param fnlist List of binfiles to display
+ * @param version Compiler version (default is the installed compiler)
  */
-function add_plots_grouped(fnlist, version) {
+function draw_plots_grouped(fnlist, version) {
     version = version || compiler_version
     fnlist = fnlist || binfiles()
 
@@ -323,12 +324,76 @@ function add_plots_grouped(fnlist, version) {
     }
 }
 
-/** Add a single plot for each binfile
+/** Draw a single plot for each binfile for all compiler versions
+ *
+ * @param fnlist List of binfiles to display
+ */
+function draw_plots_single_all_compilers(fnlist) {
+
+    function cmp_mean(a, b) {
+        if (a.mean == b.mean) {
+            return 0
+        }
+        return a.mean < b.mean ? -1 : 1
+    }
+
+    fnlist = fnlist || binfiles()
+    var data = []
+
+    for (var i = 0; i < fnlist.length; i++) {
+        var combined = []
+        var binfile = fnlist[i]
+        var mean = 0
+        // Get all the data
+        for (var v = 0; v < compiler_versions.length; v++) {
+            var version = compiler_versions[v]
+            var pd = all_plot_data(binfile, version)
+            if (pd) {
+                mean = mean + pd.acc / pd.data.length
+                pd.color = v
+                pd.label = binfile + ' ' + version
+                combined.push(pd)
+            }
+        }
+        if (combined.length) {
+            data.push({ 'mean': mean / combined.length,
+                        'binfile': binfile,
+                        'data': combined})
+        }
+    }
+
+    data.sort(cmp_mean)
+
+    for (var i = 0; i < data.length; i++) {
+        var combined = data[i].data
+        var binfile = data[i].binfile
+        if (combined.length > 0) {
+            var id = generate_id([binfile])
+            $('#plots').append(plot_html(binfile, [binfile], id))
+            plot(id, combined)
+        }
+    }
+}
+
+
+/** Draw a single plot for each binfile
  *
  * @param version Compiler version (default is the installed compiler)
  * @param fnlist List of binfiles to display
  */
-function add_plots_single(fnlist, version) {
+function draw_plots_single(fnlist, version) {
+
+    function cmp_mean(a, b) {
+
+        var ma = a.acc / a.data.length
+        var mb = b.acc / b.data.length
+
+        if (ma == mb) {
+            return 0
+        }
+        return ma < mb ? -1 : 1
+    }
+
     version = version || compiler_version
     fnlist = fnlist || binfiles()
 
@@ -341,10 +406,12 @@ function add_plots_single(fnlist, version) {
 
     for (var i = 0; i < data.length; i++) {
         var di = data[i]
-        var id = generate_id([di.label])
-        $('#plots').append(plot_html(di.label, [di.label], id))
-        di.color = i
-        plot(id, [di])
+        if (di) {
+            var id = generate_id([di.label])
+            $('#plots').append(plot_html(di.label, [di.label], id))
+            di.color = i
+            plot(id, [di])
+        }
     }
 }
 
@@ -439,15 +506,21 @@ function update() {
     var bfl = binfiles()
 
     if (group == 'grouped') {
-        add_plots_grouped(bfl, version)
+        $('#compiler_version').show()
+        draw_plots_grouped(bfl, version)
+    }
+    else if (group == 'single') {
+        $('#compiler_version').show()
+        draw_plots_single(bfl, version)
     }
     else {
-        add_plots_single(bfl, version)
+        $('#compiler_version').hide()
+        draw_plots_single_all_compilers(bfl)
     }
 }
 
 function add_version_select(versions) {
-    versions = versions || compiler_versions()
+    versions = versions || compiler_versions
     var s = ''
 
     for (var i = 0; i < versions.length; i++) {
@@ -462,9 +535,8 @@ function add_version_select(versions) {
 }
 
 $(function () {
-    var versions = compiler_versions()
-    if (versions.length > 1) {
-        add_version_select(versions)
+    if (compiler_versions.length > 1) {
+        add_version_select(compiler_versions)
     }
     var group = $('input:radio[name=group]')
     $(group).change(function() {
@@ -478,8 +550,10 @@ $(function () {
     <body>
       <h1>arduino-- size tracking</h1>
       <div id="select_ui">
-        <input type="radio" name="group" value="grouped">grouped plots</input>
+        <input type="radio" name="group" value="grouped">plots grouped by size</input>
         <input type="radio" name="group" value="single">single plots</input>
+        <input type="radio" name="group" value="single_all_versions">
+        plots for all compiler versions</input>
       </div>
       <div id="plots"></div>
     </body>

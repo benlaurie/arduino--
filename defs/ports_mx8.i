@@ -21,6 +21,8 @@ D(SPCR);
 D(EICRA);
 D(EIMSK);
 
+D(ICR1);
+
 D(TCNT0);
 D(TCNT1);
 D(TCNT2);
