@@ -48,18 +48,18 @@ typedef class _Interrupt<ISC10, INT1> Interrupt1;
 
 typedef _Timer_2C<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
                   _Register<NTCCR0A>, _Register<NTCCR0B>, 
-                  _Register<NTIFR0>, _Register<NTIMSK0> >
+                  _Register<NTIMSK0>, _Register<NTIFR0> >
 Timer0;
 
 typedef _Timer_2C3<_Register16<NTCNT1>, _Register16<NICR1>, 
                    _Register16<NOCR1A>, _Register16<NOCR1B>, 
                    _Register<NTCCR1A>, _Register<NTCCR1B>, _Register<NTCCR1C>,
-                   _Register<NTIFR1>, _Register<NTIMSK1> >
+                   _Register<NTIMSK1>, _Register<NTIFR1> >
 Timer1;
 
 typedef _Timer_2C<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
                   _Register<NTCCR2A>, _Register<NTCCR2B>, 
-                  _Register<NTIFR2>, _Register<NTIMSK2> >
+                  _Register<NTIMSK2>, _Register<NTIFR2> >
 Timer2;
 
 class Pin
