@@ -200,7 +200,7 @@ private:
 */
 template <class TCNT_, class OCRA_, class OCRB_, class TCCRA_, class TCCRB_,
           class TIMSK_, class TIFR_>
-class _Timer_2C2 : public _Timer<TCNT_, TIMSK_, 0> // 0 is TOIEx
+class _Timer_2C : public _Timer<TCNT_, TIMSK_, 0> // 0 is TOIEx
     {
 public:
 

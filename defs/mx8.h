@@ -46,9 +46,9 @@ template <byte lsb, byte maskbit> class _Interrupt
 typedef class _Interrupt<ISC00, INT0> Interrupt0;
 typedef class _Interrupt<ISC10, INT1> Interrupt1;
 
-typedef _Timer_2C2<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
-                   _Register<NTCCR0A>, _Register<NTCCR0B>, 
-                   _Register<NTIFR0>, _Register<NTIMSK0> >
+typedef _Timer_2C<_Register<NTCNT0>, _Register<NOCR0A>, _Register<NOCR0B>, 
+                  _Register<NTCCR0A>, _Register<NTCCR0B>, 
+                  _Register<NTIFR0>, _Register<NTIMSK0> >
 Timer0;
 
 typedef _Timer_2C3<_Register16<NTCNT1>, _Register16<NICR1>, 
@@ -57,9 +57,9 @@ typedef _Timer_2C3<_Register16<NTCNT1>, _Register16<NICR1>,
                    _Register<NTIFR1>, _Register<NTIMSK1> >
 Timer1;
 
-typedef _Timer_2C2<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
-                   _Register<NTCCR2A>, _Register<NTCCR2B>, 
-                   _Register<NTIFR2>, _Register<NTIMSK2> >
+typedef _Timer_2C<_Register<NTCNT2>, _Register<NOCR2A>, _Register<NOCR2B>,
+                  _Register<NTCCR2A>, _Register<NTCCR2B>, 
+                  _Register<NTIFR2>, _Register<NTIMSK2> >
 Timer2;
 
 class Pin
