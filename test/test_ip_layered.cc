@@ -37,9 +37,9 @@ public:
 	{}
 
     void add_p(const char *pmem)
-	{ len_ = IP80::fill_tcp_data_p(buf, len_, pmem); }
+	{ len_ = IP80::fill_tcp_data_p(buf_, len_, pmem); }
     void add(const char *str)
-	{ len_ = IP80::fill_tcp_data(buf, len_, str); }
+	{ len_ = IP80::fill_tcp_data(buf_, len_, str); }
     void add_hex(byte b)
 	{
 	char buf[3];
@@ -59,16 +59,19 @@ public:
 	}
     uint16_t length() const
 	{ return len_; }
+    void clearBuffer()
+	{ len_ = 0; }
     void poll();
 
 private:
     uint16_t len_;
     static const uint16_t BUFFER_SIZE = 500;
-    uint8_t buf[BUFFER_SIZE + 1];
+    uint8_t buf_[BUFFER_SIZE + 1];
     };
 
 uint16_t print_webpage(TCPBuffer *tcp)
     {
+    tcp->clearBuffer();
     tcp->add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
     return tcp->length();
     }
@@ -77,7 +80,7 @@ void TCPBuffer::poll()
     {
     uint16_t plen, dat_p;
 
-    plen = Ethernet::PacketReceive(BUFFER_SIZE, buf);
+    plen = Ethernet::PacketReceive(BUFFER_SIZE, buf_);
 
     /* plen will be unequal to zero if there is a valid packet
        (without crc error) */
@@ -85,59 +88,59 @@ void TCPBuffer::poll()
 	{
 	// arp is broadcast if unknown but a host may also verify the
 	// mac address by sending it to a unicast address.
-	if(IP80::eth_type_is_arp_and_my_ip(buf,plen))
+	if(IP80::eth_type_is_arp_and_my_ip(buf_, plen))
 	    {
-	    IP80::make_arp_answer_from_request(buf);
+	    IP80::make_arp_answer_from_request(buf_);
 	    return;
 	    }
 
 	// check if ip packets are for us:
-	if(IP80::eth_type_is_ip_and_my_ip(buf,plen) == 0)
+	if(IP80::eth_type_is_ip_and_my_ip(buf_, plen) == 0)
 	    return;
     
-	if(buf[IP_PROTO_P] == IP_PROTO_ICMP_V
-	   && buf[ICMP_TYPE_P] == ICMP_TYPE_ECHOREQUEST_V)
+	if(buf_[IP_PROTO_P] == IP_PROTO_ICMP_V
+	   && buf_[ICMP_TYPE_P] == ICMP_TYPE_ECHOREQUEST_V)
 	    {
-	    IP80::make_echo_reply_from_request(buf,plen);
+	    IP80::make_echo_reply_from_request(buf_, plen);
 	    return;
 	    }
     
 	// tcp port www start, compare only the lower byte
-	if (buf[IP_PROTO_P] == IP_PROTO_TCP_V
-	    && buf[TCP_DST_PORT_H_P] == 0
-	    && buf[TCP_DST_PORT_L_P] == mywwwport)
+	if (buf_[IP_PROTO_P] == IP_PROTO_TCP_V
+	    && buf_[TCP_DST_PORT_H_P] == 0
+	    && buf_[TCP_DST_PORT_L_P] == mywwwport)
 	    {
-	    if (buf[TCP_FLAGS_P] & TCP_FLAGS_SYN_V)
+	    if (buf_[TCP_FLAGS_P] & TCP_FLAGS_SYN_V)
 		{
-		IP80::make_tcp_synack_from_syn(buf); // make_tcp_synack_from_syn does already send the syn,ack
+		IP80::make_tcp_synack_from_syn(buf_); // make_tcp_synack_from_syn does already send the syn,ack
 		return;
 		}
-	    if (buf[TCP_FLAGS_P] & TCP_FLAGS_ACK_V)
+	    if (buf_[TCP_FLAGS_P] & TCP_FLAGS_ACK_V)
 		{
-		IP80::init_len_info(buf); // init some data structures
-		dat_p=IP80::get_tcp_data_pointer();
+		IP80::init_len_info(buf_); // init some data structures
+		dat_p = IP80::get_tcp_data_pointer();
 		if (dat_p == 0)
 		    { // we can possibly have no data, just ack:
-		    if (buf[TCP_FLAGS_P] & TCP_FLAGS_FIN_V)
-			IP80::make_tcp_ack_from_any(buf);
+		    if (buf_[TCP_FLAGS_P] & TCP_FLAGS_FIN_V)
+			IP80::make_tcp_ack_from_any(buf_);
 		    return;
 		    }
-		if (strncmp("GET ",(char *)&(buf[dat_p]),4) != 0)
+		if (strncmp("GET ", (char *)&(buf_[dat_p]), 4) != 0)
 		    {
 		    // head, post and other methods for possible status codes see:
 		    // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-		    plen=IP80::fill_tcp_data_p(buf,0,PSTR("HTTP/1.0 501 OK\r\nContent-Type: text/html\r\n\r\n"));
+		    plen=IP80::fill_tcp_data_p(buf_, 0, PSTR("HTTP/1.0 501 OK\r\nContent-Type: text/html\r\n\r\n"));
 		    goto SENDTCP;
 		    }
-		if (strncmp("/ ",(char *)&(buf[dat_p+4]),2) == 0)
+		if (strncmp("/ ", (char *)&(buf_[dat_p+4]),2) == 0)
 		    {
 		    plen=print_webpage(this);
 		    goto SENDTCP;
 		    }
 
 	    SENDTCP:
-		IP80::make_tcp_ack_from_any(buf); // send ack for http get
-		IP80::make_tcp_ack_with_data(buf,plen); // send data       
+		IP80::make_tcp_ack_from_any(buf_); // send ack for http get
+		IP80::make_tcp_ack_with_data(buf_, plen); // send data       
 		}
 	    }
 	}
