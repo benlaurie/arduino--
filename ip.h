@@ -680,6 +680,9 @@ public:
 
         return ((uint16_t)dlength);
         }
+
+    static uint16_t PacketReceive(uint16_t size, byte *buf)
+        { return Ethernet::PacketReceive(size, buf); }
 private:
     static uint16_t ip_identifier_;
     static uint8_t ipaddr_[4];
