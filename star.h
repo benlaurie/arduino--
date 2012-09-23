@@ -127,7 +127,8 @@ public:
 private:
     static void processPacket()
         {
-        Serial.write('A');
+        Observer::gotPacket(Network::getID(), Network::getType(),
+                            Network::getLength(), Network::getData());
         switch (Network::getType())
             {
         case StarBase::ALLOCATE_ID:
