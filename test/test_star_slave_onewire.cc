@@ -22,7 +22,7 @@ void MySerialSlaveObserver::canSend()
     byte n;
     for (n = 0; n < 6 && n < buttons.Count(); ++n)
 	{
-	memcpy(buf, buttons[n].ID(), 8);
+	memcpy(&buf[n*10], buttons[n].ID(), 8);
 	buf[n*10 + 8] = buttons[n].Temperature() & 0xff;
 	buf[n*10 + 9] = buttons[n].Temperature() >> 8;
 	}
