@@ -25,7 +25,7 @@
 #include "enc28j60.h"
 
 
-template <class Ethernet, byte port> class IP
+template <class Ethernet> class IP
     {
 public:
     // The Ip checksum is calculated over the ip header only starting
@@ -231,8 +231,8 @@ public:
     // at TCP_OPTIONS_P+4. If cp_seq=0 then an initial sequence number
     // is used (should be use in synack) otherwise it is copied from
     // the packet we received
-    static void make_tcphead(uint8_t *buf,uint16_t rel_ack_num,uint8_t mss,
-			     uint8_t cp_seq)
+    static void make_tcphead(uint8_t *buf, uint16_t rel_ack_num, uint8_t mss,
+			     uint8_t cp_seq, byte port)
         {
         uint8_t tseq;
 
@@ -366,7 +366,7 @@ public:
         Ethernet::PacketSend(UDP_HEADER_LEN+IP_HEADER_LEN+ETH_HEADER_LEN+datalen,buf);
         }
 
-    static void make_tcp_synack_from_syn(uint8_t *buf)
+    static void make_tcp_synack_from_syn(uint8_t *buf, byte port)
         {
         uint16_t ck;
         make_eth(buf);
@@ -376,7 +376,7 @@ public:
         buf[IP_TOTLEN_L_P]=IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+4;
         make_ip(buf);
         buf[TCP_FLAG_P]=TCP_FLAGS_SYNACK_V;
-        make_tcphead(buf,1,1,0);
+        make_tcphead(buf, 1, 1, 0, port);
         // calculate the checksum, len=8 (start from ip.src) + TCP_HEADER_LEN_PLAIN + 4 (one option: mss)
         ck=checksum(&buf[IP_SRC_P], 8+TCP_HEADER_LEN_PLAIN+4,2);
         buf[TCP_CHECKSUM_H_P]=ck>>8;
@@ -445,7 +445,7 @@ public:
 
     // Make just an ack packet with no tcp data inside
     // This will modify the eth/ip/tcp header 
-    static void make_tcp_ack_from_any(uint8_t *buf)
+    static void make_tcp_ack_from_any(uint8_t *buf, byte port)
         {
         uint16_t j;
 
@@ -455,9 +455,9 @@ public:
 
         if (info_data_len_ == 0)
             // if there is no data then we must still acknoledge one packet
-            make_tcphead(buf, 1, 0, 1); // no options
+            make_tcphead(buf, 1, 0, 1, port); // no options
         else
-            make_tcphead(buf, info_data_len_, 0, 1); // no options
+            make_tcphead(buf, info_data_len_, 0, 1, port); // no options
 
         // total length field in the IP header must be set:
         // 20 bytes IP + 20 bytes tcp (when no options) 
@@ -689,12 +689,12 @@ private:
     static uint8_t seqnum_;
     };
 
-template <class Ethernet, byte port>
-uint16_t IP<Ethernet, port>::ip_identifier_ = 1;
-template <class Ethernet, byte port> uint8_t IP<Ethernet, port>::ipaddr_[4];
-template <class Ethernet, byte port> uint8_t IP<Ethernet, port>::macaddr_[6];
-template <class Ethernet, byte port> int16_t IP<Ethernet, port>::info_hdr_len_;
-template <class Ethernet, byte port> int16_t IP<Ethernet, port>::info_data_len_;
-template <class Ethernet, byte port> uint8_t IP<Ethernet, port>::seqnum_ = 0xa;
+template <class Ethernet>
+uint16_t IP<Ethernet>::ip_identifier_ = 1;
+template <class Ethernet> uint8_t IP<Ethernet>::ipaddr_[4];
+template <class Ethernet> uint8_t IP<Ethernet>::macaddr_[6];
+template <class Ethernet> int16_t IP<Ethernet>::info_hdr_len_;
+template <class Ethernet> int16_t IP<Ethernet>::info_data_len_;
+template <class Ethernet> uint8_t IP<Ethernet>::seqnum_ = 0xa;
 
 /* end of ip_arp_udp.c */

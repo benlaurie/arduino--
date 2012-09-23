@@ -6,9 +6,7 @@
 // Nanode
 typedef ENC28J60<Pin::B0> Ethernet;
 
-typedef IP<Ethernet, 80> IP80;
-
-static uint16_t mywwwport = 80; // listen port for tcp/www (max range 1-254)
+typedef IP<Ethernet> MyIP;
 
 static uint8_t mymac[6] = {0x54,0x55,0x58,0x10,0x00,0x24}; 
 static uint8_t myip[4] = {192,168,1,111};
@@ -19,7 +17,7 @@ void setup()
     Ethernet::setup(mymac);
 
     //init the ethernet/ip layer:
-    IP80::init_ip_arp_udp_tcp(mymac,myip);
+    MyIP::init_ip_arp_udp_tcp(mymac, myip);
     }
 
 static char hexdigit(byte b)
@@ -29,7 +27,7 @@ static char hexdigit(byte b)
     return 'a' + b - 10;
     }
 
-template <class Port> class TCPServer
+template <class MyIP, byte port> class TCPServer
     {
 public:
     TCPServer()
@@ -37,9 +35,9 @@ public:
 	{}
 
     void add_p(const char *pmem)
-	{ len_ = Port::fill_tcp_data_p(buf_, len_, pmem); }
+	{ len_ = MyIP::fill_tcp_data_p(buf_, len_, pmem); }
     void add(const char *str)
-	{ len_ = Port::fill_tcp_data(buf_, len_, str); }
+	{ len_ = MyIP::fill_tcp_data(buf_, len_, str); }
     void add_hex(byte b)
 	{
 	char buf[3];
@@ -62,7 +60,7 @@ public:
     void clearBuffer()
 	{ len_ = 0; }
     char *getData() const
-	{ return (char *)&(buf_[Port::get_tcp_data_pointer()]); }
+	{ return (char *)&(buf_[MyIP::get_tcp_data_pointer()]); }
     void poll();
 
 private:
@@ -73,14 +71,14 @@ private:
     uint8_t buf_[BUFFER_SIZE + 1];
     };
 
-template <class Port> uint16_t print_webpage(TCPServer<Port> *tcp)
+template <class MyIP, byte port> uint16_t print_webpage(TCPServer<MyIP, port> *tcp)
     {
     tcp->clearBuffer();
     tcp->add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
     return tcp->length();
     }
 
-template <class Port> void TCPServer<Port>::poll()
+template <class MyIP, byte port> void TCPServer<MyIP, port>::poll()
     {
     uint16_t plen, dat_p;
 
@@ -92,53 +90,53 @@ template <class Port> void TCPServer<Port>::poll()
 	{
 	// arp is broadcast if unknown but a host may also verify the
 	// mac address by sending it to a unicast address.
-	if(Port::eth_type_is_arp_and_my_ip(buf_, plen))
+	if(MyIP::eth_type_is_arp_and_my_ip(buf_, plen))
 	    {
-	    Port::make_arp_answer_from_request(buf_);
+	    MyIP::make_arp_answer_from_request(buf_);
 	    return;
 	    }
 
 	// check if ip packets are for us:
-	if(Port::eth_type_is_ip_and_my_ip(buf_, plen) == 0)
+	if(MyIP::eth_type_is_ip_and_my_ip(buf_, plen) == 0)
 	    return;
     
 	if(buf_[IP_PROTO_P] == IP_PROTO_ICMP_V
 	   && buf_[ICMP_TYPE_P] == ICMP_TYPE_ECHOREQUEST_V)
 	    {
-	    Port::make_echo_reply_from_request(buf_, plen);
+	    MyIP::make_echo_reply_from_request(buf_, plen);
 	    return;
 	    }
     
 	// tcp port www start, compare only the lower byte
 	if (buf_[IP_PROTO_P] == IP_PROTO_TCP_V
 	    && buf_[TCP_DST_PORT_H_P] == 0
-	    && buf_[TCP_DST_PORT_L_P] == mywwwport)
+	    && buf_[TCP_DST_PORT_L_P] == port)
 	    {
 	    if (buf_[TCP_FLAGS_P] & TCP_FLAGS_SYN_V)
 		{
-		Port::make_tcp_synack_from_syn(buf_); // make_tcp_synack_from_syn does already send the syn,ack
+		MyIP::make_tcp_synack_from_syn(buf_, port); // make_tcp_synack_from_syn does already send the syn,ack
 		return;
 		}
 	    if (buf_[TCP_FLAGS_P] & TCP_FLAGS_ACK_V)
 		{
-		Port::init_len_info(buf_); // init some data structures
-		dat_p = Port::get_tcp_data_pointer();
+		MyIP::init_len_info(buf_); // init some data structures
+		dat_p = MyIP::get_tcp_data_pointer();
 		if (dat_p == 0)
 		    { // we can possibly have no data, just ack:
 		    if (buf_[TCP_FLAGS_P] & TCP_FLAGS_FIN_V)
-			Port::make_tcp_ack_from_any(buf_);
+			MyIP::make_tcp_ack_from_any(buf_, port);
 		    return;
 		    }
 		packetReceived();
 
-		Port::make_tcp_ack_from_any(buf_); // send ack for http get
-		Port::make_tcp_ack_with_data(buf_, len_); // send data       
+		MyIP::make_tcp_ack_from_any(buf_, port); // send ack for http get
+		MyIP::make_tcp_ack_with_data(buf_, len_); // send data
 		}
 	    }
 	}
     }
 
-class MyTCPServer : public TCPServer<IP80>
+class MyTCPServer : public TCPServer<MyIP, 80>
     {
     void packetReceived();
     };

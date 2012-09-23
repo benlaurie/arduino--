@@ -6,7 +6,7 @@
 // Nanode
 typedef ENC28J60<Pin::B0> Ethernet;
 
-typedef IP<Ethernet, 80> IP80;
+typedef IP<Ethernet> MyIP;
 
 static uint16_t mywwwport = 80; // listen port for tcp/www (max range 1-254)
 
@@ -53,7 +53,7 @@ void setup()
     _delay_ms(100);
 
     //init the ethernet/ip layer:
-    IP80::init_ip_arp_udp_tcp(mymac,myip);
+    MyIP::init_ip_arp_udp_tcp(mymac,myip);
     }
 
 static char hexdigit(byte b)
@@ -71,9 +71,9 @@ public:
 	{}
 
     void add_p(const char *pmem)
-	{ len_ = IP80::fill_tcp_data_p(buf, len_, pmem); }
+	{ len_ = MyIP::fill_tcp_data_p(buf, len_, pmem); }
     void add(const char *str)
-	{ len_ = IP80::fill_tcp_data(buf, len_, str); }
+	{ len_ = MyIP::fill_tcp_data(buf, len_, str); }
     void add_hex(byte b)
 	{
 	char buf[3];
@@ -127,20 +127,20 @@ void loop()
 	{
 	// arp is broadcast if unknown but a host may also verify the
 	// mac address by sending it to a unicast address.
-	if(IP80::eth_type_is_arp_and_my_ip(buf,plen))
+	if(MyIP::eth_type_is_arp_and_my_ip(buf,plen))
 	    {
-	    IP80::make_arp_answer_from_request(buf);
+	    MyIP::make_arp_answer_from_request(buf);
 	    return;
 	    }
 
 	// check if ip packets are for us:
-	if(IP80::eth_type_is_ip_and_my_ip(buf,plen) == 0)
+	if(MyIP::eth_type_is_ip_and_my_ip(buf,plen) == 0)
 	    return;
     
 	if(buf[IP_PROTO_P] == IP_PROTO_ICMP_V
 	   && buf[ICMP_TYPE_P] == ICMP_TYPE_ECHOREQUEST_V)
 	    {
-	    IP80::make_echo_reply_from_request(buf,plen);
+	    MyIP::make_echo_reply_from_request(buf,plen);
 	    return;
 	    }
     
@@ -151,24 +151,24 @@ void loop()
 	    {
 	    if (buf[TCP_FLAGS_P] & TCP_FLAGS_SYN_V)
 		{
-		IP80::make_tcp_synack_from_syn(buf); // make_tcp_synack_from_syn does already send the syn,ack
+		MyIP::make_tcp_synack_from_syn(buf, mywwwport); // make_tcp_synack_from_syn does already send the syn,ack
 		return;
 		}
 	    if (buf[TCP_FLAGS_P] & TCP_FLAGS_ACK_V)
 		{
-		IP80::init_len_info(buf); // init some data structures
-		dat_p=IP80::get_tcp_data_pointer();
+		MyIP::init_len_info(buf); // init some data structures
+		dat_p=MyIP::get_tcp_data_pointer();
 		if (dat_p == 0)
 		    { // we can possibly have no data, just ack:
 		    if (buf[TCP_FLAGS_P] & TCP_FLAGS_FIN_V)
-			IP80::make_tcp_ack_from_any(buf);
+			MyIP::make_tcp_ack_from_any(buf, mywwwport);
 		    return;
 		    }
 		if (strncmp("GET ",(char *)&(buf[dat_p]),4) != 0)
 		    {
 		    // head, post and other methods for possible status codes see:
 		    // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-		    plen=IP80::fill_tcp_data_p(buf,0,PSTR("HTTP/1.0 501 OK\r\nContent-Type: text/html\r\n\r\n"));
+		    plen=MyIP::fill_tcp_data_p(buf,0,PSTR("HTTP/1.0 501 OK\r\nContent-Type: text/html\r\n\r\n"));
 		    goto SENDTCP;
 		    }
 		if (strncmp("/ ",(char *)&(buf[dat_p+4]),2) == 0)
@@ -178,8 +178,8 @@ void loop()
 		    }
 
 	    SENDTCP:
-		IP80::make_tcp_ack_from_any(buf); // send ack for http get
-		IP80::make_tcp_ack_with_data(buf,plen); // send data       
+		MyIP::make_tcp_ack_from_any(buf, mywwwport); // send ack for http get
+		MyIP::make_tcp_ack_with_data(buf,plen); // send data
 		}
 	    }
 	}
