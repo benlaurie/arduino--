@@ -61,9 +61,13 @@ public:
 	{ return len_; }
     void clearBuffer()
 	{ len_ = 0; }
+    char *getData() const
+	{ return (char *)&(buf_[Port::get_tcp_data_pointer()]); }
     void poll();
 
 private:
+    virtual void packetReceived() = 0;
+
     uint16_t len_;
     static const uint16_t BUFFER_SIZE = 500;
     uint8_t buf_[BUFFER_SIZE + 1];
@@ -125,31 +129,37 @@ template <class Port> void TCPServer<Port>::poll()
 			Port::make_tcp_ack_from_any(buf_);
 		    return;
 		    }
-		if (strncmp("GET ", (char *)&(buf_[dat_p]), 4) != 0)
-		    {
-		    // head, post and other methods for possible status codes see:
-		    // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-		    plen=Port::fill_tcp_data_p(buf_, 0, PSTR("HTTP/1.0 501 OK\r\nContent-Type: text/html\r\n\r\n"));
-		    goto SENDTCP;
-		    }
-		if (strncmp("/ ", (char *)&(buf_[dat_p+4]),2) == 0)
-		    {
-		    plen=print_webpage(this);
-		    goto SENDTCP;
-		    }
+		packetReceived();
 
-	    SENDTCP:
 		Port::make_tcp_ack_from_any(buf_); // send ack for http get
-		Port::make_tcp_ack_with_data(buf_, plen); // send data       
+		Port::make_tcp_ack_with_data(buf_, len_); // send data       
 		}
 	    }
 	}
     }
 
+class MyTCPServer : public TCPServer<IP80>
+    {
+    void packetReceived();
+    };
+
+void MyTCPServer::packetReceived()
+    {
+    char *buf = getData();
+    if (strncmp("GET / ", buf, 6) != 0)
+	// head, post and other methods for possible status codes see:
+	// http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+	add_p(PSTR("HTTP/1.0 501 OK\r\nContent-Type: text/html\r\n\r\n"));
+    else
+	print_webpage(this);
+    }
+
+// FIXME: why do I need this?
+extern "C" void __cxa_pure_virtual() { while (1); }
 
 int main()
     {
-    TCPServer<IP80> tcp;
+    MyTCPServer tcp;
         
     setup();
 
