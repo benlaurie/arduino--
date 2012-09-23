@@ -29,10 +29,10 @@ static char hexdigit(byte b)
     return 'a' + b - 10;
     }
 
-class TCPBuffer
+class TCPServer
     {
 public:
-    TCPBuffer()
+    TCPServer()
       : len_(0)
 	{}
 
@@ -69,14 +69,14 @@ private:
     uint8_t buf_[BUFFER_SIZE + 1];
     };
 
-uint16_t print_webpage(TCPBuffer *tcp)
+uint16_t print_webpage(TCPServer *tcp)
     {
     tcp->clearBuffer();
     tcp->add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
     return tcp->length();
     }
 
-void TCPBuffer::poll()
+void TCPServer::poll()
     {
     uint16_t plen, dat_p;
 
@@ -149,7 +149,7 @@ void TCPBuffer::poll()
 
 int main()
     {
-    TCPBuffer tcp;
+    TCPServer tcp;
         
     setup();
 
