@@ -10,8 +10,6 @@ typedef IP<Ethernet, 80> IP80;
 
 static uint16_t mywwwport = 80; // listen port for tcp/www (max range 1-254)
 
-#define BUFFER_SIZE 500
-static uint8_t buf[BUFFER_SIZE+1];
 static uint8_t mymac[6] = {0x54,0x55,0x58,0x10,0x00,0x24}; 
 static uint8_t myip[4] = {192,168,1,111};
 
@@ -59,37 +57,29 @@ public:
 	buf[1] = '\0';
 	add(buf);
 	}
-    /*
-    void add_decimal(int n, int d)
-	{
-	char buf[10];
-
-	sprintf(buf, "%d.%d", n, d);
-	add(buf);
-	}
-    */
     uint16_t length() const
 	{ return len_; }
+    void poll();
 
 private:
     uint16_t len_;
+    static const uint16_t BUFFER_SIZE = 500;
+    uint8_t buf[BUFFER_SIZE + 1];
     };
 
-uint16_t print_webpage(uint8_t *buf)
+uint16_t print_webpage(TCPBuffer *tcp)
     {
-    TCPBuffer tcp;
-        
-    tcp.add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
-    return tcp.length();
+    tcp->add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
+    return tcp->length();
     }
 
-void loop()
+void TCPBuffer::poll()
     {
     uint16_t plen, dat_p;
 
     plen = Ethernet::PacketReceive(BUFFER_SIZE, buf);
 
-    /* plen will ne unequal to zero if there is a valid packet
+    /* plen will be unequal to zero if there is a valid packet
        (without crc error) */
     if (plen != 0)
 	{
@@ -141,7 +131,7 @@ void loop()
 		    }
 		if (strncmp("/ ",(char *)&(buf[dat_p+4]),2) == 0)
 		    {
-		    plen=print_webpage(buf);
+		    plen=print_webpage(this);
 		    goto SENDTCP;
 		    }
 
@@ -156,10 +146,12 @@ void loop()
 
 int main()
     {
+    TCPBuffer tcp;
+        
     setup();
 
     for( ; ; )
-	loop();
+	tcp.poll();
     
     return 0;
     }
