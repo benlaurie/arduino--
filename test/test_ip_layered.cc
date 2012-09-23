@@ -71,13 +71,6 @@ private:
     uint8_t buf_[BUFFER_SIZE + 1];
     };
 
-template <class MyIP, byte port> uint16_t print_webpage(TCPServer<MyIP, port> *tcp)
-    {
-    tcp->clearBuffer();
-    tcp->add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
-    return tcp->length();
-    }
-
 template <class MyIP, byte port> void TCPServer<MyIP, port>::poll()
     {
     uint16_t plen, dat_p;
@@ -143,13 +136,14 @@ class MyTCPServer : public TCPServer<MyIP, 80>
 
 void MyTCPServer::packetReceived()
     {
+    clearBuffer();
     char *buf = getData();
     if (strncmp("GET / ", buf, 6) != 0)
 	// head, post and other methods for possible status codes see:
 	// http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	add_p(PSTR("HTTP/1.0 501 OK\r\nContent-Type: text/html\r\n\r\n"));
     else
-	print_webpage(this);
+	add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
     }
 
 // FIXME: why do I need this?
