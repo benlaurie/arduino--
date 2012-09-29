@@ -33,7 +33,7 @@ void MyTCPServer::packetReceived()
     if (strncmp("GET / ", buf, 6) != 0)
 	// head, post and other methods for possible status codes see:
 	// http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-	add_p(PSTR("HTTP/1.0 501 OK\r\nContent-Type: text/html\r\n\r\n"));
+	add_p(PSTR("HTTP/1.0 501 Not OK\r\nContent-Type: text/html\r\n\r\n"));
     else
 	add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
     }
