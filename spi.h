@@ -1,4 +1,4 @@
-#ifndef SPI_H_
+#ifndef SPI_H
 #define SPI_H
 
 #include "arduino--.h"
