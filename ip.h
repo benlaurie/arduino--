@@ -430,7 +430,7 @@ public:
     // fill in tcp data at position pos. pos=0 means start of
     // tcp data. Returns the position at which the string after
     // this string could be filled.
-    static uint16_t fill_tcp_data(uint8_t *buf,uint16_t pos, const char *s)
+    static uint16_t fill_tcp_data(uint8_t *buf, uint16_t pos, const char *s)
         {
         // fill in tcp data at position pos
         //
@@ -441,6 +441,23 @@ public:
             pos++;
             }
         return(pos);
+        }
+
+    // fill in tcp data at position pos. pos=0 means start of
+    // tcp data. Returns the position at which the string after
+    // this string could be filled.
+    static uint16_t fill_tcp_data(uint8_t *buf, uint16_t pos, const byte *s,
+                                  byte len)
+        {
+        // fill in tcp data at position pos
+        //
+        // with no options the data starts after the checksum + 2 more bytes (urgent ptr)
+        while (len--)
+            {
+            buf[TCP_CHECKSUM_L_P+3+pos] = *s++;
+            pos++;
+            }
+        return pos;
         }
 
     // Make just an ack packet with no tcp data inside

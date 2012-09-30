@@ -38,11 +38,63 @@ public:
 	}
     };
 
-typedef StarMaster<RF12Star, SerialObserver> Master;
-
 typedef ENC28J60<Pin::B0> Ethernet;
 
 typedef IP<Ethernet> MyIP;
+
+class MyTCPServer : public TCPServer<MyIP, 80>
+    {
+    void packetReceived();
+    };
+
+inline byte min(byte a, byte b)
+    {
+    if (a < b)
+	return a;
+    return b;
+    }
+
+class Processor
+    {
+public:
+    static void processUserMessage(byte type, byte length, const byte *data)
+	{
+	switch(type)
+	    {
+	case StarBase::USER_SLAVE_MESSAGE:
+	    memcpy(save_, data, min(length, sizeof save_));
+	    length_ = length;
+	    ++sequence_;
+	    break;
+
+	default:
+	    Serial.write("User message: ");
+	    Serial.writeHex(type);
+	    Serial.write("\r\n");
+	    break;
+	    }
+	}
+
+    static void send(MyTCPServer *tcp)
+	{
+	tcp->add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: application/octet-stream\r\n\r\n"));
+	tcp->add((byte *)&sequence_, sizeof sequence_);
+	tcp->add(save_, min(length_, sizeof save_));
+	}
+
+
+private:
+    static const byte SAVE = 255;
+    static byte length_;
+    static byte save_[SAVE];
+    static uint32_t sequence_;
+    };
+
+byte Processor::length_;
+byte Processor::save_[Processor::SAVE];
+uint32_t Processor::sequence_;
+
+typedef StarMaster<RF12Star, SerialObserver, Processor> Master;
 
 static uint8_t mymac[6] = {0x54,0x55,0x58,0x10,0x00,0x24}; 
 static uint8_t myip[4] = {192,168,1,111};
@@ -56,11 +108,6 @@ void setup()
     MyIP::init_ip_arp_udp_tcp(mymac, myip);
     }
 
-class MyTCPServer : public TCPServer<MyIP, 80>
-    {
-    void packetReceived();
-    };
-
 void MyTCPServer::packetReceived()
     {
     clearBuffer();
@@ -70,7 +117,7 @@ void MyTCPServer::packetReceived()
 	// http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	add_p(PSTR("HTTP/1.0 501 Not OK\r\nContent-Type: text/html\r\n\r\n"));
     else
-	add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nHi mum"));
+	Processor::send(this);
     }
 
 // FIXME: why do I need this?

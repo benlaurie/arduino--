@@ -57,7 +57,7 @@
 
 class StarBase
     {
-protected:
+public:
     enum MessageType
         {
         // Slave
@@ -73,6 +73,7 @@ protected:
     enum MasterType
         {
         };
+protected:
     static uint32_t protocolError_;
     };
 
@@ -150,6 +151,10 @@ private:
         case StarBase::RESET_ID:
             idSet_ = false;
             break;
+
+        default:
+            ++StarBase::protocolError_;
+            break;
             }
         }
 
@@ -166,7 +171,7 @@ private:
     static byte length_;
     };
 
-template <class Network, class Observer> class StarMaster
+template <class Network, class Observer, class Processor> class StarMaster
   : public StarNode<Network, Observer>
     {
 public:
@@ -193,17 +198,24 @@ public:
         }
     static void processPacket()
         {
-        Observer::gotPacket(Network::getID(), Network::getType(),
-                            Network::getLength(), Network::getData());
+        byte type = Network::getType();
 
-        switch (Network::getType())
+        Observer::gotPacket(Network::getID(), type, Network::getLength(),
+                            Network::getData());
+
+        switch (type)
             {
         case StarBase::REQUEST_ID:
             allocateID();
             break;
 
         default:
-            ++StarBase::protocolError_;
+            if (type >= StarBase::USER_SLAVE_MESSAGE
+                && type < StarBase::USER_MASTER_MESSAGE)
+                Processor::processUserMessage(type, Network::getLength(),
+                                              Network::getData());
+            else
+                ++StarBase::protocolError_;
             break;
             }
         }
@@ -268,11 +280,17 @@ private:
     };
 
 uint32_t StarBase::protocolError_;
-template <class Network, class Observer>
-  typename StarMaster<Network, Observer>::Mac
-  StarMaster<Network, Observer>::macs_[StarMaster<Network, Observer>::NMACS];
-template <class Network, class Observer>
-  byte StarMaster<Network, Observer>::resetCount_;
+
+
+#define T template <class Network, class Observer, class Processor>
+#define M StarMaster<Network, Observer, Processor>
+
+T typename M::Mac M::macs_[M::NMACS];
+T byte M::resetCount_;
+
+#undef D
+#undef M
+
 template <class Network, class Observer>
   bool StarSlave<Network, Observer>::idSet_;
 template <class Network, class Observer> byte StarSlave<Network, Observer>::id_;

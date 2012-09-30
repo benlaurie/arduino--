@@ -36,7 +36,18 @@ public:
 	}
     };
 
-typedef StarMaster<RF12Star, SerialObserver> Master;
+class Processor
+    {
+public:
+    static void processUserMessage(byte type, byte length, const byte *data)
+	{
+	Serial.write("User message: ");
+	Serial.writeHex(type);
+	Serial.write("\r\n");
+	}
+    };
+
+typedef StarMaster<RF12Star, SerialObserver, Processor> Master;
 
 int main()
     {

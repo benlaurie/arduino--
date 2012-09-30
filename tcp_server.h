@@ -19,6 +19,8 @@ public:
 	{ len_ = MyIP::fill_tcp_data_p(buf_, len_, pmem); }
     void add(const char *str)
 	{ len_ = MyIP::fill_tcp_data(buf_, len_, str); }
+    void add(const byte *data, byte length)
+        { len_ = MyIP::fill_tcp_data(buf_, len_, data, length); }
     void add_hex(byte b)
 	{
 	char buf[3];
