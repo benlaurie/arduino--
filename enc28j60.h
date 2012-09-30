@@ -25,6 +25,8 @@ template <class CSPin> class ENC28J60
 public:
     static byte ReadOp(byte op, byte address)
 	{
+	ScopedInterruptDisable dis;
+
 	//CSACTIVE;
 	Select();
 	// issue read command
@@ -49,6 +51,8 @@ public:
 	}
     static void WriteOp(uint8_t op, uint8_t address, uint8_t data)
 	{
+	ScopedInterruptDisable dis;
+
 	//CSACTIVE;
 	Select();
 	// issue write command
@@ -64,6 +68,8 @@ public:
 	}
     static void ReadBuffer(uint16_t len, uint8_t* data)
 	{
+	ScopedInterruptDisable dis;
+
 	//CSACTIVE;
 	Select();
 	// issue read command
@@ -87,6 +93,8 @@ public:
 	}
     static void WriteBuffer(uint16_t len, uint8_t* data)
 	{
+	ScopedInterruptDisable dis;
+
 	//CSACTIVE;
 	Select();
 	// issue write command
