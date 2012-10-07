@@ -23,6 +23,7 @@ public:
         Miso::modeInput();
         Ss::modeOutput();
         Ss::set();
+	// FIXME: other SPI inits clear MOSI and SCK here. Needed?
         
         mode(config, double_speed);
         }
