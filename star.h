@@ -82,16 +82,13 @@ template <class Network, class Observer> class StarNode : public StarBase
 protected:
     static void sendPacket(byte id, byte type, byte length, const byte *data)
         {
-        Serial.write('P');
         if (!Network::canSend())
             {
             Observer::cantSend();
             return;
             }
         Network::sendPacket(id, type, length, data);
-        Serial.write('Z');
         Observer::sentPacket(id, type, length, data);
-        Serial.write('W');
         }
     };
 
@@ -133,7 +130,6 @@ private:
         switch (Network::getType())
             {
         case StarBase::ALLOCATE_ID:
-            Serial.write('C');
             if (Network::getLength() != length_)
                 // Can't be us.
                 break;
@@ -154,6 +150,8 @@ private:
 
         default:
             ++StarBase::protocolError_;
+            Observer::protocolError(Network::getID(), Network::getType(),
+                                    Network::getLength(), Network::getData());
             break;
             }
         }
@@ -186,10 +184,11 @@ public:
             processPacket();
         if (resetCount_ > 0)
             { 
-            Serial.write('X');
             if (!Network::canSend())
+                {
+                Observer::cantSend();
                 return;
-            Serial.write('Y');
+                }
             StarNode<Network, Observer>::sendPacket(0, StarBase::RESET_ID, 0,
                                                     NULL);
             --resetCount_;
@@ -312,6 +311,10 @@ public:
 	Serial.write(" data: ");
 	Serial.writeHex(data, length);
 	Serial.write("\r\n");
+	}
+    static void protocolError(byte id, byte type, byte length, const byte *data)
+	{
+	Serial.write("PROTOCOL ERROR\r\n");
 	}
     static void sentPacket(byte id, byte type, byte length, const byte *data)
 	{
