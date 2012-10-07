@@ -79,6 +79,7 @@ public:
 	{
 	tcp->add_p(PSTR("HTTP/1.0 200 OK\r\nContent-Type: application/octet-stream\r\n\r\n"));
 	tcp->add((byte *)&sequence_, sizeof sequence_);
+	tcp->add((byte *)length_, sizeof length_);
 	tcp->add(save_, min(length_, sizeof save_));
 	}
 
