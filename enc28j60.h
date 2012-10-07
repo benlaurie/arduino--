@@ -1,3 +1,5 @@
+// -*- mode: c++; indent-tabs-mode: nil; -*-
+
 // Based on the this:
 /*********************************************
  * vim:sw=8:ts=8:si:et
@@ -166,29 +168,10 @@ public:
 	//pinMode(ENC28J60_CONTROL_CS, OUTPUT);
 	CSPin::modeOutput();
 
-	//pinMode(SPI_MOSI, OUTPUT);
-	Pin::SPI_MOSI::modeOutput();
-	//pinMode(SPI_SCK, OUTPUT);
-	Pin::SPI_SCK::modeOutput();
-	//pinMode(SPI_MISO, INPUT);
-	Pin::SPI_MISO::modeInput();
-	
-	//digitalWrite(SPI_MOSI, LOW);
-	Pin::SPI_MOSI::clear();
-	
-	//digitalWrite(SPI_SCK, LOW);
-	Pin::SPI_SCK::clear();
-	
-	/*DDRB  |= 1<<PB3 | 1<<PB5; // mosi, sck output
-	  cbi(DDRB,PINB4); // MISO is input
-	  //
-	  cbi(PORTB,PB3); // MOSI low
-	  cbi(PORTB,PB5); // SCK low
-	*/
-	// initialize SPI interface
-	// master mode and Fosc/2 clock:
-	::Register::SPCR = (1 << SPE) | (1 << MSTR);
-	SPSR |= (1<<SPI2X);
+	// Note the old code cleared MOSI and SCK, SPI::init()
+	// currently doesn't.
+	SPI::init(0, true);
+
 	// perform system reset
 	WriteOp(ENC28J60_SOFT_RESET, 0, ENC28J60_SOFT_RESET);
 	_delay_ms(50);
