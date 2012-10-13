@@ -36,7 +36,7 @@ def GetTemperatures():
   
 #print GetTemperatures()
 (seq, temp) = GetTemperatures()
-print temp[0]
-print temp[1]
+print int(temp[0] * 100)
+print int(temp[1] * 100)
 print str(seq / 60) + ':' + str(seq % 60)
 print "Nanode 1-wire"
