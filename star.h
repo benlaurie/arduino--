@@ -115,6 +115,9 @@ public:
         if (Network::canSend())
             Observer::canSend();
         }
+    // Not sure why, but for now, poll fast until this is true.
+    static bool initialised()
+        { return idSet_; }
     // Only call this from Observer::canSend()
     static void sendPacket(byte type, byte length, const byte *data)
         {

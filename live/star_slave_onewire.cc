@@ -43,7 +43,16 @@ int main()
     Slave::init(buttons[0].ID(), 8);
 
     for ( ; ; )
+        {
+        LED::set();
 	Slave::poll();
+        LED::clear();
+        // Put CPU to sleep for 10 seconds.
+        if (Slave::initialised())
+            Clock16::sleep(60000);
+        else
+            Clock16::sleep(10);
+        }
 
     return 0;
     }
