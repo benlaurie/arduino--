@@ -11,9 +11,11 @@ public:
 
 typedef StarSlave<RF12Star, MySlaveObserver> Slave;
 static Buttons<Pin::B0> buttons;
+typedef Pin::D6 LED;
 
 void MySlaveObserver::canSend()
     {
+    LED::set();
     buttons.GetTemperatures();
     byte buf[60];
 
@@ -25,11 +27,15 @@ void MySlaveObserver::canSend()
 	buf[n*10 + 9] = buttons[n].Temperature() >> 8;
 	}
     Slave::sendPacket(0, n * 10, buf);
+    LED::clear();
     }
 
 int main()
     {
     Arduino::init();
+
+    LED::clear();
+    LED::modeOutput();
 
     buttons.Init();
     buttons.Scan();
