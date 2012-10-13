@@ -7,7 +7,11 @@ class MySlaveObserver : public NullSlaveObserver
     {
 public:
     static void canSend();
+
+    static bool getReadings_;
     };
+
+bool MySlaveObserver::getReadings_;
 
 typedef StarSlave<RF12Star, MySlaveObserver> Slave;
 static Buttons<Pin::B0> buttons;
@@ -15,6 +19,9 @@ typedef Pin::D6 LED;
 
 void MySlaveObserver::canSend()
     {
+    if (!getReadings_)
+        return;
+
     LED::set();
     buttons.GetTemperatures();
     byte buf[60];
@@ -28,6 +35,7 @@ void MySlaveObserver::canSend()
 	}
     Slave::sendPacket(0, n * 10, buf);
     LED::clear();
+    getReadings_ = false;
     }
 
 int main()
@@ -42,16 +50,19 @@ int main()
 
     Slave::init(buttons[0].ID(), 8);
 
+    MySlaveObserver::getReadings_ = true;
     for ( ; ; )
         {
         LED::set();
 	Slave::poll();
         LED::clear();
-        // Put CPU to sleep for 10 seconds.
-        if (Slave::initialised())
-            Clock16::sleep(60000);
-        else
+        if (Slave::fastPollNeeded())
             Clock16::sleep(10);
+        else
+            {
+            Clock16::sleep(60000);
+            MySlaveObserver::getReadings_ = true;
+            }
         }
 
     return 0;

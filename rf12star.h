@@ -38,6 +38,9 @@ public:
     // Can we send a packet?
     static bool canSend()
 	{ return RF12B::canSend(); }
+    // Do we need a fast poll (true until we've finished sending)
+    static bool fastPollNeeded()
+	{ return !canSend(); }
     // Send a packet. Only call if canSend() returns true.
     static void sendPacket(byte id, byte type, byte length, const byte *data)
 	{
