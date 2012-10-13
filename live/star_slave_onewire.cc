@@ -1,21 +1,19 @@
 // -*- mode: c++; indent-tabs-mode: nil; -*-
 
 #include "onewire.h"
-#include "serial.h"
 #include "rf12star.h"
 
-class MySerialSlaveObserver : public SerialSlaveObserver
+class MySlaveObserver : public NullSlaveObserver
     {
 public:
     static void canSend();
     };
 
-typedef StarSlave<RF12Star, MySerialSlaveObserver> Slave;
+typedef StarSlave<RF12Star, MySlaveObserver> Slave;
 static Buttons<Pin::B0> buttons;
 
-void MySerialSlaveObserver::canSend()
+void MySlaveObserver::canSend()
     {
-    Serial.write('+');
     buttons.GetTemperatures();
     byte buf[60];
 
@@ -32,7 +30,6 @@ void MySerialSlaveObserver::canSend()
 int main()
     {
     Arduino::init();
-    Serial.begin(57600);
 
     buttons.Init();
     buttons.Scan();

@@ -329,3 +329,16 @@ public:
     static void canSend() {}
     };
 
+class NullSlaveObserver
+    {
+public:
+    static void cantSend() {}
+    static void gotPacket(byte id, byte type, byte length, const byte *data)
+	{}
+    static void protocolError(byte id, byte type, byte length, const byte *data)
+	{}
+    static void sentPacket(byte id, byte type, byte length, const byte *data)
+	{}
+    static void canSend() {}
+    };
+
