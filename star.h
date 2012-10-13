@@ -203,6 +203,13 @@ public:
         Observer::gotPacket(Network::getID(), type, Network::getLength(),
                             Network::getData());
 
+        if (type != StarBase::REQUEST_ID
+            && macs_[Network::getID()].length() == 0)
+            {
+            resetCount_ = 1;
+            return;
+            }
+
         switch (type)
             {
         case StarBase::REQUEST_ID:
