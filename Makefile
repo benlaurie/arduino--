@@ -31,9 +31,10 @@ BIN = test/blink.bin test/test_clock.bin test/test_enc28j60.bin \
 
 all: avr-ports.h $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
-.depend: avr-ports.h *.cc test/*.cc *.h
+.depend: avr-ports.h *.cc *.h test/*.cc live/*.cc
 	$(CC) $(DEFS) -mmcu=$(MCU_TARGET) -MM *.cc > .depend
 	$(CC) $(DEFS) -mmcu=$(MCU_TARGET) -MM test/*.cc | sed 's;^\(.*\):;test/\1:;' >> .depend
+	$(CC) $(DEFS) -mmcu=$(MCU_TARGET) -MM live/*.cc | sed 's;^\(.*\):;live/\1:;' >> .depend
 
 .SUFFIXES: .elf .lst .bin _upload
 
