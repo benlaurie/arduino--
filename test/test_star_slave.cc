@@ -8,7 +8,7 @@
 
 int main()
     {
-    Arduino::init();
+    Nanode::init();
     Serial.begin(57600);
     //Serial.write(mac.ok() ? 'G' : 'B');
     //for (byte n = 0; n < 6; ++n)

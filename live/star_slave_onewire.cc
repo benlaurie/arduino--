@@ -1,5 +1,7 @@
 // -*- mode: c++; indent-tabs-mode: nil; -*-
 
+#define CLOCK16_PRESCALE 1024
+
 #include "onewire.h"
 #include "rf12star.h"
 
@@ -42,7 +44,8 @@ void MySlaveObserver::canSend()
 
 int main()
     {
-    Arduino::init();
+    Nanode::init();
+    Timer0::prescaler1024();
 
     LED::clear();
     LED::modeOutput();

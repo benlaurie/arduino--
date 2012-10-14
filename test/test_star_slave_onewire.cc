@@ -31,7 +31,7 @@ void MySerialSlaveObserver::canSend()
 
 int main()
     {
-    Arduino::init();
+    Nanode::init();
     Serial.begin(57600);
 
     buttons.Init();

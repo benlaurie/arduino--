@@ -679,7 +679,8 @@ public:
         if ((Timer::R_TIFR & _BV(TOV0)) && (t == 0))
             m++;
 
-        return ((m << 8) + t) * (64 / (F_CPU / 1000000L));
+        // FIXME: Timer::PRESCALE not actually defined yet, see CLOCK16_PRESCALE
+        return ((m << 8) + t) * (Timer::PRESCALE / (F_CPU / 1000000L));
         }
 
     static void delay(timeres_t ms)
