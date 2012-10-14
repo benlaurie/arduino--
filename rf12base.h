@@ -266,9 +266,16 @@ public:
                 _crc = 1; // force bad crc if packet length is invalid
 	    return true;
             }
+        enableReceive();
+        return false;
+        }
+
+    // Once this is called, received data can also change. Receive is only
+    // enabled if transmit is not in progress.
+    static void enableReceive()
+        {
         if (_rxstate == TXIDLE)
             recvStart();
-        return false;
         }
 
     static bool goodCRC() { return _crc == 0; }

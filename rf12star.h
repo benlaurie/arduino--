@@ -23,6 +23,10 @@ public:
     // again.
     static bool dataAvailable()
 	{ return recvDone() && goodCRC(); }
+    // Once this is called, received data can also change. Receive is only
+    // enabled if transmit is not in progress.
+    static void enableReceive()
+	{ RF12B::enableReceive(); }
     static byte getID()
 	{ return data()[0]; }
     // Retrieve the type field from the current received packet.

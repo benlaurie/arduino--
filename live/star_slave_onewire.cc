@@ -1,5 +1,6 @@
 // -*- mode: c++; indent-tabs-mode: nil; -*-
 
+// If we used Timer1 for the clock, we could scale it even slower.
 #define CLOCK16_PRESCALE 1024
 
 #include "onewire.h"

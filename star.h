@@ -114,6 +114,7 @@ public:
             }
         if (Network::canSend())
             Observer::canSend();
+        Network::enableReceive();
         }
     static bool fastPollNeeded()
         { return Network::fastPollNeeded(); }
