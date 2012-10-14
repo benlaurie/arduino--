@@ -3,6 +3,8 @@
 #include "onewire.h"
 #include "rf12star.h"
 
+#define READING_FREQUENCY 60000
+
 class MySlaveObserver : public NullSlaveObserver
     {
 public:
@@ -51,16 +53,27 @@ int main()
     Slave::init(buttons[0].ID(), 8);
 
     MySlaveObserver::getReadings_ = true;
+    uint16_t lastReading = Clock16::millis();
+
+    // FIXME: put this in a library somewhere
+    set_sleep_mode(SLEEP_MODE_IDLE);
+    sleep_enable();
+#ifdef sleep_bod_disable
+    sleep_bod_disable();
+#endif
     for ( ; ; )
         {
         LED::set();
 	Slave::poll();
         LED::clear();
-        if (Slave::fastPollNeeded())
-            Clock16::sleep(10);
-        else
+
+        // Sleep until something happens
+        sei();
+        sleep_cpu();
+
+        if (Clock16::millis() - lastReading > READING_FREQUENCY)
             {
-            Clock16::sleep(60000);
+            lastReading = Clock16::millis();
             MySlaveObserver::getReadings_ = true;
             }
         }
