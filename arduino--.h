@@ -154,6 +154,7 @@ public:
 
     static void stop() { prescaler(0); }
 
+    typedef TCNT_ TCNT;
 private:
 
     // must be implemented by subclasses
@@ -228,6 +229,8 @@ public:
     typedef _OutputComparator<OCRB_, TCCRA_, COMxB1, COMxB0, TIMSK_, OCIExB,
                               TIFR_, OCFxB, TCCRB_, FOCxB>
     CompB;
+
+    typedef TIFR_ TIFR;
 
     static void prescaler1() { prescaler(_BV(CSx0)); }
     static void prescaler8() { prescaler(_BV(CSx1)); }
@@ -673,10 +676,10 @@ public:
         uint8_t t;
         ScopedInterruptDisable sid;
 
-        t = Timer::R_TCNT;
+        t = Timer::TCNT::read();
         m = timer_overflow_count % (1 << TIMER16_MICRO_SCALE);
 
-        if ((Timer::R_TIFR & _BV(TOV0)) && (t == 0))
+        if ((Timer::TIFR::read() & _BV(TOV0)) && (t == 0))
             m++;
 
         // FIXME: Timer::PRESCALE not actually defined yet, see CLOCK16_PRESCALE

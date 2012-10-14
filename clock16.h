@@ -26,7 +26,8 @@
     reduction of 238 bytes with avr-gcc 4.6.1.
  */
 
-// Define this for a slower clock (for low power modes)
+// Define this for a slower clock (for low power modes). Note that you must
+// also set the prescaler, for now, unless the default of 64 is used.
 #ifndef CLOCK16_PRESCALE
 # define CLOCK16_PRESCALE 64
 #endif
