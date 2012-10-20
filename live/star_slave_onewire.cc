@@ -33,11 +33,11 @@ void MySlaveObserver::canSend()
 
     byte n;
     for (n = 0; n < 6 && n < buttons.Count(); ++n)
-	{
-	memcpy(&buf[n*10], buttons[n].ID(), 8);
-	buf[n*10 + 8] = buttons[n].Temperature() & 0xff;
-	buf[n*10 + 9] = buttons[n].Temperature() >> 8;
-	}
+        {
+        memcpy(&buf[n*10], buttons[n].ID(), 8);
+        buf[n*10 + 8] = buttons[n].Temperature() & 0xff;
+        buf[n*10 + 9] = buttons[n].Temperature() >> 8;
+        }
     Slave::sendPacket(0, n * 10, buf);
     LED::clear();
     getReadings_ = false;
@@ -61,19 +61,24 @@ int main()
 
     // FIXME: put this in a library somewhere
     set_sleep_mode(SLEEP_MODE_IDLE);
-    sleep_enable();
-#ifdef sleep_bod_disable
-    sleep_bod_disable();
-#endif
+
     for ( ; ; )
         {
+        cli();
+
         LED::set();
-	Slave::poll();
+        Slave::poll();
         LED::clear();
 
         // Sleep until something happens
+        sleep_enable();
+#ifdef sleep_bod_disable
+        sleep_bod_disable();
+#endif
         sei();
         sleep_cpu();
+        sleep_disable();
+        sei();
 
         if (Clock16::millis() - lastReading > READING_FREQUENCY)
             {
