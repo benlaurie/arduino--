@@ -12,6 +12,8 @@ class MySlaveObserver : public NullSlaveObserver
     {
 public:
     static void canSend();
+    static bool wantSend()
+        { return getReadings_; }
 
     static bool getReadings_;
     };
@@ -27,7 +29,6 @@ void MySlaveObserver::canSend()
     if (!getReadings_)
         return;
 
-    LED::set();
     buttons.GetTemperatures();
     byte buf[60];
 
@@ -39,7 +40,6 @@ void MySlaveObserver::canSend()
         buf[n*10 + 9] = buttons[n].Temperature() >> 8;
         }
     Slave::sendPacket(0, n * 10, buf);
-    LED::clear();
     getReadings_ = false;
     }
 
@@ -64,20 +64,22 @@ int main()
 
     for ( ; ; )
         {
-        cli();
-
-        LED::set();
         Slave::poll();
-        LED::clear();
 
-        // Sleep until something happens
-        sleep_enable();
+        cli();
+        if (!Slave::pollNeeded())
+            {
+            // Sleep until something happens
+            sleep_enable();
 #ifdef sleep_bod_disable
-        sleep_bod_disable();
+            sleep_bod_disable();
 #endif
-        sei();
-        sleep_cpu();
-        sleep_disable();
+            LED::clear();
+            sei();
+            sleep_cpu();
+            sleep_disable();
+            }
+        LED::set();
         sei();
 
         if (Clock16::millis() - lastReading > READING_FREQUENCY)

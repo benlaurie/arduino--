@@ -270,8 +270,25 @@ public:
         return false;
         }
 
-    // Once this is called, received data can also change. Receive is only
-    // enabled if transmit is not in progress.
+    // Alternatively, call this to detect receives without re-enabling
+    // receive. Obviously you need to enable it yourself when ready!
+    // This can be safely called multiple times before processing
+    // data.
+    static bool recvDoneNoEnable(void)
+        {
+        if ((_rxstate == TXRECV || _rxstate == TXIDLE)
+            && (_rxfill >= _buf[LENGTH] + 5 || _rxfill >= RF_MAX))
+            {
+            _rxstate = TXIDLE;
+            if (_buf[LENGTH] > RF12_MAXDATA)
+                _crc = 1; // force bad crc if packet length is invalid
+	    return true;
+            }
+        return false;
+        }
+
+    // Once this is called, received data can also change. Receive is
+    // only enabled if neither transmit nor receive is in progress.
     static void enableReceive()
         {
         if (_rxstate == TXIDLE)
