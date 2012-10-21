@@ -264,6 +264,8 @@ public:
             _rxstate = TXIDLE;
             if (_buf[LENGTH] > RF12_MAXDATA)
                 _crc = 1; // force bad crc if packet length is invalid
+            // Allow an immediate transmit
+            _lastSend = Clock16::millis() - MIN_SEND_INTERVAL - 1;
 	    return true;
             }
         enableReceive();
@@ -282,6 +284,8 @@ public:
             _rxstate = TXIDLE;
             if (_buf[LENGTH] > RF12_MAXDATA)
                 _crc = 1; // force bad crc if packet length is invalid
+            // Allow an immediate transmit
+            _lastSend = Clock16::millis() - MIN_SEND_INTERVAL - 1;
 	    return true;
             }
         return false;
