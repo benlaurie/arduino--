@@ -308,18 +308,10 @@ public:
     // rf12_sendStart()
     static bool canSend(void)
         {
-        // This allows canSend() to be called, even if recvDone() has
-        // already returned true, which previously caused canSend() to
-        // return false.
-        //
-	// FIXME: should the time limit be enforced? According to the
-	// original logic, no, because either it already was, or we're
-	// in TXIDLE because a packet was received, after which it was
-	// allowed to send immediately.
-	if (_rxstate == TXIDLE)
-	    return true;
 	if (Clock16::millis() - _lastSend < MIN_SEND_INTERVAL)
 	    return false;
+	if (_rxstate == TXIDLE)
+            return true;
         // no need to test with interrupts disabled: state TXRECV is
         // only reached outside of ISR and we don't care if rxfill
         // jumps from 0 to 1 here

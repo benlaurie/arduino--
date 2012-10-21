@@ -105,24 +105,26 @@ public:
         }
     static bool pollNeeded()
         {
-        return Network::dataAvailable() || (Network::canSend()
-                                            && Observer::wantSend());
+        if (Network::dataAvailable()
+            || (Network::canSend() && (Observer::wantSend()
+                                       || !idSet_)))
+            return true;
+
+        Network::enableReceive();
+        return false;
         }
     static void poll()
         {
         if (Network::dataAvailable())
             processPacket();
-        Network::enableReceive();
         if (Network::canSend())
             {
             if (!idSet_)
-                {
                 getID();
-                return;
-                }
             else
                 Observer::canSend();
             }
+        Network::enableReceive();
         }
     static bool fastPollNeeded()
         { return Network::fastPollNeeded(); }

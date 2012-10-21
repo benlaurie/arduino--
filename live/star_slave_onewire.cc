@@ -48,7 +48,7 @@ int main()
     Nanode::init();
     Timer0::prescaler1024();
 
-    LED::clear();
+    LED::set();
     LED::modeOutput();
 
     buttons.Init();
@@ -64,10 +64,13 @@ int main()
 
     for ( ; ; )
         {
-        Slave::poll();
-
         cli();
-        if (!Slave::pollNeeded())
+        if (Slave::pollNeeded())
+            {
+            sei();
+            Slave::poll();
+            }
+        else
             {
             // Sleep until something happens
             sleep_enable();
@@ -78,9 +81,8 @@ int main()
             sei();
             sleep_cpu();
             sleep_disable();
+            LED::set();
             }
-        LED::set();
-        sei();
 
         if (Clock16::millis() - lastReading > READING_FREQUENCY)
             {
