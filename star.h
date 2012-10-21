@@ -192,6 +192,7 @@ public:
         }
     static void poll()
         {
+        Network::enableReceive();
         if (Network::dataAvailable())
             processPacket();
         if (resetCount_ > 0)
