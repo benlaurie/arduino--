@@ -69,7 +69,12 @@ class NanodeMAC
         sendByteNoSAK(0x55);
         }
     void waitQuarterBit(byte offset)
-        { _delay_us(QUARTER_BIT - .0625*offset); }
+        {
+        if (offset == 0)
+            _delay_us(QUARTER_BIT);
+        else if (offset == 21)
+            _delay_us(QUARTER_BIT - .0625*21);
+        }
     void waitHalfBit(byte offset)
         { _delay_us(HALF_BIT - .0625*offset); }
     void bit0()
