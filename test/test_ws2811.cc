@@ -62,6 +62,7 @@ public:
 int main(void)
     {
     //    static byte base[] = { "\xff\xff\x00\x00Mary had a little lamb\xa5\xa5\x5a\x5a" };
+    // Note that the strip I have, at least, is GRB instead of RGB.
     static byte base[] = { "\xff\xff\xff"
 			   "\xff\xff\x00"
 			   "\xff\x00\x00"
