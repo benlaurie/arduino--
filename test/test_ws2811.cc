@@ -13,6 +13,7 @@ public:
 	__builtin_avr_delay_cycles(17);
  	//_delay_us(1.2 - .175 + .025 - .0375);
 	LEDS::clear();
+	// External code already goes over this delay!
 	//_delay_us(1.3 - .8125);
 	}
 
@@ -22,34 +23,6 @@ public:
 	_delay_us(.5 - .125);
 	LEDS::clear();
 	_delay_us(2.0 - .75 - .625);
-	}
-
-    static void Reset()
-	{
-	LEDS::clear();
-	_delay_us(50);
-	}
-    };
-
-class FastLEDController
-    {
-public:
-    static void One()
-	{
-	// High for .6 us, low for .65 us
-	LEDS::set();
-	_delay_us(1.2 - .175 + .025 - .2375);
-	LEDS::clear();
-	//	_delay_us(1.3);
-	// external code takes 1.4375 us!
-	}
-
-    static void Zero()
-	{
-	LEDS::set();
-	_delay_us(.5 - .125);
-	LEDS::clear();
-	//_delay_us(2.0 - 1.25 - .625);
 	}
 
     static void Reset()
