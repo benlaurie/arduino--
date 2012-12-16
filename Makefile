@@ -2,7 +2,7 @@
 
 include Makefile.local
 
-OPTIMIZE = -O3 -Os
+OPTIMIZE = -O3 # -Os
 DEFS = -I /usr/local/avr/avr/include -I. -DF_CPU=$(CPU_FREQUENCY)
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
@@ -52,6 +52,9 @@ all: avr-ports.h $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
 .o.elf:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+
+test/test.grb: test/make_grb.py
+	python test/make_grb.py > test/test.grb
 
 sizes/recent_sizes.json sizes/sizes.html: $(BIN)
 	python sizes/sizes.py recent generate

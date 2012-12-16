@@ -3,6 +3,91 @@
 typedef Pin::D4 Zero;  // convenient so we have GND on the next pin
 typedef Pin::D5 LEDS;
 
+#define NOP 	__asm__("\tnop\n")
+
+// This has not been tested and timings are rather tight, but it might work.
+class FastLEDController
+    {
+public:
+    static void One() __attribute__((always_inline))
+	{
+	// High for .6 us, low for .65 us
+	LEDS::set();
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	LEDS::clear();
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	}
+
+    static void LastOne(byte **pb) __attribute__((always_inline))
+	{
+	// High for .6 us, low for .65 us
+	LEDS::set();
+	++*pb;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	LEDS::clear();
+	}
+
+    static void Zero() __attribute__((always_inline))
+	{
+	// High for .25 us, low for 1 us
+	LEDS::set();
+	NOP;
+	NOP;
+	LEDS::clear();
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	}
+
+    static void LastZero(byte **pb) __attribute__((always_inline))
+	{
+	// High for .25 us, low for 1 us
+	LEDS::set();
+	NOP;
+	NOP;
+	LEDS::clear();
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	++*pb;
+	}
+
+    static void Reset()
+	{
+	LEDS::clear();
+	_delay_us(50);
+	}
+    };
+
 class LEDController
     {
 public:
@@ -10,19 +95,150 @@ public:
 	{
 	// High for 1.2 us, low for 1.3 us
 	LEDS::set();
-	__builtin_avr_delay_cycles(17);
- 	//_delay_us(1.2 - .175 + .025 - .0375);
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
 	LEDS::clear();
-	// External code already goes over this delay!
-	//_delay_us(1.3 - .8125);
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	}
+
+    static void LastOne(byte **pb) __attribute__((always_inline))
+	{
+	// High for 1.2 us, low for 1.3 us
+	LEDS::set();
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	LEDS::clear();
+	++*pb;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
 	}
 
     static void Zero() __attribute__((always_inline))
 	{
+	// High for .5 us, low for 2 us
 	LEDS::set();
-	_delay_us(.5 - .125);
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
 	LEDS::clear();
-	_delay_us(2.0 - .75 - .625);
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	}
+
+    static void LastZero(byte **pb) __attribute__((always_inline))
+	{
+	// High for .5 us, low for 2 us
+	LEDS::set();
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	LEDS::clear();
+	++*pb;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
+	NOP;
 	}
 
     static void Reset()
@@ -34,8 +250,9 @@ public:
 
 int main(void)
     {
-    //    static byte base[] = { "\xff\xff\x00\x00Mary had a little lamb\xa5\xa5\x5a\x5a" };
+    //static byte buf[] = { "\xff\xff\x00\x00Mary had a little lamb\xa5\xa5\x5a\x5a" };
     // Note that the strip I have, at least, is GRB instead of RGB.
+    /*
     static byte base[] = { "\xff\xff\xff"
 			   "\xff\xff\x00"
 			   "\xff\x00\x00"
@@ -51,7 +268,11 @@ int main(void)
 			   "\x77\x77\x00"
 			   "\x00\x00\x00"
     };
-    byte buf[sizeof(base) - 1];
+    */
+    static byte base[] = {
+#include "test.grb"
+    };
+    byte buf[sizeof(base)];
     Nanode::init();
 
     Zero::modeOutput();
@@ -61,26 +282,32 @@ int main(void)
 	{
 	for (uint16_t n = 0; n < sizeof buf; ++n)
 	    buf[n] = base[(n + offset) % sizeof buf];
-	if (offset == 3000)
+	if (offset >= sizeof buf)
 	    offset = 0;
 
 	byte *pb = buf;
+	byte *pe = buf + sizeof buf;
 	LEDController::Reset();
-	for (uint16_t n = 0; n < sizeof buf; ++n, ++pb)
+	for (; pb < pe; )
 	    {
 	    byte b = *pb;
-	    for (byte bit = 0; bit < 8; ++bit)
-		{
-		if (bit)
-		    __builtin_avr_delay_cycles(8);
-		if (b & 1)
-		    LEDController::One();
-		else
-		    LEDController::Zero();
-		b >>= 1;
-
-		}
+#define F(x) \
+	    if (b & x) \
+		LEDController::One(); \
+	    else \
+		LEDController::Zero()
+	    F(0x80);
+	    F(0x40);
+	    F(0x20);
+	    F(0x10);
+	    F(0x08);
+	    F(0x04);
+	    F(0x02);
+	    //F(0x80); ++pb;
+	    if (b & 0x01)
+		LEDController::LastOne(&pb);
+	    else
+		LEDController::LastZero(&pb);
 	    }
-	_delay_ms(100);
 	}
     }
