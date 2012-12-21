@@ -303,7 +303,7 @@ int main(void)
 	    F(0x08);
 	    F(0x04);
 	    F(0x02);
-	    //F(0x80); ++pb;
+	    //F(0x01); ++pb;
 	    if (b & 0x01)
 		LEDController::LastOne(&pb);
 	    else

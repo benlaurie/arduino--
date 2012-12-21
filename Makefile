@@ -2,7 +2,7 @@
 
 include Makefile.local
 
-OPTIMIZE = -O3 # -Os
+OPTIMIZE = -O3 -Os
 DEFS = -I /usr/local/avr/avr/include -I. -DF_CPU=$(CPU_FREQUENCY)
 LIBS = -B /usr/local/avr/avr/lib
 CC = avr-gcc
@@ -26,7 +26,8 @@ BIN = test/blink.bin test/test_clock.bin test/test_enc28j60.bin \
       test/test_rf12_layered.bin test/test_star.bin test/test_star_slave.bin \
       test/test_star_slave_onewire.bin test/test_star_bridge.bin \
       test/test_ip_layered.bin test/test_clock_serial.bin \
-      test/test_clock_nanode.bin test/test_ws2811.bin \
+      test/test_clock_nanode.bin test/test_ws2811.bin test/test_ws2811_2.bin \
+      test/test_ws2811_bridge.bin test/test_ws2811_bridge_2.bin \
       live/star_slave_onewire.bin
 
 all: avr-ports.h $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
@@ -55,6 +56,9 @@ all: avr-ports.h $(BIN) $(BIN:.bin=.lst) sizes/sizes.html
 
 test/test.grb: test/make_grb.py
 	python test/make_grb.py > test/test.grb
+
+test/test.rgb: test/make_rgb.py
+	python test/make_rgb.py > test/test.rgb
 
 sizes/recent_sizes.json sizes/sizes.html: $(BIN)
 	python sizes/sizes.py recent generate

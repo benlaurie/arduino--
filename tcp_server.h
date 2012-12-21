@@ -44,13 +44,15 @@ public:
 	{ len_ = 0; }
     char *getData() const
 	{ return (char *)&(buf_[MyIP::get_tcp_data_pointer()]); }
+    size_t getDataLength() const
+        { return MyIP::get_tcp_data_len(); }
     void poll();
 
 private:
     virtual void packetReceived() = 0;
 
     uint16_t len_;
-    static const uint16_t BUFFER_SIZE = 500;
+    static const uint16_t BUFFER_SIZE = 1000;
     uint8_t buf_[BUFFER_SIZE + 1];
     };
 

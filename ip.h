@@ -397,6 +397,9 @@ public:
             return(0);
         }
 
+    static size_t get_tcp_data_len()
+        { return info_data_len_; }
+
     // do some basic length calculations and store the result in
     // static varibales
     static void init_len_info(uint8_t *buf)
